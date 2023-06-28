@@ -1,0 +1,22 @@
+<mxfile host="app.diagrams.net" modified="2023-04-26T05:49:08.775Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.58" etag="lBn3IBkgOHxKn41HXZZU" version="21.2.2" type="device">
+  <diagram name="페이지-1" id="1jCLy-IB_X6hQ6iOrrUn">
+    <mxGraphModel dx="1377" dy="916" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="KwVs0PGy-JXF11UvytUC-1" value="start" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="90" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="KwVs0PGy-JXF11UvytUC-2" value="if(i&amp;gt;0) ?&amp;nbsp;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="105" y="200" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="KwVs0PGy-JXF11UvytUC-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="KwVs0PGy-JXF11UvytUC-1" target="KwVs0PGy-JXF11UvytUC-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="490" as="sourcePoint" />
+            <mxPoint x="440" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
