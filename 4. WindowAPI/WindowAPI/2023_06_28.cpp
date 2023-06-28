@@ -12,6 +12,8 @@
 
 using namespace std;
 
+
+
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
@@ -25,6 +27,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawGrid(HDC hdc, POINT start, POINT end, int count);
 void DrawCircle(HDC hdc, POINT center, int radius);
 void DrawSunflower(HDC hdc, POINT center, int radius, int num);
+void DrawStar(HDC hdc, POINT center, int radius, int vertexs);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -180,9 +183,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
         POINT center = { 250,250 };
-        double radius = 30;
-        DrawSunflower(hdc, center, radius, 5);
+        double radius = 100;
+        //POINT pt[10];
         //DrawGrid(hdc, start, end, 10);
+
+        HPEN hPen, oldPen;
+        HBRUSH hBrush, oldBrush;
+        //hBrush=CreateSolidBrush(RGB(0, 255, 255));
+        hBrush = (HBRUSH)GetStockObject(NULL_BRUSH); // 투명한 브러시(NULL_BRUSH)-> 겹칠 떄 투명해져 선 보임 
+        oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+        hPen = CreatePen(PS_DOT, 1, RGB(255, 0,0));
+        oldPen = (HPEN)SelectObject(hdc, hPen); // 형 변환 필요
+
+        DrawStar(hdc, center, radius,5);
+
+        //DrawSunflower(hdc, center, radius, 9);
+        //Rectangle(hdc, 250, 250, 700, 500);
+
+        SelectObject(hdc, oldBrush);
+        DeleteObject(hBrush);//메모리 할당 해제
+        SelectObject(hdc, oldPen);
+        DeleteObject(hPen);
+
         EndPaint(hWnd, &ps);
     }
         break;
@@ -253,4 +275,28 @@ void DrawSunflower(HDC hdc, POINT center, int radius, int num)
         POINT newCenter = {newCenterX,newCenterY};
         DrawCircle(hdc, newCenter, newRadius);
     }
+}
+
+void DrawStar(HDC hdc, POINT center, int radius,int vertexs)
+{
+    POINT * points=new POINT[2*vertexs];
+
+    for (int i = 0; i < vertexs*2; i+=2)
+    {
+        points[i].x = center.x + (-1 * sin(72 * PI * i*0.5 / 180)) * (radius);
+        points[i].y = center.y + cos(72 * PI * i*0.5 / 180) * (radius);
+    }
+
+    for (int i = 1; i < vertexs*2; i += 2)
+    {
+        points[i].x = center.x + cos(72 * PI * i*0.5 / 180) * (radius * (1 - sin(72 * PI / 180)) * tan(0.1*PI))
+            + (-1 * sin(72 * PI * i * 0.5 / 180)) * (radius * tan(0.1*PI));
+        points[i].y = center.y+ sin(72 * PI * i * 0.5 / 180)* (radius * (1 - sin(72 * PI / 180)) * tan(0.1*PI))
+            + cos(72 * PI * i * 0.5 / 180) * (radius * tan(0.1*PI));
+    }
+
+    Polygon(hdc, points, 2 * vertexs);
+
+    delete[] points;
+    
 }

@@ -81,6 +81,9 @@
     <ClCompile Include="2023_06_26.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="2023_06_28.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IntStackchar.h">
