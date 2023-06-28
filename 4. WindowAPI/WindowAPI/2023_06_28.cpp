@@ -5,8 +5,10 @@
 #include "WindowAPI.h"
 #include<iostream>
 #include<vector>
+#include<cmath>
 
 #define MAX_LOADSTRING 100
+#define PI (3.141592653589)
 
 using namespace std;
 
@@ -21,6 +23,8 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawGrid(HDC hdc, POINT start, POINT end, int count);
+void DrawCircle(HDC hdc, POINT center, int radius);
+void DrawSunflower(HDC hdc, POINT center, int radius, int num);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -175,9 +179,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     {
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
-        POINT start = { 100,100 };
-        POINT end = { 500,500 };
-        DrawGrid(hdc, start, end, 10);
+        POINT center = { 250,250 };
+        double radius = 30;
+        DrawSunflower(hdc, center, radius, 5);
+        //DrawGrid(hdc, start, end, 10);
         EndPaint(hWnd, &ps);
     }
         break;
@@ -225,5 +230,27 @@ void DrawGrid(HDC hdc, POINT start, POINT end, int count)
 
         MoveToEx(hdc, start.x, start.y + (width / count) * i, NULL);
         LineTo(hdc, end.x, start.y + (width / count) * i);
+    }
+}
+
+void DrawCircle(HDC hdc, POINT center, int radius)
+{
+    POINT start = {center.x-radius,center.y-radius};
+    POINT end = { center.x + radius, center.y + radius };
+
+    Ellipse(hdc, start.x, start.y, end.x, end.y);
+}
+
+void DrawSunflower(HDC hdc, POINT center, int radius, int num)
+{
+    DrawCircle(hdc, center, radius);
+    long newRadius = radius * sin(PI / num) / (1 - sin(PI / num));
+
+    for (long i = 1; i <= num; i++)
+    {
+        long newCenterX = center.x + (-1 * sin(2 * PI*i/num)) * (radius / (1 - sin(PI / num)));
+        long newCenterY = center.y + cos(2 * PI*i / num) * (radius / (1 - sin(PI / num)));
+        POINT newCenter = {newCenterX,newCenterY};
+        DrawCircle(hdc, newCenter, newRadius);
     }
 }
