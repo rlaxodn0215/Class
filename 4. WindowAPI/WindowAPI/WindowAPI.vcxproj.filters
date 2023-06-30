@@ -27,12 +27,24 @@
     <ClInclude Include="WindowAPI.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CObject.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2023_06_26.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="2023_06_28.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2023_06_29.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="small_Project.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CObject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
