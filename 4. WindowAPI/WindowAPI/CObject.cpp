@@ -57,19 +57,19 @@ void CCircle::Draw(const HDC & hdc)
 BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 {
 
-	//다른 물체와 충돌 했을때
-	for (int i = 0; i < vec.size(); i++)
-	{
-		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() + 2 && Length(pos, vec[i]->GetPos()) > 5)
-		{
-			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
-			velocity.x += normal.x * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
-			velocity.y += normal.y * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
-			collisonNum.push_back(i);
-			return TRUE;
-		}
+	////다른 물체와 충돌 했을때
+	//for (int i = 0; i < vec.size(); i++)
+	//{
+	//	if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() + 2 && Length(pos, vec[i]->GetPos()) > 5)
+	//	{
+	//		POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
+	//		velocity.x += normal.x * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
+	//		velocity.y += normal.y * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
+	//		//collisonNum.push_back(i);
+	//		return TRUE;
+	//	}
 
-	}
+	//}
 
 	//벽에 충돌했을 때
 	if (pos.x + radius >= recView.right)
@@ -107,7 +107,7 @@ BOOL CCircle::Merge(const RECT& recView, vector<CObject*>& vec)
 	{
 		radius += vec[collisonNum[0]]->GetRadius();
 		vec.erase(vec.begin()+collisonNum.front());
-		collisonNum.erase(collisonNum.begin());
+		//collisonNum.erase(collisonNum.begin());
 	}
 	return 0;
 }
@@ -216,6 +216,7 @@ BOOL CRectangle::Collison(const RECT& recView, const vector<CObject*>& vec)
 			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
 			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
 			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
+			//collisonNum.push_back(i);
 			return TRUE;
 		}
 
@@ -230,6 +231,7 @@ BOOL CRectangle::Merge(const RECT& recView, vector<CObject*>& vec)
 	{
 		radius += vec[collisonNum[0]]->GetRadius();
 		vec.erase(vec.begin() + collisonNum.front());
+		//체크해서 나중에 삭제
 		collisonNum.erase(collisonNum.begin());
 	}
 	return 0;
@@ -368,6 +370,7 @@ BOOL CStar::Collison(const RECT& recView, const vector<CObject*>& vec)
 			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
 			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
 			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
+			//collisonNum.push_back(i);
 			return TRUE;
 		}
 
@@ -381,6 +384,7 @@ BOOL CStar::Merge(const RECT& recView, vector<CObject*>& vec)
 	if (CStar::Collison(recView, vec))
 	{
 		radius += vec[collisonNum[0]]->GetRadius();
+		innerRadius+= vec[collisonNum[0]]->GetRadius()/2;
 		vec.erase(vec.begin() + collisonNum.front());
 		collisonNum.erase(collisonNum.begin());
 	}

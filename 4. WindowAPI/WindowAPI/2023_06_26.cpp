@@ -5,6 +5,8 @@
 #include "WindowAPI.h"
 #include<iostream>
 #include<vector>
+#include<commdlg.h>
+#include<stdio.h>
 
 #define MAX_LOADSTRING 100
 
@@ -42,7 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWAPI));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MENU1));
 
     MSG msg;
 
@@ -80,7 +82,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWAPI));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+3);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WINDOWAPI);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDR_MENU1);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -201,6 +203,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         // 메뉴 선택을 구문 분석합니다:
         switch (wmId)
         {
+        case ID_SAVECHAT:
+        {
+
+            TCHAR filter[] = _T("Every file(*.*)\0*.*\0Text file\0*.txt;*.doc\0");
+            TCHAR IpstrFile[100] = _T("123");
+            TCHAR str[100];
+
+            OPENFILENAME ofn;
+
+            memset(&ofn, 0, sizeof(OPENFILENAME));
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            ofn.hwndOwner = hWnd;
+            ofn.lpstrFilter = filter;
+            ofn.lpstrFile = IpstrFile;
+            ofn.nMaxFile = 100;
+            ofn.lpstrInitialDir = _T(".");
+
+            if (GetSaveFileName(&ofn) != 0)
+            {
+                _stprintf_s(str, _T("%s 파일로 저장하겠습니까?"), ofn.lpstrFile);
+                MessageBox(hWnd, str, _T("저장하기 선택"), MB_OK);
+            }
+        }
         case IDM_ABOUT:
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;

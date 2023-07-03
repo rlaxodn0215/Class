@@ -3,21 +3,12 @@
 
 #include "framework.h"
 #include "WindowAPI.h"
-#include "CObject.h"
 #include<iostream>
 #include<vector>
-#include<cmath>
-#include<cstdlib>
-#include<ctime>
-#include<commdlg.h>
-#include<stdio.h>
 
 #define MAX_LOADSTRING 100
-#define TIMER_FIRST 1
-#define TIMER_SECOND 2
 
 using namespace std;
-
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -29,8 +20,6 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void OutFormFile(TCHAR filename[], HWND hwnd);
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -90,7 +79,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance = hInstance;
     wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWAPI));
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 3);
     wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_WINDOWAPI);
     wcex.lpszClassName = szWindowClass;
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -113,7 +102,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) //윈도우를 생성하는 부분
     hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
     HWND hWnd = CreateWindowW(szWindowClass, _T("szTitle"), WS_OVERLAPPEDWINDOW,
-        200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+        300, 300, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)
     {
@@ -141,129 +130,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 {
     PAINTSTRUCT ps;
     HDC hdc;
-    SIZE size;
     //LPCWCHAR str = (LPCWCHAR)_T("키 눌렸다!!");
-
-    static RECT recView;
-    static POINT mousePos;
-    static vector<CObject*> obgs;
-    enum OBJECT { CIRCLE, RECTANGLE, STAR, NONE };
-    static int randNum = NONE, randRadius;
-    static int verson = 1;
-    static bool checkFinish = false;
-
-    srand(time(NULL));
 
     switch (message)
     {
     case WM_CREATE: //한번 만 호출(start느낌, 초기화)
-    {
-        GetClientRect(hWnd, &recView);
-        SetTimer(hWnd, TIMER_FIRST, 30, NULL);
-    }
-    break;
-    case WM_TIMER:
-    {
-        switch (wParam)
-        {
-        case TIMER_FIRST:
-        {
-            if (verson == 1)
-            {
-                if (checkFinish == false)
-                {
-                    for (int i = 0; i < obgs.size(); i++)
-                        obgs[i]->Update(hWnd);
-                    checkFinish = true;
-                }
-
-                else
-                {
-                    for (int i = 0; i < obgs.size(); i++)
-                        obgs[i]->Collison(recView, obgs);
-                    checkFinish = false;
-                }
-            }
-
-            else if (verson == 2)
-            {
-                for (int i = 0; i < obgs.size(); i++)
-                    obgs[i]->Merge(recView, obgs);
-
-                for (int i = 0; i < obgs.size(); i++)
-                    obgs[i]->Update(hWnd);
-            }
-
-            else if (verson == 3)
-            {
-
-            }
-
-
-        }
-        break;
-
-        }
         break;
     case WM_KEYDOWN: //눌려있는 상태 값 확인
     {
-        if (wParam == 0x31) //1번 모드
-        {
-            verson = 1;
-        }
 
-        else if (wParam == 0x32) //2번 모드
-        {
-            verson = 2;
-        }
-
-        else if (wParam == 0x33) //3번 모드
-        {
-            verson = 3;
-        }
     }
     break;
     case WM_KEYUP:
-    {
-
-    }
-    break;
-    case WM_LBUTTONDOWN:
-    {
-        mousePos.x = LOWORD(lParam);
-        mousePos.y = HIWORD(lParam);
-
-        CObject* Obj;
-
-        if (randNum == 0) //원
-        {
-            CObject* Obj = new CCircle(mousePos);
-            obgs.push_back(Obj);
-        }
-
-        else if (randNum == 1) //사각형
-        {
-            CObject* Obj = new CRectangle(mousePos);
-            obgs.push_back(Obj);
-        }
-
-        else if (randNum == 2) //별
-        {
-            CObject* Obj = new CStar(mousePos);
-            obgs.push_back(Obj);
-        }
-
-
-        InvalidateRect(hWnd, NULL, TRUE);
-    }
-    break;
-
-    case WM_LBUTTONUP:
-    {
-
-    }
-    break;
-    case WM_MOUSEMOVE:
     {
 
     }
@@ -282,59 +160,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         {
         case ID_DRAW_CIRCLE:
         {
-            int temp = randNum;
-            int ans = MessageBox(hWnd, _T("원 그릴래?"), _T("도형선택"), MB_YESNOCANCEL);
-            if (ans == IDYES)
-            {
-                randNum = CIRCLE;
-            }
 
-            else if (ans == IDNO)
-            {
-                randNum = NONE;
-            }
-
-            else
-            {
-                randNum = temp;
-            }
-
-        }
-        break;
-        case ID_DRAW_RECTANGLE:
-        {
-            randNum = RECTANGLE;
-        }
-        break;
-        case ID_DRAW_STAR:
-        {
-            randNum = STAR;
-        }
-        case ID_FILEOPEN:
-        {
-
-            TCHAR filter[] = _T("Every file(*.*)\0*.*\0Text file\0*.txt;*.doc\0");
-            TCHAR IpstrFile[100] = _T("");
-            TCHAR str[100];
-
-            OPENFILENAME ofn;
-
-            memset(&ofn, 0, sizeof(OPENFILENAME));
-            ofn.lStructSize = sizeof(OPENFILENAME);
-            ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = filter;
-            ofn.lpstrFile = IpstrFile;
-            ofn.nMaxFile = 100;
-            ofn.lpstrInitialDir = _T(".");
-            if (GetOpenFileName(&ofn) != 0)
-            {
-                //_stprintf_s(str,_T("%s 파일을 열겠습니까?",ofn.IpstrFile));
-                OutFormFile(ofn.lpstrFile, hWnd);
-                //MessageBox(hWnd, str, _T("파일선택"), MB_OK);
-            }
         }
             break;
-        break;
+        case ID_DRAW_RECTANGLE:
+            break;
+        case ID_DRAW_STAR:
+            break;   
         case IDM_ABOUT: //도움말->정보
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
@@ -344,38 +176,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
-
     }
     break;
     case WM_PAINT: //그림 띄우기
     {
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
-
-        for (int i = 0; i < obgs.size(); i++)
-        {
-            obgs[i]->Draw(hdc);
-        }
-
+       
         EndPaint(hWnd, &ps);
-    }
-    break;
+        break;
     case WM_DESTROY: //종료버튼을 누를 때 발생하는 이벤트
     {
-
-        KillTimer(hWnd, TIMER_FIRST);
         PostQuitMessage(0);
     }
     break;
     default:
-    {
         return DefWindowProc(hWnd, message, wParam, lParam); //디폴트로 처리함
     }
-    break;
-
     return 0;
-
-    }
     }
 }
 
@@ -399,28 +217,10 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-void OutFormFile(TCHAR filename[], HWND hWnd)
-{
-    FILE* fPtr;
-    HDC hdc;
-    int line;
-    TCHAR buffer[500];
-    line = 0;
-    hdc = GetDC(hWnd);
-#ifdef _UNICODE
-    _tfopen_s(&fPtr, filename, _T("r, ccs=UNICODE"));
-#else
-    - _tfopen_s(&fPtr, filename, _T("r"));
-#endif 
-    while(_fgetts(buffer,100,fPtr)!=NULL)
-    {
-        if (buffer[_tcslen(buffer) - 1] == _T('\n'))
-            buffer[_tcslen(buffer) - 1] = NULL;
-        TextOut(hdc, 0, line * 20, buffer, _tcsclen(buffer));
-        line++;
-    }
+/*
+    Q1. 채팅창에 문자열을 치고 엔터키를 누르면 문자열이 한 칸 올라가고
+    그 다음에 입력하는 데이터들은 다음줄에 보여지도록 코드를 작성해라.
+    채팅 최대 목록은 10개로 재한 한다.
 
-    fclose(fPtr);
-    ReleaseDC(hWnd, hdc);
 
-}
+*/
