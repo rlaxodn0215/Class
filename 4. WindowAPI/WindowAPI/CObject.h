@@ -25,7 +25,8 @@ public:
 	int GetObjectNum() { return objectNum; }
 	int GetRadius() { return radius; }
 	CObject(POINT pt);
-	virtual void Update(const HWND & hWnd);
+	virtual void Update();//다음 위치, 각도로 변환(충돌 X)
+	void FinalUpdate(); //충돌 고려하여 최종 변환
 	virtual void Draw(const HDC& hdc) = 0;
 	virtual BOOL Collison(const RECT & recView,const vector<CObject*> & vec)=0;
 	virtual BOOL Merge(const RECT& recView, vector<CObject*> & vec)=0;
@@ -39,7 +40,7 @@ protected:
 public:
 	CCircle(POINT pt); //마우스 좌표값을 받는다.
 	~CCircle();
-	void Update(const HWND & hWnd);
+	void Update();
 	void Draw(const HDC & hdc) override;
 	BOOL Collison(const RECT &  recView, const vector<CObject*> & vec) override;
 	BOOL Merge(const RECT& recView, vector<CObject*>& vec) override;
@@ -59,7 +60,7 @@ public:
 	POINT & GetRECT() { return *p; }
 
 	CRectangle(POINT pt);
-	void Update(const HWND& hWnd) override;
+	void Update() override;
 	void Draw(const HDC& hdc) override;
 	BOOL Collison(const RECT& recView, const vector<CObject*>& vec) override;
 	BOOL Merge(const RECT& recView, vector<CObject*>& vec) override;
@@ -75,7 +76,7 @@ protected:
 
 public:
 	CStar(POINT pt);
-	void Update(const HWND& hWnd) override;
+	void Update() override;
 	void Draw(const HDC& hdc) override;
 	BOOL Collison(const RECT& recView, const vector<CObject*>& vec) override;
 	BOOL Merge(const RECT& recView, vector<CObject*>& vec) override;

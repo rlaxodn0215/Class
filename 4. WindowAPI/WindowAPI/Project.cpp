@@ -159,7 +159,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_CREATE: //한번 만 호출(start느낌, 초기화)
     {
         GetClientRect(hWnd, &recView);
-        SetTimer(hWnd, TIMER_FIRST, 30, NULL);
+        SetTimer(hWnd, TIMER_FIRST, 20, NULL);
     }
     break;
     case WM_TIMER:
@@ -172,8 +172,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             {
                 for (int i = 0; i < obgs.size(); i++)
                 {
-                    obgs[i]->Update(hWnd);
+                    //obgs[i]->Update();
                     obgs[i]->Collison(recView, obgs);
+                    InvalidateRect(hWnd, NULL, TRUE);
                 }
             }
 
@@ -182,7 +183,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 for (int i = 0; i < obgs.size(); i++)
                 {
                     obgs[i]->Merge(recView, obgs);
-                    obgs[i]->Update(hWnd);
+                    obgs[i]->Update();
+                    InvalidateRect(hWnd, NULL, TRUE);
                 }
             }
 

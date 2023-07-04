@@ -8,18 +8,18 @@ CObject::CObject(POINT pt)
 	int sign2 = rand() % 2;
 
 	if (sign1)
-		velocity.x = rand() % 10 + 1;
+		velocity.x = rand() % 5 + 1;
 	else
-		velocity.x = -rand() % 10 - 1;
+		velocity.x = -rand() % 5 - 1;
 
 	if (sign2)
-		velocity.y = rand() % 10 + 1;
+		velocity.y = rand() % 5 + 1;
 	else
-		velocity.y = -rand() % 10 - 1;
+		velocity.y = -rand() % 5 - 1;
 	
 }
 
-void CObject::Update(const HWND & hWnd)
+void CObject::Update()
 {
 	pos.x += velocity.x;
 	pos.y += velocity.y;
@@ -38,10 +38,9 @@ CCircle::~CCircle()
 {
 }
 
-void CCircle::Update(const HWND & hWnd)
+void CCircle::Update()
 {
-	CObject::Update(hWnd);
-	InvalidateRect(hWnd, NULL, TRUE);
+	CObject::Update();
 }
 
 void CCircle::Draw(const HDC & hdc)
@@ -59,12 +58,13 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 	//다른 물체와 충돌 했을때
 	for (int i = 0; i < vec.size(); i++)
 	{
-		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() && Length(pos, vec[i]->GetPos()) > 5)
+		if (Length(pos, vec[i]->GetPos()) <= (radius + vec[i]->GetRadius()) && Length(pos, vec[i]->GetPos()) > 3)
 		{
 			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
 			velocity.x += normal.x * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
 			velocity.y += normal.y * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
 			//collisonNum.push_back(i);
+			CCircle::Update();
 			return TRUE;
 		}
 
@@ -95,6 +95,7 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 		velocity.y *= -1;
 	}
 
+	CCircle::Update();
 
 	return FALSE;
 	
@@ -140,9 +141,9 @@ CRectangle::CRectangle(POINT pt) : CObject(pt)
 		angularVelocity = (rand() % 30 + 10) *PI /(-180);
 }
 
-void CRectangle::Update(const HWND& hWnd) //사각형 4점 좌표 갱신
+void CRectangle::Update() //사각형 4점 좌표 갱신
 {
-	CObject::Update(hWnd);
+	CObject::Update();
 	angle += angularVelocity;
 
 	if (angle >= 2 * PI)
@@ -156,8 +157,6 @@ void CRectangle::Update(const HWND& hWnd) //사각형 4점 좌표 갱신
 		p[i].y = pos.y + sin(angle + PI * i / 2) * radius;
 	}
 
-
-	InvalidateRect(hWnd, NULL, TRUE);
 }
 
 //p[i].x = pos.x + cos(angularVelocity) * (p[i].x - pos.x) - sin(angularVelocity) * (p[i].y - pos.y);
@@ -300,9 +299,9 @@ CStar::CStar(POINT pt) :CObject(pt)
 		angularVelocity = (rand() % 30 + 10) * PI / (-180);
 }
 
-void CStar::Update(const HWND& hWnd)
+void CStar::Update()
 {
-	CObject::Update(hWnd);
+	CObject::Update();
 	angle += angularVelocity;
 
 	if (angle >= 2 * PI)
@@ -325,8 +324,6 @@ void CStar::Update(const HWND& hWnd)
 		}
 	}
 
-
-	InvalidateRect(hWnd, NULL, TRUE);
 }
 
 void CStar::Draw(const HDC& hdc)
