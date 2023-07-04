@@ -57,19 +57,22 @@ void CCircle::Draw(const HDC & hdc)
 BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 {
 
-	////다른 물체와 충돌 했을때
-	//for (int i = 0; i < vec.size(); i++)
-	//{
-	//	if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() + 2 && Length(pos, vec[i]->GetPos()) > 5)
-	//	{
-	//		POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
-	//		velocity.x += normal.x * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
-	//		velocity.y += normal.y * (vec[i]->GetWeight()) / (weight + vec[i]->GetWeight()) * 0.1;
-	//		//collisonNum.push_back(i);
-	//		return TRUE;
-	//	}
+	//다른 물체와 충돌 했을때
+	for (int i = 0; i < vec.size(); i++)
+	{
+		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() && Length(pos, vec[i]->GetPos()) > 5)
+		{
+			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
+			double distance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
+			pos.x += distance * normal.x / Length(pos, vec[i]->GetPos());
+			pos.y += distance * normal.y / Length(pos, vec[i]->GetPos());
+			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.2;
+			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.2;
+			//collisonNum.push_back(i);
+			return TRUE;
+		}
 
-	//}
+	}
 
 	//벽에 충돌했을 때
 	if (pos.x + radius >= recView.right)

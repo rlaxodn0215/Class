@@ -150,7 +150,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     enum OBJECT { CIRCLE, RECTANGLE, STAR, NONE };
     static int randNum = NONE, randRadius;
     static int verson = 1;
-    static bool checkFinish = false;
 
     srand(time(NULL));
 
@@ -170,19 +169,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         {
             if (verson == 1)
             {
-                if (checkFinish == false)
+                
+                for (int i = 0; i < obgs.size(); i++)
                 {
-                    for (int i = 0; i < obgs.size(); i++)
-                        obgs[i]->Update(hWnd);
-                    checkFinish = true;
+                    obgs[i]->Update(hWnd);
+                    obgs[i]->Collison(recView, obgs);
                 }
-
-                else
-                {
-                    for (int i = 0; i < obgs.size(); i++)
-                        obgs[i]->Collison(recView, obgs);
-                    checkFinish = false;
-                }
+                
             }
 
             else if (verson == 2)
