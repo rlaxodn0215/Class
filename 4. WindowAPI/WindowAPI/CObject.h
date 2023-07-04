@@ -26,7 +26,6 @@ public:
 	int GetRadius() { return radius; }
 	CObject(POINT pt);
 	virtual void Update();//다음 위치, 각도로 변환(충돌 X)
-	void FinalUpdate(); //충돌 고려하여 최종 변환
 	virtual void Draw(const HDC& hdc) = 0;
 	virtual BOOL Collison(const RECT & recView,const vector<CObject*> & vec)=0;
 	virtual BOOL Merge(const RECT& recView, vector<CObject*> & vec)=0;

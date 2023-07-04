@@ -1,0 +1,12 @@
+주제: 그리기 횟수가 제한되어있는 선 또는 도형으로 위험한 유체로 부터 중한 것을 보호하자.
+
+
+1. collider class
+
+물체(선으로 collider만들기, 일정 범위 안에 들면 도형으로 만들기)
+
+1) OnCollisionEnter ->충돌 위치, 속도 체크
+2) OnCollisionStay
+3) OnCollisionExit -> 나가는 위치, 속도 체크
+
+2. fuild dynamics class
