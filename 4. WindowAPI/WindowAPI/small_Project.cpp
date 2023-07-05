@@ -29,7 +29,6 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void OutFormFile(TCHAR filename[], HWND hwnd);
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -150,6 +149,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     enum OBJECT { CIRCLE, RECTANGLE, STAR, NONE };
     static int randNum = NONE, randRadius;
     static int verson = 1;
+    static bool checkFinish = false;
 
     srand(time(NULL));
 
@@ -158,7 +158,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_CREATE: //한번 만 호출(start느낌, 초기화)
     {
         GetClientRect(hWnd, &recView);
-        SetTimer(hWnd, TIMER_FIRST, 30, NULL);
+        SetTimer(hWnd, TIMER_FIRST, 20, NULL);
     }
     break;
     case WM_TIMER:
@@ -169,22 +169,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         {
             if (verson == 1)
             {
-                
                 for (int i = 0; i < obgs.size(); i++)
                 {
-                    obgs[i]->Update(hWnd);
+                    obgs[i]->Update();
                     obgs[i]->Collison(recView, obgs);
+                    InvalidateRect(hWnd, NULL, TRUE);
                 }
-                
             }
 
             else if (verson == 2)
             {
                 for (int i = 0; i < obgs.size(); i++)
+                {
                     obgs[i]->Merge(recView, obgs);
-
-                for (int i = 0; i < obgs.size(); i++)
-                    obgs[i]->Update(hWnd);
+                    obgs[i]->Update();
+                    InvalidateRect(hWnd, NULL, TRUE);
+                }
             }
 
             else if (verson == 3)
@@ -296,37 +296,48 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         break;
         case ID_DRAW_RECTANGLE:
         {
-            randNum = RECTANGLE;
+            int temp = randNum;
+            int ans = MessageBox(hWnd, _T("네모 그릴래?"), _T("도형선택"), MB_YESNOCANCEL);
+            if (ans == IDYES)
+            {
+                randNum = RECTANGLE;
+            }
+
+            else if (ans == IDNO)
+            {
+                randNum = NONE;
+            }
+
+            else
+            {
+                randNum = temp;
+            }
+
+
         }
         break;
         case ID_DRAW_STAR:
         {
-            randNum = STAR;
-        }
-        case ID_FILEOPEN:
-        {
 
-            TCHAR filter[] = _T("Every file(*.*)\0*.*\0Text file\0*.txt;*.doc\0");
-            TCHAR IpstrFile[100] = _T("");
-            TCHAR str[100];
-
-            OPENFILENAME ofn;
-
-            memset(&ofn, 0, sizeof(OPENFILENAME));
-            ofn.lStructSize = sizeof(OPENFILENAME);
-            ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = filter;
-            ofn.lpstrFile = IpstrFile;
-            ofn.nMaxFile = 100;
-            ofn.lpstrInitialDir = _T(".");
-            if (GetOpenFileName(&ofn) != 0)
+            int temp = randNum;
+            int ans = MessageBox(hWnd, _T("별 그릴래?"), _T("도형선택"), MB_YESNOCANCEL);
+            if (ans == IDYES)
             {
-                //_stprintf_s(str,_T("%s 파일을 열겠습니까?",ofn.IpstrFile));
-                OutFormFile(ofn.lpstrFile, hWnd);
-                //MessageBox(hWnd, str, _T("파일선택"), MB_OK);
+                randNum = STAR;
+
+            }
+
+            else if (ans == IDNO)
+            {
+                randNum = NONE;
+            }
+
+            else
+            {
+                randNum = temp;
             }
         }
-            break;
+        break;
         break;
         case IDM_ABOUT: //도움말->정보
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
@@ -392,28 +403,4 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-void OutFormFile(TCHAR filename[], HWND hWnd)
-{
-    FILE* fPtr;
-    HDC hdc;
-    int line;
-    TCHAR buffer[500];
-    line = 0;
-    hdc = GetDC(hWnd);
-#ifdef _UNICODE
-    _tfopen_s(&fPtr, filename, _T("r, ccs=UNICODE"));
-#else
-    - _tfopen_s(&fPtr, filename, _T("r"));
-#endif 
-    while(_fgetts(buffer,100,fPtr)!=NULL)
-    {
-        if (buffer[_tcslen(buffer) - 1] == _T('\n'))
-            buffer[_tcslen(buffer) - 1] = NULL;
-        TextOut(hdc, 0, line * 20, buffer, _tcsclen(buffer));
-        line++;
-    }
 
-    fclose(fPtr);
-    ReleaseDC(hWnd, hdc);
-
-}

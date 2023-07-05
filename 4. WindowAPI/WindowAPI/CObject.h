@@ -1,4 +1,5 @@
 #pragma once
+
 #include "WindowAPI.h"
 #include "framework.h"
 #include<time.h>
@@ -20,7 +21,9 @@ protected:
 	int objectNum; //0:원, 1:사각형, 2: 별
 public:
 	POINT GetPos() { return pos; }
+	void SetPos(POINT p) { pos.x = p.x; pos.y = p.y; }
 	POINT GetVelocity() { return velocity; }
+	void SetVel(POINT v) { velocity.x = v.x; velocity.y = v.y; }
 	double GetWeight() { return weight; }
 	int GetObjectNum() { return objectNum; }
 	int GetRadius() { return radius; }

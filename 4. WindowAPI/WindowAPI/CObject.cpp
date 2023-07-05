@@ -8,18 +8,18 @@ CObject::CObject(POINT pt)
 	int sign2 = rand() % 2;
 
 	if (sign1)
-		velocity.x = rand() % 10 + 1;
+		velocity.x = rand() % 20 + 10;
 	else
-		velocity.x = -rand() % 10 - 1;
+		velocity.x = -rand() % 20 - 10;
 
 	if (sign2)
-		velocity.y = rand() % 10 + 1;
+		velocity.y = rand() % 20 + 10;
 	else
-		velocity.y = -rand() % 10 - 1;
+		velocity.y = -rand() % 20 - 10;
 	
 }
 
-void CObject::Update(const HWND & hWnd)
+void CObject::Update()
 {
 	pos.x += velocity.x;
 	pos.y += velocity.y;
@@ -38,10 +38,9 @@ CCircle::~CCircle()
 {
 }
 
-void CCircle::Update(const HWND & hWnd)
+void CCircle::Update()
 {
-	CObject::Update(hWnd);
-	InvalidateRect(hWnd, NULL, TRUE);
+	CObject::Update();
 }
 
 void CCircle::Draw(const HDC & hdc)
@@ -62,12 +61,29 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 	{
 		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() && Length(pos, vec[i]->GetPos()) > 5)
 		{
-			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
-			double distance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
-			pos.x += distance * normal.x / Length(pos, vec[i]->GetPos());
-			pos.y += distance * normal.y / Length(pos, vec[i]->GetPos());
-			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.2;
-			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.2;
+			double OverlapDistance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
+			double normalX = (pos.x - vec[i]->GetPos().x) / Length(pos, vec[i]->GetPos());
+			double normalY = (pos.y - vec[i]->GetPos().y)/Length(pos, vec[i]->GetPos());
+			pos.x += 0.5*OverlapDistance * normalX;
+			pos.y += 0.5*OverlapDistance * normalY;
+
+			POINT p = { vec[i]->GetPos().x - 0.5 * OverlapDistance * normalX,
+				vec[i]->GetPos().y - 0.5 * OverlapDistance * normalY };
+
+			vec[i]->SetPos(p);
+
+			int e = 1;
+			double J = ( - (1 + e) * ((velocity.x - vec[i]->GetVelocity().x) * (normalX)
+				+ (velocity.y - vec[i]->GetVelocity().y) * normalY))/((1/weight) +(1/vec[i]->GetWeight()));
+
+			velocity.x += J* normalX / weight;
+			velocity.y += J* normalY / weight;
+
+			POINT v = { vec[i]->GetVelocity().x - J * normalX / vec[i]->GetWeight(),
+				vec[i]->GetVelocity().y - J * normalY / vec[i]->GetWeight() };
+
+			vec[i]->SetVel(v);
+
 			//collisonNum.push_back(i);
 			return TRUE;
 		}
@@ -79,26 +95,29 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 	{
 		pos.x = recView.right - radius;
 		velocity.x *= -1;
+		return TRUE;
 	}
 
 	else if (pos.x - radius <= recView.left)
 	{
 		pos.x = recView.left + radius;
 		velocity.x *= -1;
+		return TRUE;
 	}
 
 	else if (pos.y + radius >= recView.bottom)
 	{
 		pos.y = recView.bottom - radius;
 		velocity.y *= -1;
+		return TRUE;
 	}
 
 	else if (pos.y - radius <= recView.top)
 	{
 		pos.y = recView.top + radius;
 		velocity.y *= -1;
+		return TRUE;
 	}
-
 
 	return FALSE;
 	
@@ -144,9 +163,9 @@ CRectangle::CRectangle(POINT pt) : CObject(pt)
 		angularVelocity = (rand() % 30 + 10) *PI /(-180);
 }
 
-void CRectangle::Update(const HWND& hWnd) //사각형 4점 좌표 갱신
+void CRectangle::Update() //사각형 4점 좌표 갱신
 {
-	CObject::Update(hWnd);
+	CObject::Update();
 	angle += angularVelocity;
 
 	if (angle >= 2 * PI)
@@ -160,8 +179,6 @@ void CRectangle::Update(const HWND& hWnd) //사각형 4점 좌표 갱신
 		p[i].y = pos.y + sin(angle + PI * i / 2) * radius;
 	}
 
-
-	InvalidateRect(hWnd, NULL, TRUE);
 }
 
 //p[i].x = pos.x + cos(angularVelocity) * (p[i].x - pos.x) - sin(angularVelocity) * (p[i].y - pos.y);
@@ -175,6 +192,23 @@ void CRectangle::Draw(const HDC& hdc)
 
 BOOL CRectangle::Collison(const RECT& recView, const vector<CObject*>& vec)
 {
+
+	//다른 물체와 충돌했을 때
+	for (int i = 0; i < vec.size(); i++)
+	{
+		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() && Length(pos, vec[i]->GetPos()) > 5)
+		{
+			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
+			double distance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
+			pos.x += distance * normal.x / Length(pos, vec[i]->GetPos());
+			pos.y += distance * normal.y / Length(pos, vec[i]->GetPos());
+			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
+			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
+			//collisonNum.push_back(i);
+			return TRUE;
+		}
+
+	}
 
 	//벽에 충돌했을 때
 	int xMin=p[0].x, xMax = p[0].x, yMin = p[0].y, yMax = p[0].y;
@@ -191,38 +225,28 @@ BOOL CRectangle::Collison(const RECT& recView, const vector<CObject*>& vec)
 	{
 		pos.x = recView.left + radius;
 		velocity.x *= -1;
+		return TRUE;
 	}
 
 	else if (xMax >= recView.right)
 	{
 		pos.x = recView.right - radius;
 		velocity.x *= -1;
+		return TRUE;
 	}
 
 	else if (yMin <= recView.top)
 	{
 		pos.y = recView.top + radius;
 		velocity.y *= -1;
+		return TRUE;
 	}
 
 	else if (yMax >= recView.bottom)
 	{
 		pos.y = recView.bottom - radius;
 		velocity.y *= -1;
-	}
-
-	//다른 물체와 충돌했을 때
-	for (int i = 0; i < vec.size(); i++)
-	{
-		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() + 2 && Length(pos, vec[i]->GetPos()) > 5)
-		{
-			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
-			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
-			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
-			//collisonNum.push_back(i);
-			return TRUE;
-		}
-
+		return TRUE;
 	}
 
 	return FALSE;
@@ -304,9 +328,9 @@ CStar::CStar(POINT pt) :CObject(pt)
 		angularVelocity = (rand() % 30 + 10) * PI / (-180);
 }
 
-void CStar::Update(const HWND& hWnd)
+void CStar::Update()
 {
-	CObject::Update(hWnd);
+	CObject::Update();
 	angle += angularVelocity;
 
 	if (angle >= 2 * PI)
@@ -329,8 +353,6 @@ void CStar::Update(const HWND& hWnd)
 		}
 	}
 
-
-	InvalidateRect(hWnd, NULL, TRUE);
 }
 
 void CStar::Draw(const HDC& hdc)
@@ -340,43 +362,50 @@ void CStar::Draw(const HDC& hdc)
 
 BOOL CStar::Collison(const RECT& recView, const vector<CObject*>& vec)
 {
-	//벽에 충돌했을 때
-	if (pos.x + radius >= recView.right)
-	{
-		pos.x = recView.right - radius;
-		velocity.x *= -1;
-	}
-
-	else if (pos.x - radius <= recView.left)
-	{
-		pos.x = recView.left + radius;
-		velocity.x *= -1;
-	}
-
-	else if (pos.y + radius >= recView.bottom)
-	{
-		pos.y = recView.bottom - radius;
-		velocity.y *= -1;
-	}
-
-	else if (pos.y - radius <= recView.top)
-	{
-		pos.y = recView.top + radius;
-		velocity.y *= -1;
-	}
-
 	//다른 물체와 충돌 했을때
 	for (int i = 0; i < vec.size(); i++)
 	{
 		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() + 2 && Length(pos, vec[i]->GetPos()) > 5)
 		{
 			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
+			double distance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
+			pos.x += distance * normal.x / Length(pos, vec[i]->GetPos());
+			pos.y += distance * normal.y / Length(pos, vec[i]->GetPos());
 			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
 			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
 			//collisonNum.push_back(i);
 			return TRUE;
 		}
 
+	}
+
+	//벽에 충돌했을 때
+	if (pos.x + radius >= recView.right)
+	{
+		pos.x = recView.right - radius;
+		velocity.x *= -1;
+		return TRUE;
+	}
+
+	else if (pos.x - radius <= recView.left)
+	{
+		pos.x = recView.left + radius;
+		velocity.x *= -1;
+		return TRUE;
+	}
+
+	else if (pos.y + radius >= recView.bottom)
+	{
+		pos.y = recView.bottom - radius;
+		velocity.y *= -1;
+		return TRUE;
+	}
+
+	else if (pos.y - radius <= recView.top)
+	{
+		pos.y = recView.top + radius;
+		velocity.y *= -1;
+		return TRUE;
 	}
 
 	return FALSE;
