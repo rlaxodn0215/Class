@@ -46,6 +46,7 @@ void DrawBitmap(HWND hWnd, HDC hdc);
 void DeleteBitmap();
 void UpdateFrame(HWND hWnd);
 void DrawRectText(HDC hdc);
+void Update();
 
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
@@ -123,12 +124,34 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // 기본 메시지 루프입니다:
-    while (GetMessage(&msg, nullptr, 0, 0)) // 이벤트가 있어야함
+    //while (GetMessage(&msg, nullptr, 0, 0)) // 이벤트가 있어야함
+    //{
+    //    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+    //    {
+    //        TranslateMessage(&msg);
+    //        DispatchMessage(&msg);
+    //    }
+    //}
+
+    while (true) // 이벤트가 있어야함
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            if (msg.message == WM_QUIT)
+            {
+                break;
+            }
+            else
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+
+        }
+        else
+        {
+           //Update();
+           //Render();
         }
     }
 
@@ -636,6 +659,26 @@ void DrawRectText(HDC hdc)
     TextOut(hdc, 10, yPos, strTest, _tcslen(strTest));
 }
 
+void Update()
+{
+    //: wm_keydown, wm_keyup -> 반응이 직각적으로 오지 않음
+    if (GetKeyState('A') & 0x8000)
+    {
+
+    }
+
+    if (GetKeyState('D') & 0x8000)
+    {
+
+    }
+
+    if (GetKeyState('W') & 0x8000)
+    {
+
+    }
+
+}
+
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
     UpdateFrame(hWnd);
@@ -711,25 +754,30 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     }
     //<< hMenDC 에 그려주기
 
-    
-   HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255)); //2를 안 넣으면 하얀색
-   HBRUSH oldB = (HBRUSH)SelectObject(hMenDC, hBrush);
-   Ellipse(hMenDC, 500, 300, 800, 500);
-   SelectObject(hMenDC, oldB);
-   DeleteObject(hBrush);
-    
-   {//background
+    {//>> front image
 
        hMenDC2 = CreateCompatibleDC(hMenDC);
        hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hFrontImage);
        bx = bitFront.bmWidth;
        by = bitFront.bmHeight;
 
-       BitBlt(hdc, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
+       HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
+       HBRUSH oldBrush = (HBRUSH)SelectObject(hMenDC2, hBrush);
 
-       SelectObject(hMenDC2, hodBitmap);
+       Ellipse(hMenDC2, 250, 100, 750, 500);
+
+       SelectObject(hMenDC2,oldBrush);
+       DeleteObject(hBrush);
+       
+       TransparentBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+
+       SelectObject(hMenDC2, hodBitmap2);
+
+
+
        DeleteDC(hMenDC2);
-   }
+    }
+
 
     //hdc에 그려주기
    // BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
