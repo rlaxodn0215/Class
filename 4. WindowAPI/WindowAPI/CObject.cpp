@@ -84,7 +84,9 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 
 			vec[i]->SetVel(v);
 
-			//collisonNum.push_back(i);
+			if(vec[i]->GetObjectNum() == 1)//사각형과 충돌
+				collisonNum.push(i);
+
 			return TRUE;
 		}
 
@@ -125,9 +127,13 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 
 BOOL CCircle::Merge(const RECT& recView, vector<CObject*>& vec)
 {
-	if (CCircle::Collison(recView, vec))
+	if (CCircle::Collison(recView, vec) && collisonNum.front()==1)
 	{
-		radius += vec[collisonNum[0]]->GetRadius();
+		radius += vec[collisonNum.front()]->GetRadius();
+		CObject* temp = vec[collisonNum.front()];
+		vec[collisonNum.front()] = this;
+		delete temp;
+		collisonNum.pop();
 	}
 	return 0;
 }
@@ -279,10 +285,7 @@ BOOL CRectangle::Merge(const RECT& recView, vector<CObject*>& vec)
 {
 	if (CRectangle::Collison(recView, vec))
 	{
-		radius += vec[collisonNum[0]]->GetRadius();
-		vec.erase(vec.begin() + collisonNum.front());
-		//체크해서 나중에 삭제
-		collisonNum.erase(collisonNum.begin());
+
 	}
 	return 0;
 
@@ -462,10 +465,7 @@ BOOL CStar::Merge(const RECT& recView, vector<CObject*>& vec)
 {
 	if (CStar::Collison(recView, vec))
 	{
-		radius += vec[collisonNum[0]]->GetRadius();
-		innerRadius+= vec[collisonNum[0]]->GetRadius()/2;
-		vec.erase(vec.begin() + collisonNum.front());
-		collisonNum.erase(collisonNum.begin());
+
 	}
 	return 0;
 }

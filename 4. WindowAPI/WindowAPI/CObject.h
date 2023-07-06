@@ -4,12 +4,13 @@
 #include "framework.h"
 #include<time.h>
 #include<vector>
+#include<queue>
 #include<cmath>
 #define PI (3.1415926535) 
 
 using namespace std;
 
-static vector<int> collisonNum;
+static queue<int> collisonNum;
 
 struct Vector
 {

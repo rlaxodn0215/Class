@@ -56,6 +56,9 @@
     <ClCompile Include="2023_07_05.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="2023_07_06.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WindowAPI.rc">
