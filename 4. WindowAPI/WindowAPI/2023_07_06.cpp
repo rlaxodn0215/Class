@@ -17,6 +17,9 @@
 HBITMAP hBackImage;
 BITMAP bitBack;
 
+HBITMAP hFrontImage;
+BITMAP bitFront;
+
 HBITMAP hTransparentImage;
 BITMAP bitTransparent;
 
@@ -234,15 +237,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         break;
     case WM_CREATE: //한번 만 호출(start느낌, 초기화)
     {
-
-
         hMenu = GetMenu(hWnd);
         hSubMenu = GetSubMenu(hMenu, 2);
         EnableMenuItem(hSubMenu, ID_EDITCOPY, MF_GRAYED);
         EnableMenuItem(hSubMenu, ID_EDITPASTE, MF_GRAYED);
 
         CreateBitmap();
-
+        GetClientRect(hWnd, &recView);
         SetTimer(hWnd, TIMER_SECOND, 20, AniProc);
 
     }
@@ -438,7 +439,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
 
-        DrawBitmap(hWnd, hdc);
+        //DrawBitmap(hWnd, hdc);
+        DrwaBitmapDoubleBuffering(hWnd, hdc);
         DrawRectText(hdc);
 
         EndPaint(hWnd, &ps);
@@ -538,6 +540,21 @@ void CreateBitmap()
         SPRITE_FRAME_COUNT_X = bitAni.bmWidth / SPRITE_SIZE_X;
         SPRITE_FRAME_COUNT_Y = bitAni.bmHeight / SPRITE_SIZE_Y;
     }
+
+    // BackImage
+    {
+        hFrontImage = (HBITMAP)LoadImage(NULL, TEXT("Images/Background.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hFrontImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러_4"), _T("에러"), MB_OK);
+            return;
+        }
+
+        GetObject(hFrontImage, sizeof(BITMAP), &bitFront);
+    }
 }
 
 void DrawBitmap(HWND hWnd, HDC hdc)
@@ -636,13 +653,12 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     HBITMAP hodBitmap2;
 
     hMenDC =  CreateCompatibleDC(hdc);
-    if (hDoubleBufferImage == NULL)
+    if (hDoubleBufferImage == NULL )
     {
         hDoubleBufferImage = CreateCompatibleBitmap(hdc, recView.right, recView.bottom);
     }
 
     hodBitmap = (HBITMAP)SelectObject(hMenDC, hDoubleBufferImage);
-
 
 
 
@@ -684,17 +700,47 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         int xStart = curframe * bx;
         int yStart = 0;
         static int posX = 150;
-        posX += 1;
+        posX += 3;
         //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
         TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        //StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
+        //TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
         DeleteDC(hMenDC2);
     }
     //<< hMenDC 에 그려주기
 
+    
+   HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255)); //2를 안 넣으면 하얀색
+   HBRUSH oldB = (HBRUSH)SelectObject(hMenDC, hBrush);
+   Ellipse(hMenDC, 500, 300, 800, 500);
+   SelectObject(hMenDC, oldB);
+   DeleteObject(hBrush);
+    
+   {//background
+
+       hMenDC2 = CreateCompatibleDC(hMenDC);
+       hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hFrontImage);
+       bx = bitFront.bmWidth;
+       by = bitFront.bmHeight;
+
+       BitBlt(hdc, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
+
+       SelectObject(hMenDC2, hodBitmap);
+       DeleteDC(hMenDC2);
+   }
+
     //hdc에 그려주기
-    BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
+   // BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
+    TransparentBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0,
+        recView.right, recView.bottom, RGB(255, 0, 255));
+    
+    //hBrush = CreateSolidBrush(RGB(255, 0, 255));
+    //oldB = (HBRUSH)SelectObject(hMenDC, hBrush);
+    //Ellipse(hMenDC, 400, 300, 700, 500);
+    //SelectObject(hdc, oldB);
+    //DeleteObject(hBrush);
 
     SelectObject(hMenDC, hodBitmap);
     DeleteDC(hMenDC);
