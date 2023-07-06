@@ -181,8 +181,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             {
                 for (int i = 0; i < obgs.size(); i++)
                 {
-                    obgs[i]->Merge(recView, obgs);
                     obgs[i]->Update();
+                    obgs[i]->Merge(recView, obgs);
                     InvalidateRect(hWnd, NULL, TRUE);
                 }
             }

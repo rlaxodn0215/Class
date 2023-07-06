@@ -11,19 +11,25 @@ using namespace std;
 
 static vector<int> collisonNum;
 
+struct Vector
+{
+	double x;
+	double y;
+};
+
 class CObject
 {
 protected:
-	POINT pos;
-	POINT velocity;
+	Vector pos;
+	Vector velocity;
 	double weight;
 	int radius;
 	int objectNum; //0:원, 1:사각형, 2: 별
 public:
-	POINT GetPos() { return pos; }
-	void SetPos(POINT p) { pos.x = p.x; pos.y = p.y; }
-	POINT GetVelocity() { return velocity; }
-	void SetVel(POINT v) { velocity.x = v.x; velocity.y = v.y; }
+	Vector GetPos() { return pos; }
+	void SetPos(Vector p) { pos.x = p.x; pos.y = p.y; }
+	Vector GetVelocity() { return velocity; }
+	void SetVel(Vector v) { velocity.x = v.x; velocity.y = v.y; }
 	double GetWeight() { return weight; }
 	int GetObjectNum() { return objectNum; }
 	int GetRadius() { return radius; }
@@ -33,7 +39,7 @@ public:
 	virtual BOOL Collison(const RECT & recView,const vector<CObject*> & vec)=0;
 	virtual BOOL Merge(const RECT& recView, vector<CObject*> & vec)=0;
 
-	double Length(const POINT a, const POINT b) { return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)); }
+	double Length(const Vector a, const Vector b) { return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)); }
 };
 
 class CCircle : public CObject
@@ -51,7 +57,7 @@ public:
 class CRectangle : public CObject
 {
 protected:
-	POINT p[4];
+	Vector p[4];
 	double angle;
 	double angularVelocity;
 
@@ -59,7 +65,7 @@ public:
 	int GetRadius() { return radius; }
 	double GetAng() { return angle; }
 	double GetAngVel() { return angularVelocity; }
-	POINT & GetRECT() { return *p; }
+	Vector& GetRECT() { return *p; }
 
 	CRectangle(POINT pt);
 	void Update() override;
@@ -71,7 +77,7 @@ public:
 class CStar : public CObject
 {
 protected:
-	POINT p[10];
+	Vector p[10];
 	int innerRadius;
 	double angle;
 	double angularVelocity;

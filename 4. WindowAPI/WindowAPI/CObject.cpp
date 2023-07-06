@@ -8,14 +8,14 @@ CObject::CObject(POINT pt)
 	int sign2 = rand() % 2;
 
 	if (sign1)
-		velocity.x = rand() % 20 + 10;
+		velocity.x = rand() % 7 + 2;
 	else
-		velocity.x = -rand() % 20 - 10;
+		velocity.x = -rand() % 7 - 2;
 
 	if (sign2)
-		velocity.y = rand() % 20 + 10;
+		velocity.y = rand() % 7 + 2;
 	else
-		velocity.y = -rand() % 20 - 10;
+		velocity.y = -rand() % 7 - 2;
 	
 }
 
@@ -67,19 +67,19 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 			pos.x += 0.5*OverlapDistance * normalX;
 			pos.y += 0.5*OverlapDistance * normalY;
 
-			POINT p = { vec[i]->GetPos().x - 0.5 * OverlapDistance * normalX,
+			Vector p = { vec[i]->GetPos().x - 0.5 * OverlapDistance * normalX,
 				vec[i]->GetPos().y - 0.5 * OverlapDistance * normalY };
 
 			vec[i]->SetPos(p);
 
-			int e = 1;
+			int e = 1.3;
 			double J = ( - (1 + e) * ((velocity.x - vec[i]->GetVelocity().x) * (normalX)
 				+ (velocity.y - vec[i]->GetVelocity().y) * normalY))/((1/weight) +(1/vec[i]->GetWeight()));
 
 			velocity.x += J* normalX / weight;
 			velocity.y += J* normalY / weight;
 
-			POINT v = { vec[i]->GetVelocity().x - J * normalX / vec[i]->GetWeight(),
+			Vector v = { vec[i]->GetVelocity().x - J * normalX / vec[i]->GetWeight(),
 				vec[i]->GetVelocity().y - J * normalY / vec[i]->GetWeight() };
 
 			vec[i]->SetVel(v);
@@ -95,28 +95,28 @@ BOOL CCircle::Collison(const RECT& recView, const vector<CObject*>& vec)
 	{
 		pos.x = recView.right - radius;
 		velocity.x *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (pos.x - radius <= recView.left)
 	{
 		pos.x = recView.left + radius;
 		velocity.x *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (pos.y + radius >= recView.bottom)
 	{
 		pos.y = recView.bottom - radius;
 		velocity.y *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (pos.y - radius <= recView.top)
 	{
 		pos.y = recView.top + radius;
 		velocity.y *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	return FALSE;
@@ -128,8 +128,6 @@ BOOL CCircle::Merge(const RECT& recView, vector<CObject*>& vec)
 	if (CCircle::Collison(recView, vec))
 	{
 		radius += vec[collisonNum[0]]->GetRadius();
-		vec.erase(vec.begin()+collisonNum.front());
-		//collisonNum.erase(collisonNum.begin());
 	}
 	return 0;
 }
@@ -186,24 +184,49 @@ void CRectangle::Update() //사각형 4점 좌표 갱신
 
 void CRectangle::Draw(const HDC& hdc)
 {
-	Polygon(hdc, p, 4);
+
+	POINT vex[4];
+
+	for (int i = 0; i < 4; i++)
+	{
+		vex[i] = { (int)p[i].x,(int)p[i].y };
+	}
+
+	Polygon(hdc, vex, 4);
 }
 
 
 BOOL CRectangle::Collison(const RECT& recView, const vector<CObject*>& vec)
 {
 
-	//다른 물체와 충돌했을 때
+	//다른 물체와 충돌 했을때
 	for (int i = 0; i < vec.size(); i++)
 	{
 		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() && Length(pos, vec[i]->GetPos()) > 5)
 		{
-			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
-			double distance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
-			pos.x += distance * normal.x / Length(pos, vec[i]->GetPos());
-			pos.y += distance * normal.y / Length(pos, vec[i]->GetPos());
-			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
-			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
+			double OverlapDistance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
+			double normalX = (pos.x - vec[i]->GetPos().x) / Length(pos, vec[i]->GetPos());
+			double normalY = (pos.y - vec[i]->GetPos().y) / Length(pos, vec[i]->GetPos());
+			pos.x += 0.5 * OverlapDistance * normalX;
+			pos.y += 0.5 * OverlapDistance * normalY;
+
+			Vector p = { vec[i]->GetPos().x - 0.5 * OverlapDistance * normalX,
+				vec[i]->GetPos().y - 0.5 * OverlapDistance * normalY };
+
+			vec[i]->SetPos(p);
+
+			int e = 1.3;
+			double J = (-(1 + e) * ((velocity.x - vec[i]->GetVelocity().x) * (normalX)
+				+(velocity.y - vec[i]->GetVelocity().y) * normalY)) / ((1 / weight) + (1 / vec[i]->GetWeight()));
+
+			velocity.x += J * normalX / weight;
+			velocity.y += J * normalY / weight;
+
+			Vector v = { vec[i]->GetVelocity().x - J * normalX / vec[i]->GetWeight(),
+				vec[i]->GetVelocity().y - J * normalY / vec[i]->GetWeight() };
+
+			vec[i]->SetVel(v);
+
 			//collisonNum.push_back(i);
 			return TRUE;
 		}
@@ -225,28 +248,28 @@ BOOL CRectangle::Collison(const RECT& recView, const vector<CObject*>& vec)
 	{
 		pos.x = recView.left + radius;
 		velocity.x *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (xMax >= recView.right)
 	{
 		pos.x = recView.right - radius;
 		velocity.x *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (yMin <= recView.top)
 	{
 		pos.y = recView.top + radius;
 		velocity.y *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (yMax >= recView.bottom)
 	{
 		pos.y = recView.bottom - radius;
 		velocity.y *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	return FALSE;
@@ -294,7 +317,7 @@ BOOL CRectangle::Merge(const RECT& recView, vector<CObject*>& vec)
 //
 //}
 
-CStar::CStar(POINT pt) :CObject(pt)
+CStar::CStar(POINT pt) : CObject(pt)
 {
 	radius = rand() % 30 + 20;
 	innerRadius = radius / 2;
@@ -357,7 +380,14 @@ void CStar::Update()
 
 void CStar::Draw(const HDC& hdc)
 {
-	Polygon(hdc, p, 10);
+	POINT vex[10];
+
+	for (int i = 0; i < 10; i++)
+	{
+		vex[i] = { (int)p[i].x,(int)p[i].y };
+	}
+
+	Polygon(hdc, vex, 10);
 }
 
 BOOL CStar::Collison(const RECT& recView, const vector<CObject*>& vec)
@@ -365,14 +395,31 @@ BOOL CStar::Collison(const RECT& recView, const vector<CObject*>& vec)
 	//다른 물체와 충돌 했을때
 	for (int i = 0; i < vec.size(); i++)
 	{
-		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() + 2 && Length(pos, vec[i]->GetPos()) > 5)
+		if (Length(pos, vec[i]->GetPos()) <= radius + vec[i]->GetRadius() && Length(pos, vec[i]->GetPos()) > 5)
 		{
-			POINT normal = { pos.x - vec[i]->GetPos().x, pos.y - vec[i]->GetPos().y }; // 호출 함수 기준
-			double distance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
-			pos.x += distance * normal.x / Length(pos, vec[i]->GetPos());
-			pos.y += distance * normal.y / Length(pos, vec[i]->GetPos());
-			velocity.x += normal.x * (weight / (weight + vec[i]->GetWeight())) * 0.1;
-			velocity.y += normal.y * (weight / (weight + vec[i]->GetWeight())) * 0.1;
+			double OverlapDistance = radius + vec[i]->GetRadius() - Length(pos, vec[i]->GetPos());
+			double normalX = (pos.x - vec[i]->GetPos().x) / Length(pos, vec[i]->GetPos());
+			double normalY = (pos.y - vec[i]->GetPos().y) / Length(pos, vec[i]->GetPos());
+			pos.x += 0.5 * OverlapDistance * normalX;
+			pos.y += 0.5 * OverlapDistance * normalY;
+
+			Vector p = { vec[i]->GetPos().x - 0.5 * OverlapDistance * normalX,
+				vec[i]->GetPos().y - 0.5 * OverlapDistance * normalY };
+
+			vec[i]->SetPos(p);
+
+			int e = 1.3;
+			double J = (-(1 + e) * ((velocity.x - vec[i]->GetVelocity().x) * (normalX)
+				+(velocity.y - vec[i]->GetVelocity().y) * normalY)) / ((1 / weight) + (1 / vec[i]->GetWeight()));
+
+			velocity.x += J * normalX / weight;
+			velocity.y += J * normalY / weight;
+
+			Vector v = { vec[i]->GetVelocity().x - J * normalX / vec[i]->GetWeight(),
+				vec[i]->GetVelocity().y - J * normalY / vec[i]->GetWeight() };
+
+			vec[i]->SetVel(v);
+
 			//collisonNum.push_back(i);
 			return TRUE;
 		}
@@ -384,28 +431,28 @@ BOOL CStar::Collison(const RECT& recView, const vector<CObject*>& vec)
 	{
 		pos.x = recView.right - radius;
 		velocity.x *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (pos.x - radius <= recView.left)
 	{
 		pos.x = recView.left + radius;
 		velocity.x *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (pos.y + radius >= recView.bottom)
 	{
 		pos.y = recView.bottom - radius;
 		velocity.y *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	else if (pos.y - radius <= recView.top)
 	{
 		pos.y = recView.top + radius;
 		velocity.y *= -1;
-		return TRUE;
+		//return TRUE;
 	}
 
 	return FALSE;
