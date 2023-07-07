@@ -39,6 +39,7 @@ public:
 
 	virtual void Update();
 	virtual void Draw(HDC hdc) {};
+	virtual void BallActive(const vector<Object*>& blocks, const Vector& vel) {};
 	virtual BOOL Collison(const RECT& recView, Object* player, const vector<Object*>& blocks) { return FALSE; }
 
 	double Length(const Vector & a, const Vector & b)
@@ -62,7 +63,7 @@ public:
 
 	void Update() override;
 	void Draw(HDC hdc)override;
-	BOOL BallActive();
+	void BallActive(const vector<Object*>& blocks, const Vector& vel) override;
 	BOOL Collison(const RECT& recView, Object* player, const vector<Object*>& blocks)override;
 
 };
@@ -81,6 +82,8 @@ public:
 	int GetHeight()const { return height; }
 	void SetHeight(int h) { height = h; }
 	BOOL GetDead() const { return dead; }
+	int GetHp()const { return Hp; }
+	void SetHp(int hp) { Hp = hp; }
 
 	Block();
 	Block(Vector & p, Vector & v, int w, int h, int hp);

@@ -114,7 +114,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+      200, 200, 530, 768, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -143,7 +143,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
 
     static RECT rectView;
-    static Vector PlayerPos = { 512,600 };
+    static Vector PlayerPos = { 306,600 };
     static Vector PlayerVel = { 0,0 };
     static int playerSpeed = 10;
     static int playerWidth = 100;
@@ -162,8 +162,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static Object* play = (Object*)player;
     static Object* fBall = (Object*)firstBall;
     // static vector<Object*> Items;
-    static int BlockNum = 120;
-    static int hideBallNum = 10;
+    static int BlockNum = 100;
+    static int hideBallNum = 3;
     static bool isStart = false;
 
     switch (message)
@@ -188,7 +188,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 Balls[i]->Update();
                 Balls[i]->Collison(rectView, play, Blocks);
+                Balls[i]->BallActive(Blocks, RandomVelocity());
 
+            }
+
+
+            for (int i = 0; i < Blocks.size(); i++)
+            {
+                Blocks[i]->Update();
             }
 
             InvalidateRect(hWnd, NULL, TRUE);
@@ -377,13 +384,12 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
     srand(time(NULL));
 
     Vector v = { 0,0 };
-    int width = 15; //가로줄
-    int height = 8; //세로줄
+    int width = 10; //가로줄
+    int height = 10; //세로줄
     int blockWidth = 50; //블럭 가로
-    int blockHeight = 30; //블럭 세로
-    int hp = 4;
+    int blockHeight = 20; //블럭 세로
 
-    Vector startP = { 150,100 };
+    Vector startP = { 30,50 };
 
     if (blockNum == width * height)
     {
@@ -394,6 +400,7 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
             int start = st.x;
             for (int j = 0; j < width; j++)
             {
+                int hp = rand() % 5 + 1;
                 Block* block = new Block(st, v, blockWidth, blockHeight, hp);
                 Object* B = (Object*)block;
                 blocks.push_back(B);
@@ -411,16 +418,12 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
         Vector pos = blocks[num]->GetPos();
         Vector vel = { 0,0 };
 
-        Ball* ball = new Ball(pos, vel, 5, num);
+        Ball* ball = new Ball(pos, vel, 10, num);
         Object* B = (Object*)ball;
         balls.push_back(B);
     }
 
 
-    
-    // 아이템 랜덤 위치, 성능도 랜덤으로
-
-    
 
 }
 
@@ -429,21 +432,21 @@ Vector RandomVelocity()
     int sign1 = rand() % 2;
     int sign2 = rand() % 2;
 
-    double x;
-    double y;
+    double x=0;
+    double y=0;
 
     if (sign1)
     {
         if (sign2)
         {
-            x = rand() % 10 + 5;
-            y = rand() % 10 + 5;
+            x = rand() % 6 + 5;
+            y = rand() % 6 + 5;
         }
 
         else
         {
-            x = rand() % 10 + 5;
-            y = (rand() % 10 + 5) * (-1);
+            x = rand() % 6 + 5;
+            y = (rand() % 6 + 5) * (-1);
         }
     }
 
@@ -451,14 +454,14 @@ Vector RandomVelocity()
     {
         if (sign2)
         {
-            x = (rand() % 10 + 5) * (-1);
-            y = (rand() % 10 + 5) * (-1);
+            x = (rand() % 6 + 5) * (-1);
+            y = (rand() % 6 + 5) * (-1);
         }
 
         else
         {
-            x = (rand() % 10 + 5) * (-1);
-            y = rand() % 10 + 5;
+            x = (rand() % 6 + 5) * (-1);
+            y = rand() % 6 + 5;
         }
     }
 

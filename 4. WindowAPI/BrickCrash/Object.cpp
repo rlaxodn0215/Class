@@ -45,7 +45,7 @@ void Ball::Update()
 
 void Ball::Draw(HDC hdc)
 {
-	if (isAble == TRUE)
+	if (isAble==TRUE)
 	{
 		int x1 = position.x - radius;
 		int y1 = position.y - radius;
@@ -54,6 +54,28 @@ void Ball::Draw(HDC hdc)
 
 		Ellipse(hdc, x1, y1, x2, y2);
 	}
+}
+
+void Ball::BallActive(const vector<Object*>& blocks,const Vector & vel)
+{
+	vector<Block*> block;
+
+	for (int i = 0; i < blocks.size(); i++)
+	{
+		block.push_back((Block*)blocks[i]);
+	}
+
+	if (block[this->hideBlockNum]->BlockDead() == TRUE && isAble ==FALSE)
+	{
+		this->velocity = vel;
+		this->isAble = TRUE;
+	}
+	
+	for (int i = 0; i < blocks.size(); i++)
+	{
+		block.pop_back();
+	}
+
 }
 
 
@@ -115,8 +137,9 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 					if (position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
 						position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius)
 					{
+						block->SetHp(block->GetHp() - 1);
 						velocity.x *= -1;
-						//return TRUE;
+						return TRUE;
 					}
 				}
 
@@ -128,8 +151,9 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 					if (position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
 						position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius)
 					{
+						block->SetHp(block->GetHp() - 1);
 						velocity.y *= -1;
-						//return TRUE;
+						return TRUE;
 					}
 				}
 
@@ -300,7 +324,35 @@ Block::Block(Vector & p, Vector & v, int w, int h, int hp):Object(p,v)
 
 void Block::Update()
 {
-	Object::Update();
+
+	if (Hp == 1)
+	{
+		col = RED;
+	}
+
+	else if(Hp==2)
+	{
+		col = ORANGE;
+	}
+
+	else if (Hp == 3)
+	{
+		col = YELLOW;
+	}
+
+	else if (Hp == 4)
+	{
+		col = GREEN;
+	}
+
+	else if (Hp == 5)
+	{
+		col = BLUE;
+	}
+	else
+	{
+		dead = TRUE;
+	}
 }
 
 void Block::Draw(HDC hdc)
@@ -312,6 +364,7 @@ void Block::Draw(HDC hdc)
 		int x2 = position.x + width / 2;
 		int y2 = position.y + height / 2;
 
+
 		Rectangle(hdc, x1, y1, x2, y2);
 	}
 }
@@ -321,9 +374,10 @@ BOOL Block::BlockDead()
 	if (Hp <= 0)
 	{
 		dead = TRUE;
+		return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
 BOOL Block::Collison(const vector<Object*>& balls)
