@@ -55,6 +55,10 @@ VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 HBITMAP hDoubleBufferImage;
 void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc);
 
+
+
+BOOL CALLBACK Dialog_Test1_Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+
 //<<
 
 #define MAX_LOADSTRING 100
@@ -378,8 +382,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         case ID_DRAW_RECTANGLE:
         {
             int temp = randNum;
-            int ans = MessageBox(hWnd, _T("네모 그릴래?"), _T("도형선택"), MB_YESNOCANCEL);
-            if (ans == IDYES)
+            //int ans = MessageBox(hWnd, _T("네모 그릴래?"), _T("도형선택"), MB_YESNOCANCEL);
+
+            DialogBox(hInst, MAKEINTATOM(IDD_DIALOG1), hWnd, Dialog_Test1_Proc);
+
+
+            /*if (ans == IDYES)
             {
                 randNum = RECTANGLE;
             }
@@ -392,7 +400,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             else
             {
                 randNum = temp;
-            }
+            }*/
 
 
         }
@@ -792,4 +800,69 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
     SelectObject(hMenDC, hodBitmap);
     DeleteDC(hMenDC);
+}
+
+BOOL CALLBACK Dialog_Test1_Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (iMsg)
+    {
+    case WM_INITDIALOG:
+    {
+        HWND hBtn = GetDlgItem(hDlg, IDC_PAUSE);
+        EnableWindow(hBtn, FALSE);
+    }
+        return 1;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_START:
+        {
+            HDC hdc = GetDC(hDlg);
+            SetDlgItemText(hDlg, ID_TEXT, _T("Start"));
+            ReleaseDC(hDlg, hdc);
+
+            HWND hBtn = GetDlgItem(hDlg, IDC_START);
+            EnableWindow(hBtn, FALSE);
+
+            hBtn = GetDlgItem(hDlg, IDC_PAUSE);
+            EnableWindow(hBtn, TRUE);
+        }
+            break;
+        case IDC_PAUSE:
+        {
+            HDC hdc = GetDC(hDlg);
+            SetDlgItemText(hDlg, ID_TEXT, _T("Pause"));
+            ReleaseDC(hDlg, hdc);
+
+
+            HWND hBtn = GetDlgItem(hDlg, IDC_PAUSE);
+            EnableWindow(hBtn, FALSE);
+
+            hBtn = GetDlgItem(hDlg, IDC_START);
+            EnableWindow(hBtn, TRUE);
+        }
+            break;
+        case IDC_BUTTON_PRINT:
+        {
+            HDC hdc = GetDC(hDlg);
+            TextOut(hdc, 0, 0, _T("Print"), 5);
+
+            SetDlgItemText(hDlg, ID_TEXT, _T("Print"));
+
+            ReleaseDC(hDlg,hdc);
+        }
+            break;
+        case IDOK:
+            EndDialog(hDlg, 0);
+            break;
+        case ID_EXIT:
+            EndDialog(hDlg, 0);
+            break;
+        }
+
+        break;
+
+    }
+    return 0;
 }

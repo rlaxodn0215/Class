@@ -183,7 +183,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 {
                     obgs[i]->Update();
                     obgs[i]->Merge(recView, obgs);
-                    InvalidateRect(hWnd, NULL, TRUE);
                 }
             }
 

@@ -13,10 +13,15 @@
 #define IDC_WINDOWAPI                   109
 #define IDR_MAINFRAME                   128
 #define IDR_MENU1                       131
+#define IDD_DIALOG1                     132
+#define IDC_BUTTON_PRINT                1010
+#define IDC_BUTTON_END                  1011
+#define ID_EXIT                         1012
+#define ID_TEXT                         1013
+#define IDC_START                       1015
+#define IDC_PAUSE                       1016
 #define ID_MENUTEST_E                   32773
 #define ID_MENUTEST_                    32774
-#define ID_BUTTON2_BUTTON2              32775
-#define ID_BUTTON2_BTN2                 32776
 #define ID_DRAW_CIRCLE                  32777
 #define ID_DRAW_RECTANGLE               32778
 #define ID_DRAW_STAR                    32780
@@ -32,9 +37,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32793
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
