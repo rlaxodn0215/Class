@@ -143,14 +143,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
 
     static RECT rectView;
-    static Vector PlayerPos = {512,600};
-    static Vector PlayerVel = {10,0};
-    static int playerWidth = 50;
-    static int playerHeight = 10;
+    static Vector PlayerPos = { 512,600 };
+    static Vector PlayerVel = { 0,0 };
+    static int playerSpeed = 10;
+    static int playerWidth = 100;
+    static int playerHeight = 20;
 
-    static int ballRadius = 5;
-    static Vector FirstBallPos = {PlayerPos.x,PlayerPos.y-playerHeight/2-ballRadius};
-    static Vector FirstBallVel = {0,0};
+    static int ballRadius = 10;
+    static Vector FirstBallPos = { PlayerPos.x,PlayerPos.y - playerHeight / 2 - ballRadius };
+    static Vector FirstBallVel = { 0,0 };
 
     static vector<Object*> Blocks;
     static vector<Object*> Balls;
@@ -160,9 +161,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     static Object* play = (Object*)player;
     static Object* fBall = (Object*)firstBall;
-   // static vector<Object*> Items;
+    // static vector<Object*> Items;
     static int BlockNum = 120;
-    static int hideBallNum=10;
+    static int hideBallNum = 10;
     static bool isStart = false;
 
     switch (message)
@@ -171,7 +172,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         GetClientRect(hWnd, &rectView);
         SetTimer(hWnd, TIMER_FIRST, 20, NULL);
-        StageBlockSetting(Blocks, Balls,BlockNum, hideBallNum);
+        StageBlockSetting(Blocks, Balls, BlockNum, hideBallNum);
     }
     break;
     case WM_TIMER:
@@ -191,22 +192,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 
             InvalidateRect(hWnd, NULL, TRUE);
-            
+
         }
-            break;
+        break;
         default:
             break;
         }
     }
     break;
-    case WM_KEYDOWN: 
+    case WM_KEYDOWN:
     {
         switch (wParam)
         {
         case VK_LEFT:
         {
-            Vector newPos = { play->GetPos().x - play->GetVel().x,play->GetPos().y };
+            Vector newPos = { play->GetPos().x - playerSpeed,play->GetPos().y };
             play->SetPos(newPos);
+            PlayerVel = { (double)playerSpeed,0 };
+            play->SetVel(PlayerVel);
+
             player->Collison(rectView, Balls);
 
             if (isStart == false)
@@ -219,11 +223,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
         }
-            break;
+        break;
         case VK_RIGHT:
         {
-            Vector newPos = { play->GetPos().x + play->GetVel().x,play->GetPos().y };
+            Vector newPos = { play->GetPos().x + playerSpeed,play->GetPos().y };
             play->SetPos(newPos);
+
+            PlayerVel = { -(double)playerSpeed,0 };
+            play->SetVel(PlayerVel);
+
             player->Collison(rectView, Balls);
 
             if (isStart == false)
@@ -234,7 +242,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             InvalidateRect(hWnd, NULL, TRUE);
         }
-            break;
+        break;
         case VK_SPACE:
         {
             //공 발사 
@@ -244,54 +252,75 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
         }
-            break;
+        break;
         default:
             break;
         }
     }
     break;
+
+    case WM_KEYUP:
+    {
+        switch (wParam)
+        {
+        case VK_LEFT:
+        {
+            PlayerVel = { 0,0 };
+            play->SetVel(PlayerVel);
+        }
+        break;
+        case VK_RIGHT:
+        {
+            PlayerVel = { 0,0 };
+            play->SetVel(PlayerVel);
+        }
+        break;
+
+        }
+        break;
+
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // 메뉴 선택을 구문 분석합니다:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
+    {
+        hdc = BeginPaint(hWnd, &ps);
+        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+
+        play->Draw(hdc);
+        firstBall->Draw(hdc);
+
+        for (int i = 0; i < BlockNum; i++)
         {
-            hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-
-            play->Draw(hdc);
-            firstBall->Draw(hdc);
-
-            for (int i = 0; i < BlockNum; i++)
-            {
-                Blocks[i]->Draw(hdc);
-            }
-
-            for (int i = 0; i < hideBallNum; i++)
-            {
-                Balls[i]->Draw(hdc);
-            }
-
-            
-            
-           // Rectangle(hdc, 487, 537, 745, 755);
-
-            EndPaint(hWnd, &ps);
+            Blocks[i]->Draw(hdc);
         }
-        break;
+
+        for (int i = 0; i < hideBallNum; i++)
+        {
+            Balls[i]->Draw(hdc);
+        }
+
+
+
+        // Rectangle(hdc, 487, 537, 745, 755);
+
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
     {
         delete player;
@@ -299,14 +328,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < BlockNum; i++)
         {
-           Object* obj = Blocks[i];
-           delete obj;
+            Object* obj = Blocks[i];
+            delete obj;
         }
 
         for (int i = 0; i < hideBallNum; i++)
         {
-           Object* obj = Balls[i];
-           delete obj;
+            Object* obj = Balls[i];
+            delete obj;
         }
 
 
@@ -314,11 +343,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         //_CrtDumpMemoryLeaks();
     }
-        break;
+    break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
+    }
 }
 
 // 정보 대화 상자의 메시지 처리기입니다.
@@ -349,11 +379,11 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
     Vector v = { 0,0 };
     int width = 15; //가로줄
     int height = 8; //세로줄
-    int blockWidth = 40; //블럭 가로
-    int blockHeight = 20; //블럭 세로
+    int blockWidth = 50; //블럭 가로
+    int blockHeight = 30; //블럭 세로
     int hp = 4;
 
-    Vector startP = { 200,100 };
+    Vector startP = { 150,100 };
 
     if (blockNum == width * height)
     {
@@ -367,9 +397,9 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
                 Block* block = new Block(st, v, blockWidth, blockHeight, hp);
                 Object* B = (Object*)block;
                 blocks.push_back(B);
-                st.x += blockWidth + 1;
+                st.x += blockWidth;
             }
-            startP.y += blockHeight + 1;
+            startP.y += blockHeight;
         }
     }
 

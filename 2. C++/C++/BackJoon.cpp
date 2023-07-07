@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<string>
 #include"StopWatch.h"
 
 //ios::sync_with_stdio(0);
@@ -7,37 +8,87 @@
 
 using namespace std;
 
-int list[100];
+int compareCount=0;
+int matchCount = 0;
 
-void func(int * arr, int arrlen)
+void func(string sentence, string word)
 {
-    int max=arr[0];
+    
 
-    for (int i = 0; i < arrlen; i++)
+    for (int i = 0; i <= sentence.size()-word.size(); i++)
     {
-        list[arr[i]] += 1;
-        max = (arr[i] > max) ? arr[i] : max;
-    }
+        cout << i;
 
-    int j = 0;
-    while(1)
-    {
-        while (list[j] != 0)
+        int count = 0;
+        for (int j = 0; j < word.size(); j++)
         {
-            cout << j << " ";
-            list[j]--;
+            cout << " ";
+            if (j != 0) cout << " ";
+            cout << sentence << "\n";
+            cout << "  ";
+
+            for (int t = 0; t < i; t++)
+                cout << " ";
+
+            if (sentence[i+j] == word[j])
+            {
+
+                for(int k=0;k<j;k++)
+                    cout << " ";
+
+                cout << "+" << "\n";
+
+                cout << "  ";
+
+                for (int k = 0; k < i; k++)
+                    cout << " ";
+
+                cout << word;
+                count++;
+            }
+
+            else
+            {
+
+                for (int k = 0; k < j; k++)
+                    cout << " ";
+
+                cout << "|"<<"\n";
+
+                cout << "  ";
+
+                for (int k = 0; k < i; k++)
+                    cout << " ";
+
+                cout << word;
+                break;
+            }
+
+            cout << "\n";
+
         }
-        if (j == max) break;
-         else j++;
+
+        if (count == word.size())
+        {
+            matchCount++;
+            count = 0;
+        }
+
+        compareCount++;
+        cout << "\n";
     }
-    cout << "\n";
 }
 
 
 int main()
 {
-    int num[13] = {72,8,19,6,55,55,33,2,17,17,69,88,88};
-    func(num,13);
+    string sentence = "ababcdefga";
+    string word = "abc";
+
+    func(sentence, word);
+
+    cout << "비교를 " << compareCount << "회 시도했습니다." << "\n";
+    cout << "일치한 횟수는 " << matchCount << "입니다." << "\n";
 
     return 0;
 }
