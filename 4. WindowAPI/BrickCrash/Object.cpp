@@ -52,8 +52,14 @@ void Ball::Draw(HDC hdc)
 		int x2 = position.x + radius;
 		int y2 = position.y + radius;
 
+		HBRUSH hBrush, oldBrush;
+		hBrush = CreateSolidBrush(RGB(0, 0, 0));
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 		Ellipse(hdc, x1, y1, x2, y2);
+		SelectObject(hdc, oldBrush);
+		DeleteObject(hBrush);
 	}
+
 }
 
 void Ball::BallActive(const vector<Object*>& blocks,const Vector & vel)
@@ -138,6 +144,7 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 						position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius)
 					{
 						block->SetHp(block->GetHp() - 1);
+						play->SetPoint(play->GetPoint() + 100);
 						velocity.x *= -1;
 						return TRUE;
 					}
@@ -152,6 +159,7 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 						position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius)
 					{
 						block->SetHp(block->GetHp() - 1);
+						play->SetPoint(play->GetPoint() + 100);
 						velocity.y *= -1;
 						return TRUE;
 					}
@@ -364,8 +372,26 @@ void Block::Draw(HDC hdc)
 		int x2 = position.x + width / 2;
 		int y2 = position.y + height / 2;
 
+		HBRUSH hBrush, oldBrush;
+		
+		hBrush = NULL;
 
+		if (col == RED)
+			hBrush = CreateSolidBrush(RGB(255, 0, 0));
+		else if (col == ORANGE)
+			hBrush = CreateSolidBrush(RGB(255, 153, 0));
+		else if (col == YELLOW)
+			hBrush = CreateSolidBrush(RGB(255, 255, 0));
+		else if (col == GREEN)
+			hBrush = CreateSolidBrush(RGB(0, 255, 153));
+		else if (col == BLUE)
+			hBrush = CreateSolidBrush(RGB(0, 0, 255));
+
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 		Rectangle(hdc, x1, y1, x2, y2);
+
+		SelectObject(hdc, oldBrush);
+		DeleteObject(hBrush);
 	}
 }
 
