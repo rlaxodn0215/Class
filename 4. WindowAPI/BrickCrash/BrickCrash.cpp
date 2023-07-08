@@ -23,8 +23,6 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 
-
-
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -143,9 +141,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
 
     static RECT rectView;
-    static Vector PlayerPos = { 306,600 };
+    static Vector PlayerPos = { 304,600 };
     static Vector PlayerVel = { 0,0 };
-    static int playerSpeed = 10;
+    static int playerSpeed = 15;
     static int playerWidth = 100;
     static int playerHeight = 20;
 
