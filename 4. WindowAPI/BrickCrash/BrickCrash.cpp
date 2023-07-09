@@ -112,7 +112,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      200, 200, 530, 768, nullptr, nullptr, hInstance, nullptr);
+      200, 100, 800, 900, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -141,9 +141,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
 
     static RECT rectView;
-    static Vector PlayerPos = { 304,600 };
+    static RECT playRectview = {200,10,755,785};
+    static RECT pointBoard = { 40,100,150,120 };
+    static TCHAR points[10]; 
+
+    static Vector PlayerPos = { 504,750 };
     static Vector PlayerVel = { 0,0 };
-    static int playerSpeed = 15;
+    static int playerSpeed = 25;
     static int playerWidth = 100;
     static int playerHeight = 20;
 
@@ -180,12 +184,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case TIMER_FIRST:
         {
             firstBall->Update();
-            firstBall->Collison(rectView, play, Blocks);
+            firstBall->Collison(playRectview, play, Blocks);
 
             for (int i = 0; i < Balls.size(); i++)
             {
                 Balls[i]->Update();
-                Balls[i]->Collison(rectView, play, Blocks);
+                Balls[i]->Collison(playRectview, play, Blocks);
                 Balls[i]->BallActive(Blocks, RandomVelocity());
 
             }
@@ -216,7 +220,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PlayerVel = { (double)playerSpeed,0 };
             play->SetVel(PlayerVel);
 
-            player->Collison(rectView, Balls);
+            player->Collison(playRectview, Balls);
 
             if (isStart == false)
             {
@@ -237,7 +241,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PlayerVel = { -(double)playerSpeed,0 };
             play->SetVel(PlayerVel);
 
-            player->Collison(rectView, Balls);
+            player->Collison(playRectview, Balls);
 
             if (isStart == false)
             {
@@ -306,6 +310,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
+        wsprintf(points, TEXT("Points :  %d"), player->GetPoint());
+
+        DrawText(hdc, points, _tcslen(points), &pointBoard, DT_SINGLELINE | DT_VCENTER);
+
+
+        Rectangle(hdc, playRectview.left, playRectview.top, playRectview.right, playRectview.bottom);
+
         play->Draw(hdc);
         firstBall->Draw(hdc);
 
@@ -319,6 +330,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             Balls[i]->Draw(hdc);
         }
 
+
+        //InvalidateRect(hWnd, NULL, TRUE);
 
 
         // Rectangle(hdc, 487, 537, 745, 755);
@@ -387,7 +400,7 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
     int blockWidth = 50; //블럭 가로
     int blockHeight = 20; //블럭 세로
 
-    Vector startP = { 30,50 };
+    Vector startP = { 250,50 };
 
     if (blockNum == width * height)
     {
