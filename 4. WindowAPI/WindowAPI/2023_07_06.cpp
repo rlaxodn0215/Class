@@ -271,7 +271,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
         CreateBitmap();
         GetClientRect(hWnd, &recView);
-        SetTimer(hWnd, TIMER_SECOND, 20, AniProc);
+        //SetTimer(hWnd, TIMER_SECOND, 20, AniProc);
 
     }
     break;
@@ -384,7 +384,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             int temp = randNum;
             //int ans = MessageBox(hWnd, _T("네모 그릴래?"), _T("도형선택"), MB_YESNOCANCEL);
 
-            DialogBox(hInst, MAKEINTATOM(IDD_DIALOG1), hWnd, Dialog_Test1_Proc);
+            //DialogBox(hInst, MAKEINTATOM(IDD_DIALOG1), hWnd, Dialog_Test1_Proc);
 
 
             /*if (ans == IDYES)
@@ -714,33 +714,33 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
 
 
-    {//수지
-        hMenDC2 = CreateCompatibleDC(hMenDC);
-        hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hBackImage);
-        bx = bitBack.bmWidth;
-        by = bitBack.bmHeight;
+    //{//수지
+    //    hMenDC2 = CreateCompatibleDC(hMenDC);
+    //    hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hBackImage);
+    //    bx = bitBack.bmWidth;
+    //    by = bitBack.bmHeight;
 
-        BitBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
+    //    BitBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
 
-        SelectObject(hMenDC2, hodBitmap2);
-        DeleteDC(hMenDC2);
-    }
+    //    SelectObject(hMenDC2, hodBitmap2);
+    //    DeleteDC(hMenDC2);
+    //}
 
-    {//시공
+    //{//시공
 
-        hMenDC2 = CreateCompatibleDC(hMenDC);
-        hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hTransparentImage);
-        bx = bitTransparent.bmWidth;
-        by = bitTransparent.bmHeight;
+    //    hMenDC2 = CreateCompatibleDC(hMenDC);
+    //    hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hTransparentImage);
+    //    bx = bitTransparent.bmWidth;
+    //    by = bitTransparent.bmHeight;
 
-        //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
-        TransparentBlt(hMenDC, 240, 255, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
-        TransparentBlt(hMenDC, 383, 265, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+    //    //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
+    //    TransparentBlt(hMenDC, 240, 255, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+    //    TransparentBlt(hMenDC, 383, 265, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
 
-        SelectObject(hMenDC2, hodBitmap2);
-        DeleteDC(hMenDC2);
+    //    SelectObject(hMenDC2, hodBitmap2);
+    //    DeleteDC(hMenDC2);
 
-    }
+    //}
 
     {//Ani
         hMenDC2 = CreateCompatibleDC(hMenDC);
@@ -753,7 +753,7 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         static int posX = 150;
         posX += 3;
         //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
-        TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        //TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
         //StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
         //TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
@@ -762,35 +762,35 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     }
     //<< hMenDC 에 그려주기
 
-    {//>> front image
+    //{//>> front image
 
-       hMenDC2 = CreateCompatibleDC(hMenDC);
-       hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hFrontImage);
-       bx = bitFront.bmWidth;
-       by = bitFront.bmHeight;
+    //   hMenDC2 = CreateCompatibleDC(hMenDC);
+    //   hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hFrontImage);
+    //   bx = bitFront.bmWidth;
+    //   by = bitFront.bmHeight;
 
-       HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
-       HBRUSH oldBrush = (HBRUSH)SelectObject(hMenDC2, hBrush);
+    //   HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
+    //   HBRUSH oldBrush = (HBRUSH)SelectObject(hMenDC2, hBrush);
 
-       Ellipse(hMenDC2, 250, 100, 750, 500);
+    //   Ellipse(hMenDC2, 250, 100, 750, 500);
 
-       SelectObject(hMenDC2,oldBrush);
-       DeleteObject(hBrush);
-       
-       TransparentBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+    //   SelectObject(hMenDC2,oldBrush);
+    //   DeleteObject(hBrush);
+    //   
+    //   TransparentBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
 
-       SelectObject(hMenDC2, hodBitmap2);
+    //   SelectObject(hMenDC2, hodBitmap2);
 
 
 
-       DeleteDC(hMenDC2);
-    }
+    //   DeleteDC(hMenDC2);
+    //}
 
 
     //hdc에 그려주기
-   // BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
-    TransparentBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0,
-        recView.right, recView.bottom, RGB(255, 0, 255));
+    BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
+    /*TransparentBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0,
+        recView.right, recView.bottom, RGB(255, 0, 255));*/
     
     //hBrush = CreateSolidBrush(RGB(255, 0, 255));
     //oldB = (HBRUSH)SelectObject(hMenDC, hBrush);

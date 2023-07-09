@@ -22,14 +22,15 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
+HBITMAP screen;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int blockNum, int ballNum);
 Vector RandomVelocity();
+void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int blockNum, int ballNum);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -165,7 +166,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static Object* fBall = (Object*)firstBall;
     // static vector<Object*> Items;
     static int BlockNum = 100;
-    static int hideBallNum = 10;
+    static int hideBallNum = 5;
     static bool isStart = false;
 
     switch (message)
@@ -200,7 +201,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 Blocks[i]->Update();
             }
 
-            InvalidateRect(hWnd, NULL, TRUE);
+
+            if (GetAsyncKeyState(VK_LEFT)&0x8000) //왼쪽
+            {
+                Vector newPos = { play->GetPos().x - playerSpeed,play->GetPos().y };
+                play->SetPos(newPos);
+                PlayerVel = { (double)playerSpeed,0 };
+                play->SetVel(PlayerVel);
+
+                player->Collison(playRectview, Balls);
+
+                if (isStart == false)
+                {
+                    Vector newBallpos = { newPos.x, fBall->GetPos().y };
+                    fBall->SetPos(newBallpos);
+                }
+            }
+
+            if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
+            {
+                Vector newPos = { play->GetPos().x + playerSpeed,play->GetPos().y };
+                play->SetPos(newPos);
+
+                PlayerVel = { -(double)playerSpeed,0 };
+                play->SetVel(PlayerVel);
+
+                player->Collison(playRectview, Balls);
+
+                if (isStart == false)
+                {
+                    Vector newBallpos = { newPos.x, fBall->GetPos().y };
+                    fBall->SetPos(newBallpos);
+                }
+            }
+
+            InvalidateRect(hWnd, NULL, FALSE);
 
         }
         break;
@@ -213,45 +248,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         switch (wParam)
         {
-        case VK_LEFT:
-        {
-            Vector newPos = { play->GetPos().x - playerSpeed,play->GetPos().y };
-            play->SetPos(newPos);
-            PlayerVel = { (double)playerSpeed,0 };
-            play->SetVel(PlayerVel);
 
-            player->Collison(playRectview, Balls);
-
-            if (isStart == false)
-            {
-                Vector newBallpos = { newPos.x, fBall->GetPos().y };
-                fBall->SetPos(newBallpos);
-            }
-
-            InvalidateRect(hWnd, NULL, TRUE);
-
-
-        }
-        break;
-        case VK_RIGHT:
-        {
-            Vector newPos = { play->GetPos().x + playerSpeed,play->GetPos().y };
-            play->SetPos(newPos);
-
-            PlayerVel = { -(double)playerSpeed,0 };
-            play->SetVel(PlayerVel);
-
-            player->Collison(playRectview, Balls);
-
-            if (isStart == false)
-            {
-                Vector newBallpos = { newPos.x, fBall->GetPos().y };
-                fBall->SetPos(newBallpos);
-            }
-
-            InvalidateRect(hWnd, NULL, TRUE);
-        }
-        break;
         case VK_SPACE:
         {
             //공 발사 
@@ -310,31 +307,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
+        HDC hMemDC;
+        HBITMAP hOldBitmap;
+
+        hMemDC = CreateCompatibleDC(hdc);
+
+        //if(screen==NULL)
+            screen=CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
+
+        hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
+
         wsprintf(points, TEXT("Points :  %d"), player->GetPoint());
 
-        DrawText(hdc, points, _tcslen(points), &pointBoard, DT_SINGLELINE | DT_VCENTER);
+        DrawText(hMemDC, points, _tcslen(points), &pointBoard, DT_SINGLELINE | DT_VCENTER);
 
+        Rectangle(hMemDC, playRectview.left, playRectview.top, playRectview.right, playRectview.bottom);
 
-        Rectangle(hdc, playRectview.left, playRectview.top, playRectview.right, playRectview.bottom);
-
-        play->Draw(hdc);
-        firstBall->Draw(hdc);
+        play->Draw(hMemDC);
+        firstBall->Draw(hMemDC);
 
         for (int i = 0; i < BlockNum; i++)
         {
-            Blocks[i]->Draw(hdc);
+            Blocks[i]->Draw(hMemDC);
         }
 
         for (int i = 0; i < hideBallNum; i++)
         {
-            Balls[i]->Draw(hdc);
+            Balls[i]->Draw(hMemDC);
         }
+        
+        BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hMemDC, 0, 0, SRCCOPY);
 
-
-        //InvalidateRect(hWnd, NULL, TRUE);
-
-
-        // Rectangle(hdc, 487, 537, 745, 755);
+        SelectObject(hMemDC, hOldBitmap);
+        DeleteDC(hMemDC);
 
         EndPaint(hWnd, &ps);
     }
@@ -343,6 +348,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         delete player;
         delete firstBall;
+
+        if (screen)
+            DeleteObject(screen);
 
         for (int i = 0; i < BlockNum; i++)
         {
@@ -437,6 +445,7 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
 
 
 }
+
 
 Vector RandomVelocity()
 {
