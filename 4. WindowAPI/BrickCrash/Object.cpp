@@ -103,9 +103,9 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 		{
 
 			double OverlapDistance = radius -(y - position.y);
-			position.y -= OverlapDistance;
+			//position.y -= OverlapDistance;
 			double normalY = -1;
-			position.y += OverlapDistance * normalY;
+			//position.y += OverlapDistance * normalY;
 			velocity.y *= -1;
 
 			if (player->GetVel().x)
@@ -129,156 +129,177 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 
 		if (block->GetDead() == FALSE && isAble==TRUE)
 		{
-			if ((position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
-				position.x >= blocks[i]->GetPos().x - block->GetWidth() - radius / 2) ||
-				(position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
-					position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius))
+			double nearX = max(blocks[i]->GetPos().x - block->GetWidth() / 2,
+				min(position.x, blocks[i]->GetPos().x + block->GetWidth() / 2));
+
+			double nearY = max(blocks[i]->GetPos().y - block->GetHeight() / 2,
+				min(position.y, blocks[i]->GetPos().y + block->GetHeight() / 2));
+
+			Vector nearXY = { nearX,nearY };
+			double difference = Length(nearXY, position);
+
+			if (difference <= radius)
 			{
-
-				if ((position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
-					position.x >= blocks[i]->GetPos().x + block->GetWidth() / 2) ||
-					(position.x <= blocks[i]->GetPos().x - block->GetWidth() / 2 &&
-						position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius))
+				if (difference <= 0.0001)
 				{
-					if (position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
-						position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius)
-					{
-						block->SetHp(block->GetHp() - 1);
-						play->SetPoint(play->GetPoint() + 100);
-						velocity.x *= -1;
-						return TRUE;
-					}
+
 				}
 
-				if ((position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
-					position.y >= blocks[i]->GetPos().y + block->GetHeight() / 2) ||
-					(position.y <= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius &&
-						position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2))
-				{
-					if (position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
-						position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius)
-					{
-						block->SetHp(block->GetHp() - 1);
-						play->SetPoint(play->GetPoint() + 100);
-						velocity.y *= -1;
-						return TRUE;
-					}
-				}
 
+				Vector normal = { (position.x - nearX) / difference, (position.y - nearY) / difference };
+
+				velocity.x += -2 * velocity.x * normal.x;
+				velocity.y += -2 * velocity.y * normal.y;
+
+				/*if (velSize < velocity.x * velocity.x + velocity.y * velocity.y)
+				{
+					velocity.x *= velSize / (velocity.x * velocity.x + velocity.y * velocity.y);
+					velocity.y *= velSize / (velocity.x * velocity.x + velocity.y * velocity.y);
+				}*/
+
+				block->SetHp(block->GetHp() - 1);
+				play->SetPoint(play->GetPoint() + 100);
+				return TRUE;
 			}
-
-
-
-
-		 //if ((position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius && velocity.y < 0) || 
-			//	(position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius && velocity.y > 0))
-			//{
-			//	if (position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
-			//		position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius)
-			//	{
-			//		velocity.y *= -1;
-			//		return TRUE;
-			//	}
-			//}
-
-		 // if ((position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius && velocity.x < 0) ||
-			// (position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius && velocity.x > 0))
-		 //{
-			// if (position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
-			//	 position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius)
-			// {
-			//	 velocity.x *= -1;
-			//	 return TRUE;
-			// }
-		 //}
-
-
-
-			//double nearX = max(blocks[i]->GetPos().x - block->GetWidth() / 2,
-			//	min(position.x, blocks[i]->GetPos().x + block->GetWidth() / 2));
-
-			//double nearY = max(blocks[i]->GetPos().y - block->GetHeight() / 2,
-			//	min(position.y, blocks[i]->GetPos().y + block->GetHeight() / 2));
-
-			//Vector nearXY = { nearX,nearY };
-			//double difference = Length(nearXY, position);
-
-			//if (difference <= radius)
-			//{ 
-			//	if (difference < 0.00001) //공이 블록 안으로 들어왔다.
-			//	{
-			//		double minLength = position.x - (blocks[i]->GetPos().x - block->GetWidth() / 2); //왼쪽 
-			//		int way = 9;
-
-
-			//		if (minLength < (blocks[i]->GetPos().x + block->GetWidth() / 2) - position.x) //오른쪽
-			//		{
-			//			minLength = (blocks[i]->GetPos().x + block->GetWidth() / 2) - position.x;
-			//			way = 3;
-			//		}
-
-			//		if (minLength < (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y) //아래쪽
-			//		{
-			//			minLength = (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y;
-			//			way = 6;
-			//		}
-
-			//		if (minLength < (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y) //위쪽
-			//		{
-			//			 minLength = (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y;
-			//			 way = 12;
-			//		}
-
-			//		difference= minLength + radius;
-			//		
-			//		switch (way)
-			//		{
-			//		case 3:
-			//		{
-			//			position.x += difference;
-			//		}
-			//			break;
-			//		case 6:
-			//		{
-			//			position.y+= difference;
-			//		}
-			//			break;
-			//		case 9:
-			//		{
-			//			position.x -= difference;
-			//		}
-			//			break;
-			//		case 12:
-			//		{
-			//			position.y -= difference;
-			//		}
-			//			break;
-			//		}
-
-			//	}
-
-			//	if (position.y >= blocks[i]->GetPos().y + block->GetHeight() / 2 - radius ||
-			//		position.y <= blocks[i]->GetPos().y - block->GetHeight() / 2 + radius)//위아래에서 충돌
-			//	{
-			//		velocity.y *= -1;
-			//		return TRUE;
-			//	}
-
-			//	else if (position.x <= blocks[i]->GetPos().x - block->GetWidth() / 2 + radius ||
-			//		position.x >= blocks[i]->GetPos().x + block->GetWidth() / 2 - radius) //좌우에서 충돌
-			//	{
-			//		velocity.x *= -1;
-			//		return TRUE;
-			//	}
-
-				//Vector normal = { (position.x - nearX) / difference, (position.y - nearY) / difference };
-				//velocity.x = sqrt(velocity.x * velocity.x + velocity.y * velocity.y) * normal.x;
-				//velocity.y = sqrt(velocity.x * velocity.x + velocity.y * velocity.y) * normal.y;
-
-
-			
 		}
 	}
+
+	//if ((position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
+//	position.x >= blocks[i]->GetPos().x - block->GetWidth() - radius / 2) ||
+//	(position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
+//		position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius))
+//{
+
+//	if ((position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
+//		position.x >= blocks[i]->GetPos().x + block->GetWidth() / 2) ||
+//		(position.x <= blocks[i]->GetPos().x - block->GetWidth() / 2 &&
+//			position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius))
+//	{
+//		if (position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
+//			position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius)
+//		{
+//			block->SetHp(block->GetHp() - 1);
+//			play->SetPoint(play->GetPoint() + 100);
+//			velocity.x *= -1;
+//			return TRUE;
+//		}
+//	}
+
+//	if ((position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
+//		position.y >= blocks[i]->GetPos().y + block->GetHeight() / 2) ||
+//		(position.y <= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius &&
+//			position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2))
+//	{
+//		if (position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
+//			position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius)
+//		{
+//			block->SetHp(block->GetHp() - 1);
+//			play->SetPoint(play->GetPoint() + 100);
+//			velocity.y *= -1;
+//			return TRUE;
+//		}
+//	}
+
+//}
+
+
+
+
+//if ((position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius && velocity.y < 0) || 
+   //	(position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius && velocity.y > 0))
+   //{
+   //	if (position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius &&
+   //		position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius)
+   //	{
+   //		velocity.y *= -1;
+   //		return TRUE;
+   //	}
+   //}
+
+// if ((position.x <= blocks[i]->GetPos().x + block->GetWidth() / 2 + radius && velocity.x < 0) ||
+   // (position.x >= blocks[i]->GetPos().x - block->GetWidth() / 2 - radius && velocity.x > 0))
+//{
+   // if (position.y <= blocks[i]->GetPos().y + block->GetHeight() / 2 + radius &&
+   //	 position.y >= blocks[i]->GetPos().y - block->GetHeight() / 2 - radius)
+   // {
+   //	 velocity.x *= -1;
+   //	 return TRUE;
+   // }
+//}
+
+	//if (difference <= radius)
+//{ 
+//	if (difference < 0.00001) //공이 블록 안으로 들어왔다.
+//	{
+//		double minLength = position.x - (blocks[i]->GetPos().x - block->GetWidth() / 2); //왼쪽 
+//		int way = 9;
+
+
+//		if (minLength < (blocks[i]->GetPos().x + block->GetWidth() / 2) - position.x) //오른쪽
+//		{
+//			minLength = (blocks[i]->GetPos().x + block->GetWidth() / 2) - position.x;
+//			way = 3;
+//		}
+
+//		if (minLength < (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y) //아래쪽
+//		{
+//			minLength = (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y;
+//			way = 6;
+//		}
+
+//		if (minLength < (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y) //위쪽
+//		{
+//			 minLength = (blocks[i]->GetPos().y + block->GetHeight() / 2) - position.y;
+//			 way = 12;
+//		}
+
+//		difference= minLength + radius;
+//		
+//		switch (way)
+//		{
+//		case 3:
+//		{
+//			position.x += difference;
+//		}
+//			break;
+//		case 6:
+//		{
+//			position.y+= difference;
+//		}
+//			break;
+//		case 9:
+//		{
+//			position.x -= difference;
+//		}
+//			break;
+//		case 12:
+//		{
+//			position.y -= difference;
+//		}
+//			break;
+//		}
+
+//	}
+
+//	if (position.y >= blocks[i]->GetPos().y + block->GetHeight() / 2 - radius ||
+//		position.y <= blocks[i]->GetPos().y - block->GetHeight() / 2 + radius)//위아래에서 충돌
+//	{
+//		velocity.y *= -1;
+//		return TRUE;
+//	}
+
+//	else if (position.x <= blocks[i]->GetPos().x - block->GetWidth() / 2 + radius ||
+//		position.x >= blocks[i]->GetPos().x + block->GetWidth() / 2 - radius) //좌우에서 충돌
+//	{
+//		velocity.x *= -1;
+//		return TRUE;
+//	}
+
+	//Vector normal = { (position.x - nearX) / difference, (position.y - nearY) / difference };
+	//velocity.x = sqrt(velocity.x * velocity.x + velocity.y * velocity.y) * normal.x;
+	//velocity.y = sqrt(velocity.x * velocity.x + velocity.y * velocity.y) * normal.y;
+
+
 
 	//윈도우 벽과 충돌했을 때
 	if (position.x + radius >= recView.right)
@@ -295,7 +316,7 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 		return TRUE;
 	}
 
-	//라이프 차감
+	// 플레이어 사망
 	else if (position.y + radius >= recView.bottom)
 	{
 		position.y = recView.bottom - radius;

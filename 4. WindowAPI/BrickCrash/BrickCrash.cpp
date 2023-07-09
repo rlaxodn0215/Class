@@ -147,7 +147,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     static Vector PlayerPos = { 504,750 };
     static Vector PlayerVel = { 0,0 };
-    static int playerSpeed = 25;
+    static int playerSpeed = 8;
     static int playerWidth = 100;
     static int playerHeight = 20;
 
@@ -165,7 +165,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static Object* fBall = (Object*)firstBall;
     // static vector<Object*> Items;
     static int BlockNum = 100;
-    static int hideBallNum = 3;
+    static int hideBallNum = 10;
     static bool isStart = false;
 
     switch (message)
@@ -173,7 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
     {
         GetClientRect(hWnd, &rectView);
-        SetTimer(hWnd, TIMER_FIRST, 20, NULL);
+        SetTimer(hWnd, TIMER_FIRST, 16, NULL);
         StageBlockSetting(Blocks, Balls, BlockNum, hideBallNum);
     }
     break;
@@ -256,7 +256,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             //공 발사 
             isStart = true;
-            Vector vec = { 0,-10 };
+            Vector vec = { 0,-playerSpeed };
             fBall->SetVel(vec);
 
 
