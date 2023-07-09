@@ -23,6 +23,7 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 HBITMAP screen;
+bool PlayScene = false;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -31,6 +32,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 Vector RandomVelocity();
 void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int blockNum, int ballNum);
+
+INT_PTR CALLBACK ID_Input_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK Rank_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -144,6 +148,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static RECT rectView;
     static RECT playRectview = {200,10,755,785};
     static RECT pointBoard = { 40,100,150,120 };
+
+    static RECT Title = { 200,200,550,250 };
+    static RECT startButton = { 250,450,500,500 };
+    static RECT rankButton = { 250,500,500,550 };
+    static RECT exitButton = { 250,550,500,600 };
+    static POINT mousePos;
+
+    static TCHAR playerID[100];
     static TCHAR points[10]; 
 
     static Vector PlayerPos = { 504,750 };
@@ -167,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     // static vector<Object*> Items;
     static int BlockNum = 100;
     static int hideBallNum = 5;
-    static bool isStart = false;
+    static bool GameStart = false;
 
     switch (message)
     {
@@ -176,6 +188,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetClientRect(hWnd, &rectView);
         SetTimer(hWnd, TIMER_FIRST, 16, NULL);
         StageBlockSetting(Blocks, Balls, BlockNum, hideBallNum);
+        
     }
     break;
     case WM_TIMER:
@@ -211,7 +224,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 player->Collison(playRectview, Balls);
 
-                if (isStart == false)
+                if (GameStart == false)
                 {
                     Vector newBallpos = { newPos.x, fBall->GetPos().y };
                     fBall->SetPos(newBallpos);
@@ -228,7 +241,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 player->Collison(playRectview, Balls);
 
-                if (isStart == false)
+                if (GameStart == false)
                 {
                     Vector newBallpos = { newPos.x, fBall->GetPos().y };
                     fBall->SetPos(newBallpos);
@@ -244,6 +257,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }
     break;
+    case WM_LBUTTONDOWN:
+    {
+        mousePos.x = LOWORD(lParam);
+        mousePos.y = HIWORD(lParam);
+
+        if (mousePos.x>=startButton.left && mousePos.x<=startButton.right &&
+            mousePos.y >= startButton.top && mousePos.y <= startButton.bottom)
+        {
+            DialogBox(hInst, MAKEINTRESOURCE(ID_IDINPUT), hWnd, ID_Input_Dialogue);
+        }
+
+        else if (mousePos.x >= rankButton.left && mousePos.x <= rankButton.right &&
+            mousePos.y >= rankButton.top && mousePos.y <= rankButton.bottom)
+        {
+
+            DialogBox(hInst, MAKEINTRESOURCE(ID_RankingBoard), hWnd, Rank_Dialogue);
+
+
+        }
+
+        else if (mousePos.x >= exitButton.left && mousePos.x <= exitButton.right &&
+            mousePos.y >= exitButton.top && mousePos.y <= exitButton.bottom)
+        {
+            exit(1);
+        }
+    }
     case WM_KEYDOWN:
     {
         switch (wParam)
@@ -252,7 +291,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_SPACE:
         {
             //공 발사 
-            isStart = true;
+            GameStart = true;
             Vector vec = { 0,-playerSpeed };
             fBall->SetVel(vec);
 
@@ -307,39 +346,55 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-        HDC hMemDC;
-        HBITMAP hOldBitmap;
-
-        hMemDC = CreateCompatibleDC(hdc);
-
-        //if(screen==NULL)
-            screen=CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
-
-        hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
-
-        wsprintf(points, TEXT("Points :  %d"), player->GetPoint());
-
-        DrawText(hMemDC, points, _tcslen(points), &pointBoard, DT_SINGLELINE | DT_VCENTER);
-
-        Rectangle(hMemDC, playRectview.left, playRectview.top, playRectview.right, playRectview.bottom);
-
-        play->Draw(hMemDC);
-        firstBall->Draw(hMemDC);
-
-        for (int i = 0; i < BlockNum; i++)
+        if (PlayScene == false)
         {
-            Blocks[i]->Draw(hMemDC);
-        }
+            DrawText(hdc, _T("벽돌을 부숴라!!"), 9, &Title, DT_SINGLELINE |DT_CENTER| DT_VCENTER);
 
-        for (int i = 0; i < hideBallNum; i++)
-        {
-            Balls[i]->Draw(hMemDC);
+            Rectangle(hdc, startButton.left, startButton.top, startButton.right, startButton.bottom);
+            DrawText(hdc, _T("START"), 5, &startButton, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+
+            Rectangle(hdc, rankButton.left, rankButton.top, rankButton.right, rankButton.bottom);
+            DrawText(hdc, _T("RANK"), 4, &rankButton, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+
+            Rectangle(hdc, exitButton.left, exitButton.top, exitButton.right, exitButton.bottom);
+            DrawText(hdc, _T("EXIT"), 4, &exitButton, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
         }
         
-        BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hMemDC, 0, 0, SRCCOPY);
+        else
+        {
+            HDC hMemDC;
+            HBITMAP hOldBitmap;
 
-        SelectObject(hMemDC, hOldBitmap);
-        DeleteDC(hMemDC);
+            hMemDC = CreateCompatibleDC(hdc);
+
+            screen = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
+
+            hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
+
+            wsprintf(points, TEXT("Points :  %d"), player->GetPoint());
+
+            DrawText(hMemDC, points, _tcslen(points), &pointBoard, DT_SINGLELINE | DT_VCENTER);
+
+            Rectangle(hMemDC, playRectview.left, playRectview.top, playRectview.right, playRectview.bottom);
+
+            play->Draw(hMemDC);
+            firstBall->Draw(hMemDC);
+
+            for (int i = 0; i < BlockNum; i++)
+            {
+                Blocks[i]->Draw(hMemDC);
+            }
+
+            for (int i = 0; i < hideBallNum; i++)
+            {
+                Balls[i]->Draw(hMemDC);
+            }
+
+            BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hMemDC, 0, 0, SRCCOPY);
+
+            SelectObject(hMemDC, hOldBitmap);
+            DeleteDC(hMemDC);
+        }
 
         EndPaint(hWnd, &ps);
     }
@@ -375,26 +430,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
     }
-}
-
-// 정보 대화 상자의 메시지 처리기입니다.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
 }
 
 void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int blockNum, int hideballNum)
@@ -443,6 +478,90 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
     }
 
 
+
+}
+
+// 정보 대화 상자의 메시지 처리기입니다.
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR ID_Input_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+
+    switch (iMsg)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+        {
+            EndDialog(hDlg, 0);
+            PlayScene = true;
+            return (INT_PTR)TRUE;
+        }
+        break;
+        case IDCANCEL:
+        {
+            EndDialog(hDlg, 0);
+            return (INT_PTR)TRUE;
+        }
+        break;
+        }
+
+    }
+    break;
+    }
+
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK Rank_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+
+    switch (iMsg)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+        {
+            EndDialog(hDlg, 0);
+            return (INT_PTR)TRUE;
+        }
+        break;
+        }
+
+    }
+        break;
+    }
+
+    return (INT_PTR)FALSE;
 
 }
 
