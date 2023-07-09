@@ -23,7 +23,16 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 HBITMAP screen;
+TCHAR InBuff[1000];
+TCHAR OutBuff[100];
+
+DWORD size;
+
+
 bool PlayScene = false;
+bool GameStart = false;
+bool gameOver = false;
+bool gameWin = false;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -32,9 +41,13 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 Vector RandomVelocity();
 void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int blockNum, int ballNum);
+BOOL GameOver(vector<Object*>& balls, Ball * ba);
+BOOL GameWin(vector<Object*>& blocks);
 
 INT_PTR CALLBACK ID_Input_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK Rank_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK GameOver_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK GameWin_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -179,7 +192,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     // static vector<Object*> Items;
     static int BlockNum = 100;
     static int hideBallNum = 5;
-    static bool GameStart = false;
 
     switch (message)
     {
@@ -188,6 +200,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetClientRect(hWnd, &rectView);
         SetTimer(hWnd, TIMER_FIRST, 16, NULL);
         StageBlockSetting(Blocks, Balls, BlockNum, hideBallNum);
+       // hFile = CreateFile(_T("Rank.txt"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
+        memset(InBuff, 0, sizeof(InBuff));
         
     }
     break;
@@ -197,59 +211,72 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case TIMER_FIRST:
         {
-            firstBall->Update();
-            firstBall->Collison(playRectview, play, Blocks);
-
-            for (int i = 0; i < Balls.size(); i++)
+            if (PlayScene)
             {
-                Balls[i]->Update();
-                Balls[i]->Collison(playRectview, play, Blocks);
-                Balls[i]->BallActive(Blocks, RandomVelocity());
+                firstBall->Update();
+                firstBall->Collison(playRectview, play, Blocks);
 
-            }
-
-
-            for (int i = 0; i < Blocks.size(); i++)
-            {
-                Blocks[i]->Update();
-            }
-
-
-            if (GetAsyncKeyState(VK_LEFT)&0x8000) //왼쪽
-            {
-                Vector newPos = { play->GetPos().x - playerSpeed,play->GetPos().y };
-                play->SetPos(newPos);
-                PlayerVel = { (double)playerSpeed,0 };
-                play->SetVel(PlayerVel);
-
-                player->Collison(playRectview, Balls);
-
-                if (GameStart == false)
+                for (int i = 0; i < Balls.size(); i++)
                 {
-                    Vector newBallpos = { newPos.x, fBall->GetPos().y };
-                    fBall->SetPos(newBallpos);
+                    Balls[i]->Update();
+                    Balls[i]->Collison(playRectview, play, Blocks);
+                    Balls[i]->BallActive(Blocks, RandomVelocity());
                 }
-            }
 
-            if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
-            {
-                Vector newPos = { play->GetPos().x + playerSpeed,play->GetPos().y };
-                play->SetPos(newPos);
 
-                PlayerVel = { -(double)playerSpeed,0 };
-                play->SetVel(PlayerVel);
-
-                player->Collison(playRectview, Balls);
-
-                if (GameStart == false)
+                for (int i = 0; i < Blocks.size(); i++)
                 {
-                    Vector newBallpos = { newPos.x, fBall->GetPos().y };
-                    fBall->SetPos(newBallpos);
+                    Blocks[i]->Update();
                 }
+
+
+                if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
+                {
+                    Vector newPos = { play->GetPos().x - playerSpeed,play->GetPos().y };
+                    play->SetPos(newPos);
+                    PlayerVel = { (double)playerSpeed,0 };
+                    play->SetVel(PlayerVel);
+
+                    player->Collison(playRectview, Balls);
+
+                    if (GameStart == false)
+                    {
+                        Vector newBallpos = { newPos.x, fBall->GetPos().y };
+                        fBall->SetPos(newBallpos);
+                    }
+                }
+
+                if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
+                {
+                    Vector newPos = { play->GetPos().x + playerSpeed,play->GetPos().y };
+                    play->SetPos(newPos);
+
+                    PlayerVel = { -(double)playerSpeed,0 };
+                    play->SetVel(PlayerVel);
+
+                    player->Collison(playRectview, Balls);
+
+                    if (GameStart == false)
+                    {
+                        Vector newBallpos = { newPos.x, fBall->GetPos().y };
+                        fBall->SetPos(newBallpos);
+                    }
+                }
+
+                if (GameOver(Balls,firstBall))
+                {
+                    gameOver = true;
+                    PlayScene = false;
+                }
+
+                if (GameWin(Blocks))
+                {
+                    gameWin = true;
+                    PlayScene = false;
+                }
+
+                InvalidateRect(hWnd, NULL, FALSE);
             }
-
-            InvalidateRect(hWnd, NULL, FALSE);
-
         }
         break;
         default:
@@ -271,10 +298,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         else if (mousePos.x >= rankButton.left && mousePos.x <= rankButton.right &&
             mousePos.y >= rankButton.top && mousePos.y <= rankButton.bottom)
         {
-
             DialogBox(hInst, MAKEINTRESOURCE(ID_RankingBoard), hWnd, Rank_Dialogue);
-
-
         }
 
         else if (mousePos.x >= exitButton.left && mousePos.x <= exitButton.right &&
@@ -346,7 +370,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-        if (PlayScene == false)
+        if (PlayScene == false && gameOver==false)
         {
             DrawText(hdc, _T("벽돌을 부숴라!!"), 9, &Title, DT_SINGLELINE |DT_CENTER| DT_VCENTER);
 
@@ -360,7 +384,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DrawText(hdc, _T("EXIT"), 4, &exitButton, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
         }
         
-        else
+        else if(PlayScene==true && gameOver == false)
         {
             HDC hMemDC;
             HBITMAP hOldBitmap;
@@ -396,6 +420,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DeleteDC(hMemDC);
         }
 
+        if (gameOver)
+        {
+            DialogBox(hInst, MAKEINTRESOURCE(ID_GAMEOVER), hWnd, GameOver_Dialogue);
+            //gameOver = false;
+        }
+
+        if (gameWin)
+        {
+            DialogBox(hInst, MAKEINTRESOURCE(ID_GAMEWIN), hWnd, GameWin_Dialogue);
+        }
+
         EndPaint(hWnd, &ps);
     }
     break;
@@ -418,6 +453,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             Object* obj = Balls[i];
             delete obj;
         }
+
+ 
 
 
         KillTimer(hWnd, TIMER_FIRST);
@@ -479,6 +516,66 @@ void StageBlockSetting(vector<Object*>& blocks, vector<Object*>& balls, int bloc
 
 
 
+}
+
+BOOL GameOver(vector<Object*>& balls, Ball * ba)
+{
+    int count = 0;
+    for (int i = 0; i < balls.size(); i++)
+    {
+        Ball* ball = (Ball*)balls[i];
+        if (ball->GetEnable() == FALSE)
+        {
+            count++;
+        }
+
+        else
+        {
+            return FALSE;
+        }
+
+    }
+
+    if (count == balls.size() && !(ba->GetEnable()))
+    {
+        return TRUE;
+    }
+
+    else
+    {
+        return FALSE;
+    }
+}
+
+BOOL GameWin(vector<Object*>& blocks)
+{
+    int count = 0;
+
+    for (int i = 0; i < blocks.size(); i++)
+    {
+        Block* block = (Block*)blocks[i];
+        if (block->BlockDead())
+        {
+            count++;
+        }
+
+        else
+        {
+            return FALSE;
+        }
+        
+    }
+
+    if (count == blocks.size())
+    {
+        return TRUE;
+    }
+
+    else
+    {
+        return FALSE;
+
+    }
 }
 
 // 정보 대화 상자의 메시지 처리기입니다.
@@ -543,6 +640,17 @@ INT_PTR CALLBACK Rank_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lPara
     switch (iMsg)
     {
     case WM_INITDIALOG:
+    {
+        DWORD size;
+        HANDLE hFile = CreateFile(_T("Rank.txt"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, 0);
+        if (hFile != INVALID_HANDLE_VALUE)
+        {
+            memset(InBuff, 0, sizeof(InBuff));
+            ReadFile(hFile, InBuff, 999 * sizeof(TCHAR), &size, NULL);
+            SetDlgItemText(hDlg, ID_TEXT, InBuff);
+            CloseHandle(hFile);
+        }
+    }
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -563,6 +671,64 @@ INT_PTR CALLBACK Rank_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lPara
 
     return (INT_PTR)FALSE;
 
+}
+
+INT_PTR CALLBACK GameOver_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+
+    switch (iMsg)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+        {
+            EndDialog(hDlg, 0);
+            exit(1);
+            return (INT_PTR)TRUE;
+        }
+        break;
+        }
+
+    }
+    break;
+    }
+
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK GameWin_Dialogue(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+
+    switch (iMsg)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+        {
+            EndDialog(hDlg, 0);
+            exit(1);
+            return (INT_PTR)TRUE;
+        }
+        break;
+        }
+
+    }
+    break;
+    }
+
+    return (INT_PTR)FALSE;
 }
 
 

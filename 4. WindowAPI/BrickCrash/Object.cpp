@@ -321,6 +321,7 @@ BOOL Ball::Collison(const RECT& recView, Object* player, const vector<Object*>& 
 	{
 		position.y = recView.bottom - radius;
 		velocity.y *= -1;
+		isAble = FALSE;
 		return TRUE;
 	}
 

@@ -57,6 +57,7 @@ protected:
 public:
 	int GetRad()const { return radius; }
 	void SetRad(int r) { radius = r; }
+	BOOL GetEnable()const { return isAble; }
 
 	Ball();
 	Ball(Vector & p, Vector & v, int r, int hideLo);
