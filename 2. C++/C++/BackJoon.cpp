@@ -1,94 +1,83 @@
 #include<iostream>
-#include<vector>
+#include<stack>
 #include<string>
-#include"StopWatch.h"
-
-//ios::sync_with_stdio(0);
-//cin.tie(0);
 
 using namespace std;
 
-int compareCount=0;
-int matchCount = 0;
-
-void func(string sentence, string word)
+int main()
 {
-    
+    ios::sync_with_stdio(0);
+    cin.tie(0);
 
-    for (int i = 0; i <= sentence.size()-word.size(); i++)
+    stack<int> st;
+
+    int num;
+    cin >> num;
+
+    string order;
+    for (int i = 0; i < num; i++)
     {
-        cout << i;
+        cin >> order;
 
-        int count = 0;
-        for (int j = 0; j < word.size(); j++)
+        if (order == "push")
         {
-            cout << " ";
-            if (j != 0) cout << " ";
-            cout << sentence << "\n";
-            cout << "  ";
+            int n;
+            cin >> n;
+            st.push(n);
+        }
 
-            for (int t = 0; t < i; t++)
-                cout << " ";
-
-            if (sentence[i+j] == word[j])
+        else if (order == "pop")
+        {
+            if (st.empty())
             {
-
-                for(int k=0;k<j;k++)
-                    cout << " ";
-
-                cout << "+" << "\n";
-
-                cout << "  ";
-
-                for (int k = 0; k < i; k++)
-                    cout << " ";
-
-                cout << word;
-                count++;
+                cout << -1;
+                cout << "\n";
             }
 
             else
             {
+                cout << st.top();
+                cout << "\n";
+                st.pop();
+            }
+        }
 
-                for (int k = 0; k < j; k++)
-                    cout << " ";
+        else if (order == "size")
+        {
+            cout << st.size();
+            cout << "\n";
+        }
 
-                cout << "|"<<"\n";
-
-                cout << "  ";
-
-                for (int k = 0; k < i; k++)
-                    cout << " ";
-
-                cout << word;
-                break;
+        else if (order == "empty")
+        {
+            if (st.empty())
+            {
+                cout << 1;
             }
 
+            else
+            {
+                cout << 0;
+            }
             cout << "\n";
-
         }
 
-        if (count == word.size())
+        else if (order == "top")
         {
-            matchCount++;
-            count = 0;
+            if (st.empty())
+            {
+                cout << -1;
+            }
+
+            else
+            {
+                cout << st.top();
+            }
+            cout << "\n";
         }
 
-        compareCount++;
-        cout << "\n";
     }
-}
 
-
-int main()
-{
-    string sentence = "ababcdefga";
-    string word = "abc";
-
-    func(sentence, word);
-
-    cout << "비교를 " << compareCount << "회 시도했습니다." << "\n";
-    cout << "일치한 횟수는 " << matchCount << "입니다." << "\n";
 
     return 0;
 }

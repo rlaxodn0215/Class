@@ -198,7 +198,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
     {
         GetClientRect(hWnd, &rectView);
-        SetTimer(hWnd, TIMER_FIRST, 16, NULL);
+        SetTimer(hWnd, TIMER_FIRST, 10, NULL);
         StageBlockSetting(Blocks, Balls, BlockNum, hideBallNum);
        // hFile = CreateFile(_T("Rank.txt"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
         memset(InBuff, 0, sizeof(InBuff));
