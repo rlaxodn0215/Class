@@ -270,8 +270,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_DESTROY:
     {
-        delete GM;
         KillTimer(hWnd, TIMER_FIRST);
+        delete GM;
         PostQuitMessage(0);
     }
         break;
@@ -315,7 +315,7 @@ void DrawLines(vector<POINT>& vec, HDC hdc)
 
 BOOL CheckMakeObject(vector<POINT>& vec, Player * player)
 {
-    if (vec.size()>3)
+    if (!vec.empty())
     {
           if (player->GetWay() == 6 || player->GetWay() == 12) //위아래
           {
@@ -369,7 +369,7 @@ void MakeObject(vector<POINT>& vec, Player* player,int & vertex, vector<vector<P
             obj.push_back(*(vec.end()-i));
         }
 
-        vertex = 0;
+        vertex = 1;
 
         ObjectPoints.push_back(obj);
     }
