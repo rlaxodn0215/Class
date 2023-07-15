@@ -21,6 +21,8 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 vector<POINT> LinePoints; //선을 그리는 점들
 vector<vector<POINT>> ObjectPoints; // 도형을 그리기 위한 점들
 
+HBITMAP screen;
+
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -224,7 +226,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 
 
-            InvalidateRect(hWnd, NULL, TRUE);
+            InvalidateRect(hWnd, NULL, FALSE);
         }
     }
     break;
@@ -250,10 +252,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-        player->PlayerCharactorUpdate(hdc);
-        DrawLines(LinePoints, hdc);
-        GM->DrawLine(hdc);
-        GM->PaintArea(hdc, ObjectPoints);
+        HDC hMemDC;
+        HBITMAP hOldBitmap;
+
+        hMemDC = CreateCompatibleDC(hdc);
+
+        screen = CreateCompatibleBitmap(hdc, recView.right, recView.bottom);
+
+        hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
+
+        player->PlayerCharactorUpdate(hMemDC);
+        DrawLines(LinePoints, hMemDC);
+        GM->DrawLine(hMemDC);
+        GM->PaintArea(hMemDC, ObjectPoints);
+
+        BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMemDC, 0, 0, SRCCOPY);
+
+        SelectObject(hMemDC, hOldBitmap);
+        DeleteDC(hMemDC);
 
         EndPaint(hWnd, &ps);
     }
@@ -293,6 +309,10 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void DrawLines(vector<POINT>& vec, HDC hdc)
 {
+    HPEN hPen, oldPen;
+    hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    oldPen = (HPEN)SelectObject(hdc, hPen);
+
     if (vec.size() > 1)
     {
         for (int i = 0; i < vec.size() - 1; i++)
@@ -301,6 +321,9 @@ void DrawLines(vector<POINT>& vec, HDC hdc)
             LineTo(hdc, vec[i + 1].x, vec[i + 1].y);
         }
     }
+
+    SelectObject(hdc, oldPen);
+    DeleteObject(hPen);
 }
 
 BOOL CheckMakeObject(vector<POINT>& vec, Player* player, int& endPoint)

@@ -11,20 +11,27 @@ BOOL GameManager::PlayerMoveable()
 
 void GameManager::DrawLine(HDC hdc)
 {
+	HPEN hPen, oldPen;
+	hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+	oldPen = (HPEN)SelectObject(hdc, hPen);
+
 	MoveToEx(hdc, GetBeforePos().x, GetBeforePos().y, NULL);
 	LineTo(hdc, GetCurPos().x, GetCurPos().y);
+
+	SelectObject(hdc, oldPen);
+	DeleteObject(hPen);
 }
 
 void GameManager::PaintArea(HDC hdc, vector<vector<POINT>> & ObjectPoints)
 {
 	HBRUSH hBrush, oldBrush;
-	hBrush = CreateSolidBrush(RGB(255, 0, 0));
+	hBrush = CreateSolidBrush(RGB(0, 0, 255));
 	oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
 
 	for (int i = 0; i < ObjectPoints.size(); i++)
 	{
-		POINT point[150] = {};
+		POINT point[500] = {};
 
 		for (int j = 0; j < ObjectPoints[i].size(); j++)
 		{
@@ -36,6 +43,16 @@ void GameManager::PaintArea(HDC hdc, vector<vector<POINT>> & ObjectPoints)
 
 	SelectObject(hdc, oldBrush);
 	DeleteObject(hBrush);
+}
+
+BOOL GameManager::AreaCollider(vector<vector<POINT>>& ObjectPoints)
+{
+	return false;
+}
+
+BOOL GameManager::RectangleCollider()
+{
+	return 0;
 }
 
 double GameManager::AreaRatio()

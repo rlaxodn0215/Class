@@ -9,7 +9,8 @@ public:
 	BOOL PlayerMoveable();
 	void DrawLine(HDC hdc);
 	void PaintArea(HDC hdc, vector<vector<POINT>>& ObjectPoints);
-	//void AreaCollider();
+	BOOL AreaCollider(vector<vector<POINT>>& ObjectPoints); // divided into rectangle and integrel
+	BOOL RectangleCollider();
 	double AreaRatio();
 };
 
