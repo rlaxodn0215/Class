@@ -29,13 +29,13 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 void DrawLines(vector<POINT>& vec, HDC hdc);
-BOOL CheckMakeObject(vector<POINT>& vec, Player* player);
-void MakeObject(vector<POINT>& vec, Player* player, int& vertex, vector<vector<POINT>>& ObjectPoints);
+BOOL CheckMakeObject(vector<POINT>& vec, Player* player, int& endPoint);
+void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -48,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
@@ -67,7 +67,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
 
@@ -83,17 +83,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GALSPANICPROJECT));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_GALSPANICPROJECT);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GALSPANICPROJECT));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_GALSPANICPROJECT);
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
@@ -110,20 +110,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-       200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+        200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
 
-   return TRUE;
+    return TRUE;
 }
 
 //
@@ -149,7 +149,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static Player* player = GM;
     static POINT curPos = player->GetCurPos();
     static int playerVel = 5;
-    static int vertex = 0;
+    static int ObjEndPoint = 0;
 
     switch (message)
     {
@@ -158,7 +158,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         GetClientRect(hWnd, &recView);
         SetTimer(hWnd, TIMER_FIRST, 10, NULL);
-        //LinePoints.push_back(player->GetCurPos());
     }
     break;
     case WM_TIMER:
@@ -173,14 +172,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     LinePoints.push_back(player->GetCurPos());
                     player->PlayerPosUpdate();
-                    vertex++;
-                    //MakeObject(LinePoints, player, vertex, ObjectPoints);
                 }
 
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
                 player->SetCurPos(updatePos);
                 player->SetWay(12);
-                MakeObject(LinePoints, player, vertex, ObjectPoints);
+                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
             }
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
@@ -189,14 +186,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     LinePoints.push_back(player->GetCurPos());
                     player->PlayerPosUpdate();
-                    vertex++;
-                    //MakeObject(LinePoints, player, vertex, ObjectPoints);
                 }
 
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
                 player->SetCurPos(updatePos);
                 player->SetWay(6);
-                MakeObject(LinePoints, player, vertex, ObjectPoints);
+                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
             }
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
@@ -205,15 +200,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     LinePoints.push_back(player->GetCurPos());
                     player->PlayerPosUpdate();
-                    vertex++;
-                    //MakeObject(LinePoints, player, vertex, ObjectPoints);
-                    
+
                 }
 
                 updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
                 player->SetWay(9);
-                MakeObject(LinePoints, player, vertex, ObjectPoints);
+                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
             }
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
@@ -222,59 +215,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     LinePoints.push_back(player->GetCurPos());
                     player->PlayerPosUpdate();
-                    vertex++;
-                    //MakeObject(LinePoints, player, vertex, ObjectPoints);
                 }
 
                 updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
                 player->SetWay(3);
-                MakeObject(LinePoints, player, vertex, ObjectPoints);
+                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
             }
 
-            //MakeObject(LinePoints, player, vertex, ObjectPoints);
 
             InvalidateRect(hWnd, NULL, TRUE);
         }
     }
     break;
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // 메뉴 선택을 구문 분석합니다:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
-        {
-            hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+    {
+        hdc = BeginPaint(hWnd, &ps);
+        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-            player->PlayerCharactorUpdate(hdc);
-            DrawLines(LinePoints, hdc);
-            GM->DrawLine(hdc);
-            GM->PaintArea(hdc, ObjectPoints);
+        player->PlayerCharactorUpdate(hdc);
+        DrawLines(LinePoints, hdc);
+        GM->DrawLine(hdc);
+        GM->PaintArea(hdc, ObjectPoints);
 
-            EndPaint(hWnd, &ps);
-        }
-        break;
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
     {
         KillTimer(hWnd, TIMER_FIRST);
         delete GM;
         PostQuitMessage(0);
     }
-        break;
+    break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -303,73 +293,76 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void DrawLines(vector<POINT>& vec, HDC hdc)
 {
-    if (vec.size()>1)
+    if (vec.size() > 1)
     {
-        for (int i = 0; i < vec.size()-1; i++)
+        for (int i = 0; i < vec.size() - 1; i++)
         {
             MoveToEx(hdc, vec[i].x, vec[i].y, NULL);
-            LineTo(hdc, vec[i+1].x, vec[i+1].y);
+            LineTo(hdc, vec[i + 1].x, vec[i + 1].y);
         }
     }
 }
 
-BOOL CheckMakeObject(vector<POINT>& vec, Player * player)
+BOOL CheckMakeObject(vector<POINT>& vec, Player* player, int& endPoint)
 {
     if (!vec.empty())
     {
-          if (player->GetWay() == 6 || player->GetWay() == 12) //위아래
-          {
-              for (int i = 0; i < vec.size() - 1; i++)
-              {
-                  
-                  if (player->GetCurPos().y == vec[i].y && vec[i].y == vec[i + 1].y) // y값 비교
-                  {
-                      if (player->GetCurPos().x >= min(vec[i].x, vec[i + 1].x) && player->GetCurPos().x <= max(vec[i].x, vec[i + 1].x)) //x값 비교
-                      {
-                          //linepoint에 추가
-                          vec.push_back(player->GetCurPos());
-                          return TRUE;
-                      }
-                  }
-                  
-              }
-          }
-          
-          else if (player->GetWay() == 3 || player->GetWay() == 9)//좌우
-          {
-              for (int i = 0; i < vec.size() - 1; i++)
-              {
-                  
-                  if (player->GetCurPos().x == vec[i].x && vec[i].x == vec[i + 1].x) // x값 비교
-                  {
-                      if (player->GetCurPos().y >= min(vec[i].y, vec[i + 1].y) && player->GetCurPos().y <= max(vec[i].y, vec[i + 1].y)) //y값 비교
-                      {
-                          //linepoint에 추가
-                          vec.push_back(player->GetCurPos());
-                          return TRUE;
-                      }
-                  }
-  
-              }
-          }
-        
+        if (player->GetWay() == 6 || player->GetWay() == 12) //위아래
+        {
+            for (int i = 0; i < vec.size() - 1; i++)
+            {
+
+                if (player->GetCurPos().y == vec[i].y && vec[i].y == vec[i + 1].y) // y값 비교
+                {
+                    if (player->GetCurPos().x >= min(vec[i].x, vec[i + 1].x) && player->GetCurPos().x <= max(vec[i].x, vec[i + 1].x)) //x값 비교
+                    {
+                        //linepoint에 추가
+                        vec.push_back(player->GetCurPos());
+                        endPoint = i + 1;
+                        return TRUE;
+                    }
+                }
+
+            }
+        }
+
+        else if (player->GetWay() == 3 || player->GetWay() == 9)//좌우
+        {
+            for (int i = 0; i < vec.size() - 1; i++)
+            {
+
+                if (player->GetCurPos().x == vec[i].x && vec[i].x == vec[i + 1].x) // x값 비교
+                {
+                    if (player->GetCurPos().y >= min(vec[i].y, vec[i + 1].y) && player->GetCurPos().y <= max(vec[i].y, vec[i + 1].y)) //y값 비교
+                    {
+                        //linepoint에 추가
+                        vec.push_back(player->GetCurPos());
+                        endPoint = i + 1;
+                        return TRUE;
+                    }
+                }
+
+            }
+        }
+
     }
 
     return FALSE;
 }
 
-void MakeObject(vector<POINT>& vec, Player* player,int & vertex, vector<vector<POINT>> & ObjectPoints)
+void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint)
 {
-    if (CheckMakeObject(vec, player))
+    if (CheckMakeObject(vec, player, endPoint))
     {
         vector<POINT> obj;
+        int endP = endPoint;
 
-        for (int i = 1; i <= vertex; i++)
+        while (&vec.back() != &vec[endP])
         {
-            obj.push_back(*(vec.end()-i));
+            obj.push_back(vec[endP++]);
         }
 
-        vertex = 1;
+        obj.push_back(vec.back());
 
         ObjectPoints.push_back(obj);
     }

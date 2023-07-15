@@ -24,7 +24,7 @@ void GameManager::PaintArea(HDC hdc, vector<vector<POINT>> & ObjectPoints)
 
 	for (int i = 0; i < ObjectPoints.size(); i++)
 	{
-		POINT point[100] = {};
+		POINT point[150] = {};
 
 		for (int j = 0; j < ObjectPoints[i].size(); j++)
 		{
