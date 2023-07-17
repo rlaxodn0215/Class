@@ -1,7 +1,22 @@
 #include "GameManager.h"
 
-void GameManager::StartGame(HDC hdc)
+void GameManager::StartGame(POINT recCenter, int width, int height, Player * player, vector<vector<POINT>>& ObjectPoints, vector<POINT> & LinePoints)
 {
+
+	POINT num1 = { recCenter.x - width / 2, recCenter.y - height / 2 };
+	POINT num2 = { recCenter.x + width / 2, recCenter.y - height / 2 };
+	POINT num3 = { recCenter.x + width / 2, recCenter.y + height / 2 };
+	POINT num4 = { recCenter.x - width / 2, recCenter.y + height / 2 };
+
+
+	vector<POINT> firstPoint = { num1,num2,num3,num4 };
+
+	ObjectPoints.push_back(firstPoint);
+
+	player->SetBeforePos(num1);
+	player->SetCurPos(num1);
+	//LinePoints.push_back(GetCurPos());
+
 }
 
 BOOL GameManager::PlayerMoveable()
@@ -12,7 +27,7 @@ BOOL GameManager::PlayerMoveable()
 void GameManager::DrawLine(HDC hdc)
 {
 	HPEN hPen, oldPen;
-	hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+	hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 255));
 	oldPen = (HPEN)SelectObject(hdc, hPen);
 
 	MoveToEx(hdc, GetBeforePos().x, GetBeforePos().y, NULL);
@@ -25,7 +40,7 @@ void GameManager::DrawLine(HDC hdc)
 void GameManager::PaintArea(HDC hdc, vector<vector<POINT>> & ObjectPoints)
 {
 	HBRUSH hBrush, oldBrush;
-	hBrush = CreateSolidBrush(RGB(0, 0, 255));
+	hBrush = CreateSolidBrush(RGB(255, 0, 255));
 	oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
 
@@ -45,15 +60,14 @@ void GameManager::PaintArea(HDC hdc, vector<vector<POINT>> & ObjectPoints)
 	DeleteObject(hBrush);
 }
 
-BOOL GameManager::AreaCollider(vector<vector<POINT>>& ObjectPoints)
+BOOL GameManager::AreaCollider(vector<vector<POINT>>& ObjectPoints, vector<RECT> Colliders)
 {
+	
+	
+
 	return false;
 }
 
-BOOL GameManager::RectangleCollider()
-{
-	return 0;
-}
 
 double GameManager::AreaRatio()
 {

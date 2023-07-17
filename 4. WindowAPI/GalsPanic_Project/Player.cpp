@@ -60,8 +60,8 @@ void Player::SetWay(int w)
 
 Player::Player()
 {
-	curPos = { 100,100 };
-	beforePos = { 100,100 };
+	curPos = { 0,0 };
+	beforePos = { 0,0 };
 	life = 3;
 	up = false;
 	down = false;

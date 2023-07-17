@@ -1,11 +1,20 @@
 ﻿// GalsPanic_Project.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
+
+
 #include "framework.h"
 #include "GameManager.h"
 #include "Player.h"
 #include "GalsPanic_Project.h"
 #include <vector>
+#include<iostream>
+
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
+#endif // UNICODE
 
 #define MAX_LOADSTRING 100
 #define TIMER_FIRST 1
@@ -18,11 +27,11 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 
-vector<POINT> LinePoints; //선을 그리는 점들
+vector<POINT> NewPathPoints; //선을 그리는 점들
 vector<vector<POINT>> ObjectPoints; // 도형을 그리기 위한 점들
+vector<RECT> Colliders; // 사각형의 collider들
 
 HBITMAP screen;
-
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -31,8 +40,10 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 void DrawLines(vector<POINT>& vec, HDC hdc);
-BOOL CheckMakeObject(vector<POINT>& vec, Player* player, int& endPoint);
-void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint);
+BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Player* player, int& endPoint, bool & newtry);
+void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool & newtry);
+BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, bool & newtry);
+vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window, int playerVel); //using raycast system (up, down) 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -146,12 +157,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     PAINTSTRUCT ps;
     HDC hdc;
 
+    static POINT startCenter = { 200,250 };
+    static int startWidth = 150;
+    static int startHeight = 100;
+
     static RECT recView;
     static GameManager* GM = new GameManager;
     static Player* player = GM;
     static POINT curPos = player->GetCurPos();
     static int playerVel = 5;
     static int ObjEndPoint = 0;
+    static bool isNewTry = false;
 
     switch (message)
     {
@@ -160,6 +176,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         GetClientRect(hWnd, &recView);
         SetTimer(hWnd, TIMER_FIRST, 10, NULL);
+        GM->StartGame(startCenter, startWidth, startHeight, player,ObjectPoints, NewPathPoints);
+        cout << "Ready for Playing" << endl;
+
     }
     break;
     case WM_TIMER:
@@ -167,40 +186,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (wParam == TIMER_FIRST)
         {
             POINT updatePos;
+            int way;
 
             if (GetAsyncKeyState(VK_UP) & 0x8000) //위쪽
             {
-                if (player->GetWay() != 12 && player->GetWay() != 6)
+                way = 12;
+                if (player->GetWay() != 12 && player->GetWay() != 6 && NewLineStart(ObjectPoints, player, way, isNewTry))
                 {
-                    LinePoints.push_back(player->GetCurPos());
+                    NewPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point" << endl;
                     player->PlayerPosUpdate();
                 }
 
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
                 player->SetCurPos(updatePos);
                 player->SetWay(12);
-                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
             }
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
             {
-                if (player->GetWay() != 6 && player->GetWay() != 12)
+                way = 6;
+                if (player->GetWay() != 6 && player->GetWay() != 12 && NewLineStart(ObjectPoints, player, way, isNewTry))
                 {
-                    LinePoints.push_back(player->GetCurPos());
+                    NewPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point" << endl;
                     player->PlayerPosUpdate();
                 }
 
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
                 player->SetCurPos(updatePos);
                 player->SetWay(6);
-                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
             }
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
             {
-                if (player->GetWay() != 9 && player->GetWay() != 3)
+                way = 9;
+                if (player->GetWay() != 9 && player->GetWay() != 3 && NewLineStart(ObjectPoints, player, way, isNewTry))
                 {
-                    LinePoints.push_back(player->GetCurPos());
+                    NewPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point" << endl;
                     player->PlayerPosUpdate();
 
                 }
@@ -208,23 +234,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
                 player->SetWay(9);
-                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
             }
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
             {
-                if (player->GetWay() != 3 && player->GetWay() != 9)
+                way = 3;
+                if (player->GetWay() != 3 && player->GetWay() != 9 && NewLineStart(ObjectPoints, player, way, isNewTry))
                 {
-                    LinePoints.push_back(player->GetCurPos());
+                    NewPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point" << endl;
                     player->PlayerPosUpdate();
                 }
 
                 updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
                 player->SetWay(3);
-                MakeObject(LinePoints, player, ObjectPoints, ObjEndPoint);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
             }
-
 
             InvalidateRect(hWnd, NULL, FALSE);
         }
@@ -261,10 +288,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
 
-        player->PlayerCharactorUpdate(hMemDC);
-        DrawLines(LinePoints, hMemDC);
+        DrawLines(NewPathPoints, hMemDC);
         GM->DrawLine(hMemDC);
         GM->PaintArea(hMemDC, ObjectPoints);
+        player->PlayerCharactorUpdate(hMemDC);
 
         BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMemDC, 0, 0, SRCCOPY);
 
@@ -310,7 +337,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 void DrawLines(vector<POINT>& vec, HDC hdc)
 {
     HPEN hPen, oldPen;
-    hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 255));
     oldPen = (HPEN)SelectObject(hdc, hPen);
 
     if (vec.size() > 1)
@@ -326,67 +353,142 @@ void DrawLines(vector<POINT>& vec, HDC hdc)
     DeleteObject(hPen);
 }
 
-BOOL CheckMakeObject(vector<POINT>& vec, Player* player, int& endPoint)
+BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Player* player, int& endPoint, bool& newtry)
 {
-    if (!vec.empty())
-    {
-        if (player->GetWay() == 6 || player->GetWay() == 12) //위아래
-        {
-            for (int i = 0; i < vec.size() - 1; i++)
-            {
+     if (player->GetWay() == 6 || player->GetWay() == 12) //위아래
+     {
+         for (int i = 0; i < ObjectPoints.size(); i++)
+         {
+             for (int j = 0; j < ObjectPoints[i].size() - 1; j++)
+             {
+                 if (player->GetCurPos().y == ObjectPoints[i][j].y && ObjectPoints[i][j].y == ObjectPoints[i][j+1].y) // y값 비교
+                 {
+                     if (player->GetCurPos().x >= min(ObjectPoints[i][j].x, ObjectPoints[i][j + 1].x)
+                         && player->GetCurPos().x <= max(ObjectPoints[i][j].x, ObjectPoints[i][j + 1].x)) //x값 비교
+                     {
+                         vec.push_back(player->GetCurPos());
+                         newtry = false;
+                         return TRUE;
+                     }
+                 }
+             }
 
-                if (player->GetCurPos().y == vec[i].y && vec[i].y == vec[i + 1].y) // y값 비교
-                {
-                    if (player->GetCurPos().x >= min(vec[i].x, vec[i + 1].x) && player->GetCurPos().x <= max(vec[i].x, vec[i + 1].x)) //x값 비교
-                    {
-                        //linepoint에 추가
-                        vec.push_back(player->GetCurPos());
-                        endPoint = i + 1;
-                        return TRUE;
-                    }
-                }
+         }
+     }
 
-            }
-        }
+     else if (player->GetWay() == 3 || player->GetWay() == 9)//좌우
+     {
+         for (int i = 0; i < ObjectPoints.size(); i++)
+         {
+             for (int j = 0; j < ObjectPoints[i].size() - 1; j++)
+             {
+                 if (player->GetCurPos().x == ObjectPoints[i][j].x && ObjectPoints[i][j].x == ObjectPoints[i][j+1].x) // x값 비교
+                 {
+                     if (player->GetCurPos().y >= min(ObjectPoints[i][j].y, ObjectPoints[i][j+1].y)
+                         && player->GetCurPos().y <= max(ObjectPoints[i][j].y, ObjectPoints[i][j + 1].y)) //y값 비교
+                     {
+                         vec.push_back(player->GetCurPos());
+                         newtry = false;
+                         return TRUE;
+                     }
+                 }
+             }
+         }
+     }
 
-        else if (player->GetWay() == 3 || player->GetWay() == 9)//좌우
-        {
-            for (int i = 0; i < vec.size() - 1; i++)
-            {
-
-                if (player->GetCurPos().x == vec[i].x && vec[i].x == vec[i + 1].x) // x값 비교
-                {
-                    if (player->GetCurPos().y >= min(vec[i].y, vec[i + 1].y) && player->GetCurPos().y <= max(vec[i].y, vec[i + 1].y)) //y값 비교
-                    {
-                        //linepoint에 추가
-                        vec.push_back(player->GetCurPos());
-                        endPoint = i + 1;
-                        return TRUE;
-                    }
-                }
-
-            }
-        }
-
-    }
+    
 
     return FALSE;
 }
 
-void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint)
+void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool& newtry)
 {
-    if (CheckMakeObject(vec, player, endPoint))
+    if (CheckMakeObject(ObjectPoints, vec, player, endPoint, newtry))
     {
-        vector<POINT> obj;
-        int endP = endPoint;
 
-        while (&vec.back() != &vec[endP])
+        for (int i = 0; i < vec.size(); i++)
         {
-            obj.push_back(vec[endP++]);
+            ObjectPoints[0].push_back(vec[i]);
         }
 
-        obj.push_back(vec.back());
+        //using raycast method
 
-        ObjectPoints.push_back(obj);
+        vec = {};
+        vec.push_back(player->GetCurPos());
+
     }
 }
+
+BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, bool & newtry)
+{
+    if (!newtry)
+    {
+        for (int i = 0; i < ObjectPoints.size(); i++)
+        {
+            for (int j = 0; j < ObjectPoints[i].size() - 1; j++)
+            {
+                if (way == 6 || way == 12) //위아래 이동
+                {
+                    if (player->GetCurPos().y == ObjectPoints[i][j].y &&
+                        player->GetCurPos().y == ObjectPoints[i][j + 1].y) // y축 동일
+                    {
+                        newtry = true;
+                        return TRUE;
+                    }
+
+                }
+
+                else //좌우 이동
+                {
+                    if (player->GetCurPos().x == ObjectPoints[i][j].x &&
+                        player->GetCurPos().x == ObjectPoints[i][j + 1].x) // x축 동일
+                    {
+                        newtry = true;
+                        return TRUE;
+                    }
+                }
+            }
+        }
+        return FALSE;
+    }
+
+
+    else
+    {
+        return TRUE;
+    }
+
+  
+
+}
+
+vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window, int playerVel)
+{
+    vector<POINT> vec;
+
+    for (int i = 0; i <= window.right; i += playerVel) // x ->
+    {
+        for (int j = 0; j <= window.bottom; j += playerVel) // y down
+        {
+        }
+
+    }
+
+    for (int i = window.right; i >= 0; i -= playerVel) // x <-
+    {
+        // y up
+    }
+
+    for (int i = window.right; i >= 0; i -= playerVel) // x <-
+    {
+        // y up
+    }
+
+    for (int i = window.right; i >= 0; i -= playerVel) // x <-
+    {
+        // y up
+    }
+
+    return vec;
+}
+
