@@ -15,7 +15,7 @@ void GameManager::StartGame(POINT recCenter, int width, int height, Player * pla
 
 	player->SetBeforePos(num1);
 	player->SetCurPos(num1);
-	LinePoints.push_back(GetCurPos());
+	//LinePoints.push_back(GetCurPos());
 
 }
 
