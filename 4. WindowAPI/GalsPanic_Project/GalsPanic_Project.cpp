@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "GalsPanic_Project.h"
 #include <vector>
+#include<list>
 #include<iostream>
 
 #ifdef UNICODE
@@ -41,9 +42,9 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 void DrawLines(vector<POINT>& vec, HDC hdc);
 BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Player* player, int& endPoint, bool & newtry);
-void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool & newtry);
+void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool & newtry, RECT window);
 BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, bool & newtry);
-vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window, int playerVel); //using raycast system (up, down) 
+vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window); //using raycast system (up, down) 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -201,7 +202,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
                 player->SetCurPos(updatePos);
                 player->SetWay(12);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry, recView);
             }
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
@@ -217,7 +218,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
                 player->SetCurPos(updatePos);
                 player->SetWay(6);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry, recView);
             }
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
@@ -234,7 +235,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
                 player->SetWay(9);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry, recView);
             }
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
@@ -250,7 +251,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
                 player->SetWay(3);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry);
+                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry,recView);
             }
 
             InvalidateRect(hWnd, NULL, FALSE);
@@ -359,12 +360,13 @@ BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Pla
      {
          for (int i = 0; i < ObjectPoints.size(); i++)
          {
-             for (int j = 0; j < ObjectPoints[i].size() - 1; j++)
+             for (int j = 0; j < ObjectPoints[i].size(); j++)
              {
-                 if (player->GetCurPos().y == ObjectPoints[i][j].y && ObjectPoints[i][j].y == ObjectPoints[i][j+1].y) // y값 비교
+                 if (player->GetCurPos().y == ObjectPoints[i][j % ObjectPoints[i].size()].y &&
+                     ObjectPoints[i][j % ObjectPoints[i].size()].y == ObjectPoints[i][(j+1) % ObjectPoints[i].size()].y) // y값 비교
                  {
-                     if (player->GetCurPos().x >= min(ObjectPoints[i][j].x, ObjectPoints[i][j + 1].x)
-                         && player->GetCurPos().x <= max(ObjectPoints[i][j].x, ObjectPoints[i][j + 1].x)) //x값 비교
+                     if (player->GetCurPos().x > min(ObjectPoints[i][j % ObjectPoints[i].size()].x, ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x)
+                         && player->GetCurPos().x < max(ObjectPoints[i][j % ObjectPoints[i].size()].x, ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x)) //x값 비교
                      {
                          vec.push_back(player->GetCurPos());
                          newtry = false;
@@ -380,12 +382,13 @@ BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Pla
      {
          for (int i = 0; i < ObjectPoints.size(); i++)
          {
-             for (int j = 0; j < ObjectPoints[i].size() - 1; j++)
+             for (int j = 0; j < ObjectPoints[i].size(); j++)
              {
-                 if (player->GetCurPos().x == ObjectPoints[i][j].x && ObjectPoints[i][j].x == ObjectPoints[i][j+1].x) // x값 비교
+                 if (player->GetCurPos().x == ObjectPoints[i][j % ObjectPoints[i].size()].x &&
+                     ObjectPoints[i][j % ObjectPoints[i].size()].x == ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x) // x값 비교
                  {
-                     if (player->GetCurPos().y >= min(ObjectPoints[i][j].y, ObjectPoints[i][j+1].y)
-                         && player->GetCurPos().y <= max(ObjectPoints[i][j].y, ObjectPoints[i][j + 1].y)) //y값 비교
+                     if (player->GetCurPos().y > min(ObjectPoints[i][j % ObjectPoints[i].size()].y, ObjectPoints[i][(j+1) % ObjectPoints[i].size()].y)
+                         && player->GetCurPos().y < max(ObjectPoints[i][j % ObjectPoints[i].size()].y, ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].y)) //y값 비교
                      {
                          vec.push_back(player->GetCurPos());
                          newtry = false;
@@ -401,7 +404,7 @@ BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Pla
     return FALSE;
 }
 
-void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool& newtry)
+void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool& newtry, RECT window)
 {
     if (CheckMakeObject(ObjectPoints, vec, player, endPoint, newtry))
     {
@@ -412,6 +415,7 @@ void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& Objec
         }
 
         //using raycast method
+        ObjectPoints[0] = RayCastArea(ObjectPoints, window);
 
         vec = {};
         vec.push_back(player->GetCurPos());
@@ -425,31 +429,32 @@ BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, 
     {
         for (int i = 0; i < ObjectPoints.size(); i++)
         {
-            for (int j = 0; j < ObjectPoints[i].size() - 1; j++)
+            for (int j = 0; j < ObjectPoints[i].size(); j++)
             {
                 if (way == 6 || way == 12) //위아래 이동
                 {
-                    if (player->GetCurPos().y == ObjectPoints[i][j].y &&
-                        player->GetCurPos().y == ObjectPoints[i][j + 1].y) // y축 동일
+                    if (player->GetCurPos().x == ObjectPoints[i][j % ObjectPoints[i].size()].x &&
+                        player->GetCurPos().x == ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x) // x축 동일
                     {
-                        newtry = true;
-                        return TRUE;
+                        newtry = false;
+                        return FALSE;
                     }
 
                 }
 
                 else //좌우 이동
                 {
-                    if (player->GetCurPos().x == ObjectPoints[i][j].x &&
-                        player->GetCurPos().x == ObjectPoints[i][j + 1].x) // x축 동일
+                    if (player->GetCurPos().y == ObjectPoints[i][j % ObjectPoints[i].size()].y &&
+                        player->GetCurPos().y == ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].y) // y축 동일
                     {
-                        newtry = true;
-                        return TRUE;
+                        newtry = false;
+                        return FALSE;
                     }
                 }
             }
         }
-        return FALSE;
+        newtry = true;
+        return TRUE;
     }
 
 
@@ -462,33 +467,161 @@ BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, 
 
 }
 
-vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window, int playerVel)
+vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window)
 {
     vector<POINT> vec;
+    vector<POINT> answer;
+    bool horizontal = true;
+    bool right = true;
+    int location=0;
+    POINT startP;
+    POINT beforP;
+    POINT pnt = { window.right, window.bottom };
 
-    for (int i = 0; i <= window.right; i += playerVel) // x ->
+    for (int i = 0; i < ObjectPoints[0].size(); i++)
     {
-        for (int j = 0; j <= window.bottom; j += playerVel) // y down
+        vec.push_back(ObjectPoints[0][i]);
+    }
+
+    for (int i = 0; i<vec.size(); i++)
+    {
+        pnt.x = (pnt.x < vec[i].x) ? pnt.x : vec[i].x;
+
+        if (pnt.x == vec[i].x)
         {
+            pnt.y = (pnt.y < vec[i].y) ? pnt.y : vec[i].y;
+
+            if(pnt.y == vec[i].y)
+            location = i;
         }
 
     }
 
-    for (int i = window.right; i >= 0; i -= playerVel) // x <-
-    {
-        // y up
-    }
+    startP = pnt;
+    beforP = pnt;
+    //answer.push_back(pnt);
+    //vec.erase(vec.begin() + location);
 
-    for (int i = window.right; i >= 0; i -= playerVel) // x <-
+    do
     {
-        // y up
-    }
+        if (horizontal)
+        {
+            bool isfirst = true;
+            int count = 0;
+            for (int i = 0; i < vec.size(); i++)
+            {
+                if (beforP.y == vec[i].y)
+                {
+                    if (beforP.x < vec[i].x && right)
+                    {
 
-    for (int i = window.right; i >= 0; i -= playerVel) // x <-
-    {
-        // y up
-    }
+                        if (isfirst)
+                        {
+                            pnt.x = vec[i].x;
+                            isfirst = false;
+                        }
 
-    return vec;
+                        pnt.x = (pnt.x < vec[i].x) ? pnt.x : vec[i].x;
+
+                        if (pnt.x == vec[i].x)
+                        location = i;
+                        count--;
+                        
+                    }
+
+                    else if(!right)
+                    {
+                        if (isfirst)
+                        {
+                            pnt.x = vec[i].x;
+                            isfirst = false;
+                        }
+
+                        pnt.x = (pnt.x < vec[i].x) ? pnt.x : vec[i].x;
+
+                        if (pnt.x == vec[i].x)
+                        location = i;
+
+                        count--;
+                        
+                    }
+
+                }
+                    count++;
+                
+            }
+
+            if (count == vec.size())
+            {
+                right = false;
+                continue;
+            }
+
+            horizontal = false;
+        }
+
+        else
+        {
+            bool isfirst = true;
+            int count = 0;
+            for (int i = 0; i < vec.size(); i++)
+            {
+                if (beforP.x == vec[i].x)
+                {
+                    if (beforP.y > vec[i].y)
+                    {
+
+                        if (isfirst)
+                        {
+                            pnt.y = vec[i].y;
+                            isfirst = false;
+                        }
+
+                        pnt.y = (pnt.y < vec[i].y) ? pnt.y : vec[i].y;
+
+                        if (pnt.y == vec[i].y)
+                        location = i;
+
+                        count--;
+                        
+                    }
+
+                    else 
+                    {
+                        if (isfirst)
+                        {
+                            pnt.y = vec[i].y;
+                            isfirst = false;
+                        }
+
+                        pnt.y = (pnt.y < vec[i].y) ? pnt.y : vec[i].y;
+
+                        if (pnt.y == vec[i].y)
+                        location = i;
+
+                        count--;
+                    }
+                }
+                
+                count++;
+            }
+
+            if (count == vec.size())
+            {
+                right = false;
+            }
+
+            horizontal = true;
+        }
+
+        answer.push_back(pnt);
+        vec.erase(vec.begin() + location);
+        beforP = pnt;
+
+    } while (!(startP.x == pnt.x && startP.y == pnt.y));
+
+    answer.push_back(startP);
+
+    return answer;
 }
 
