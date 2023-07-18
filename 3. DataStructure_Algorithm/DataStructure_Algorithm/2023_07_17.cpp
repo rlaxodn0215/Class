@@ -6,32 +6,31 @@
 
 using namespace std;
 
-int unused = 0;
-int dat[10];
-int nxt[10];
+const int MX = 10;
 
-int free[10];
-int freenxt[10];
+int data[MX];
+int prev[MX];
+int next[MX];
+int free[MX];
 
-
-void InsertData()
-{
-	
-
-}
-
-void DeleteData()
+void Insert(int addr, int num)
 {
 
 }
 
-void PrintData()
+void Delete(int addr)
+{
+
+}
+
+void Print()
 {
 
 }
 
 int main()
 {
+
 	int command=0;
 
 	while (command !=4)
@@ -43,17 +42,17 @@ int main()
 		{
 		case 1:
 		{
-			InsertData();
+			//InsertData();
 		}
 			break;
 		case 2:
 		{
-			DeleteData();
+			//DeleteData();
 		}
 			break;
 		case 3:
 		{
-			PrintData();
+			Print();
 		}
 			break;
 		case 4:
