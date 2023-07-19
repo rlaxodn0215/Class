@@ -27,10 +27,8 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-
-vector<POINT> NewPathPoints; //선을 그리는 점들
-vector<vector<POINT>> ObjectPoints; // 도형을 그리기 위한 점들
-vector<RECT> Colliders; // 사각형의 collider들
+vector<POINT> PlayerPathPoints; //선을 그리는 점들
+vector<POINT> AreaPoints; // 도형을 그리기 위한 점들
 
 HBITMAP screen;
 
@@ -40,11 +38,13 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-void DrawLines(vector<POINT>& vec, HDC hdc);
-BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Player* player, int& endPoint, bool & newtry);
-void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool & newtry, RECT window);
-BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, bool & newtry);
-vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window); //using raycast system (up, down) 
+void DrawLines(vector<POINT> & vec, HDC hdc); //플레이어가 새로운 영역에 들어갈 때 선을 그려준다
+BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int& lineNum, bool& isVertical, int way);// 플레이어가 영역 선상에 있는지 확인
+BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical); // 새로운 도형을 만들려고 시작 할 때 시작 위치와 선 번호를 알려준다
+void AddLinePoint(Player* player, vector<POINT> & PlayerPathPoints);
+BOOL LineEnd(vector<POINT> & AreaPoints, Player* player, vector<POINT> & PlayerPathPoints, int & endLineNum, BOOL islinestart); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
+BOOL PlayerDead(vector<POINT> & PlayerPathPoints, Player* player); //선 끼리 충돌하면 플레이어 사망
+void MakeArea(vector<POINT> & PlayerPathPoints, vector<POINT> & AreaPoints); //도형을 만드는 함수
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -163,12 +163,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static int startHeight = 100;
 
     static RECT recView;
+
     static GameManager* GM = new GameManager;
     static Player* player = GM;
     static POINT curPos = player->GetCurPos();
+
     static int playerVel = 5;
-    static int ObjEndPoint = 0;
-    static bool isNewTry = false;
+    static int playerLineNum = 0;
+    static bool isInArea=true;
+    static bool isLineVertical=true;
+    static bool isLineStart = false;
+    static bool isLineEnd = false;
+    
+
 
     switch (message)
     {
@@ -177,7 +184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         GetClientRect(hWnd, &recView);
         SetTimer(hWnd, TIMER_FIRST, 10, NULL);
-        GM->StartGame(startCenter, startWidth, startHeight, player,ObjectPoints, NewPathPoints);
+        GM->StartGame(startCenter, startWidth, startHeight, player,AreaPoints);
         cout << "Ready for Playing" << endl;
 
     }
@@ -187,71 +194,81 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (wParam == TIMER_FIRST)
         {
             POINT updatePos;
-            int way;
 
             if (GetAsyncKeyState(VK_UP) & 0x8000) //위쪽
             {
-                way = 12;
-                if (player->GetWay() != 12 && player->GetWay() != 6 && NewLineStart(ObjectPoints, player, way, isNewTry))
+                if (isLineStart && player->GetWay() != 6 && player->GetWay() != 12)
                 {
-                    NewPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point" << endl;
+                    PlayerPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point (up)" << endl;
                     player->PlayerPosUpdate();
                 }
 
+                player->SetWay(12);
+                isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if(!isLineStart)
+                    isLineStart=LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
                 player->SetCurPos(updatePos);
-                player->SetWay(12);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry, recView);
             }
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
             {
-                way = 6;
-                if (player->GetWay() != 6 && player->GetWay() != 12 && NewLineStart(ObjectPoints, player, way, isNewTry))
+                if (isLineStart && player->GetWay() != 6 && player->GetWay() != 12)
                 {
-                    NewPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point" << endl;
+                    PlayerPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point (down)" << endl;
                     player->PlayerPosUpdate();
                 }
 
+                player->SetWay(6);
+                isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if (!isLineStart)
+                    isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
                 player->SetCurPos(updatePos);
-                player->SetWay(6);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry, recView);
             }
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
             {
-                way = 9;
-                if (player->GetWay() != 9 && player->GetWay() != 3 && NewLineStart(ObjectPoints, player, way, isNewTry))
+                if (isLineStart && player->GetWay() != 3 && player->GetWay() != 9)
                 {
-                    NewPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point" << endl;
+                    PlayerPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point (left)" << endl;
                     player->PlayerPosUpdate();
-
                 }
+
+                player->SetWay(9);
+                isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if (!isLineStart)
+                    isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
 
                 updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
-                player->SetWay(9);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry, recView);
             }
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
             {
-                way = 3;
-                if (player->GetWay() != 3 && player->GetWay() != 9 && NewLineStart(ObjectPoints, player, way, isNewTry))
+                if (isLineStart && player->GetWay() != 3 && player->GetWay() != 9)
                 {
-                    NewPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point" << endl;
+                    PlayerPathPoints.push_back(player->GetCurPos());
+                    cout << "add line point (right)" << endl;
                     player->PlayerPosUpdate();
                 }
 
+                player->SetWay(3);
+                isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if (!isLineStart)
+                    isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
                 updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
                 player->SetCurPos(updatePos);
-                player->SetWay(3);
-                MakeObject(NewPathPoints, player, ObjectPoints, ObjEndPoint, isNewTry,recView);
             }
 
             InvalidateRect(hWnd, NULL, FALSE);
@@ -289,9 +306,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
 
-        DrawLines(NewPathPoints, hMemDC);
+        DrawLines(PlayerPathPoints, hMemDC);
         GM->DrawLine(hMemDC);
-        GM->PaintArea(hMemDC, ObjectPoints);
+        GM->PaintArea(hMemDC, AreaPoints);
         player->PlayerCharactorUpdate(hMemDC);
 
         BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMemDC, 0, 0, SRCCOPY);
@@ -352,6 +369,108 @@ void DrawLines(vector<POINT>& vec, HDC hdc)
 
     SelectObject(hdc, oldPen);
     DeleteObject(hPen);
+}
+
+BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum, bool & isVertical, int way)
+{
+    for (int i = 0; i < AreaPoints.size(); i++)
+    {
+        if (player->GetCurPos().x == AreaPoints[i].x && player->GetCurPos().y == AreaPoints[i].y) // 플레이어가 꼭짓점에 있다.
+        {
+            cout << "플레이어는 꼭짓점에 있습니다" << endl;
+
+            if (way == 6 || way == 12) //위 아래로 이동중
+            {
+                isVertical = false;
+                return TRUE;
+            }
+
+            else if(way == 3 || way == 9)//좌 우로 이동중
+            {
+                isVertical = true;
+                return TRUE;
+            }
+        }
+
+
+        else if (player->GetCurPos().y == AreaPoints[i].y && AreaPoints[i].y == AreaPoints[(i + 1) % AreaPoints.size()].y) // y 선상
+        {
+            if (player->GetCurPos().x > min(AreaPoints[i].x, AreaPoints[(i + 1) % AreaPoints.size()].x) &&
+                player->GetCurPos().x < max(AreaPoints[i].x, AreaPoints[(i + 1) % AreaPoints.size()].x)) // x 가 선 안에 있다
+            {
+                cout << "선분 " << i << " " << (i + 1) % AreaPoints.size() << " 에 플레이어가 있습니다" << endl;
+                isVertical = false;
+                lineNum = i;
+                return TRUE;
+            }
+        }
+
+        else if (player->GetCurPos().x == AreaPoints[i].x && AreaPoints[i].x == AreaPoints[(i + 1) % AreaPoints.size()].x) // x 선상
+        {
+            if (player->GetCurPos().y > min(AreaPoints[i].y, AreaPoints[(i + 1) % AreaPoints.size()].y) &&
+                player->GetCurPos().y < max(AreaPoints[i].y, AreaPoints[(i + 1) % AreaPoints.size()].y)) // y 가 선 안에 있다
+            {
+                cout << "선분 " << i << " " << (i + 1) % AreaPoints.size() << " 에 플레이어가 있습니다" << endl;
+                isVertical = true;
+                lineNum = i;
+                return TRUE;
+            }
+        }
+
+
+    }
+
+    //cout << "플레이어가 새로운 영역을 만들고 있습니다." << endl;
+    return FALSE;
+}
+
+BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical)
+{
+    if (way == 6 || way == 12) //위 아래
+    {
+        if (isVertical == false)
+        {
+            cout << "LineStart(UpDown)" << endl;
+            PlayerPathPoints.push_back(player->GetCurPos());
+        }
+        return TRUE;
+    }
+    
+    else if(way == 3 || way == 9)//좌 우
+    {
+        if (isVertical == true)
+        {
+            cout << "LineStart(LeftRight)" << endl;
+            PlayerPathPoints.push_back(player->GetCurPos());
+        }
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+void AddLinePoint(Player* player, vector<POINT> & PlayerPathPoints)
+{
+    PlayerPathPoints.push_back(player->GetCurPos());
+}
+
+BOOL LineEnd(vector<POINT>& AreaPoints, Player* player, vector<POINT> & PlayerPathPoints, int& endLineNum, BOOL islinestart)
+{
+    if (islinestart)
+    {
+
+    }
+
+    return 0;
+}
+
+BOOL PlayerDead(vector<POINT>& PlayerPathPoints, Player* player)
+{
+    return 0;
+}
+
+void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints)
+{
 }
 
 BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Player* player, int& endPoint, bool& newtry)
@@ -415,7 +534,7 @@ void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& Objec
         }
 
         //using raycast method
-        ObjectPoints[0] = RayCastArea(ObjectPoints, window);
+        //ObjectPoints[0] = RayCastArea(ObjectPoints, window);
 
         vec = {};
         vec.push_back(player->GetCurPos());

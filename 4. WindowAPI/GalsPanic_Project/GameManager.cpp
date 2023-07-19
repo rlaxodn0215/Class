@@ -1,6 +1,6 @@
 #include "GameManager.h"
 
-void GameManager::StartGame(POINT recCenter, int width, int height, Player * player, vector<vector<POINT>>& ObjectPoints, vector<POINT> & LinePoints)
+void GameManager::StartGame(POINT recCenter, int width, int height, Player * player, vector<POINT> & AreaPoints)
 {
 
 	POINT num1 = { recCenter.x - width / 2, recCenter.y - height / 2 };
@@ -8,13 +8,14 @@ void GameManager::StartGame(POINT recCenter, int width, int height, Player * pla
 	POINT num3 = { recCenter.x + width / 2, recCenter.y + height / 2 };
 	POINT num4 = { recCenter.x - width / 2, recCenter.y + height / 2 };
 
-
-	vector<POINT> firstPoint = { num1,num2,num3,num4 };
-
-	ObjectPoints.push_back(firstPoint);
+	AreaPoints.push_back(num1);
+	AreaPoints.push_back(num2);
+	AreaPoints.push_back(num3);
+	AreaPoints.push_back(num4);
 
 	player->SetBeforePos(num1);
 	player->SetCurPos(num1);
+
 	//LinePoints.push_back(GetCurPos());
 
 }
@@ -37,24 +38,21 @@ void GameManager::DrawLine(HDC hdc)
 	DeleteObject(hPen);
 }
 
-void GameManager::PaintArea(HDC hdc, vector<vector<POINT>> & ObjectPoints)
+void GameManager::PaintArea(HDC hdc, vector<POINT> & ObjectPoints)
 {
 	HBRUSH hBrush, oldBrush;
 	hBrush = CreateSolidBrush(RGB(255, 0, 255));
 	oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
-
-	for (int i = 0; i < ObjectPoints.size(); i++)
+	POINT point[500] = {};
+	
+	for (int j = 0; j < ObjectPoints.size(); j++)
 	{
-		POINT point[500] = {};
-
-		for (int j = 0; j < ObjectPoints[i].size(); j++)
-		{
-			point[j] = ObjectPoints[i][j];
-		}
-
-		Polygon(hdc, point, ObjectPoints[i].size());
+		point[j] = ObjectPoints[j];
 	}
+	
+	Polygon(hdc, point, ObjectPoints.size());
+	
 
 	SelectObject(hdc, oldBrush);
 	DeleteObject(hBrush);
