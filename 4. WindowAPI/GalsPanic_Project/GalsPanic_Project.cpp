@@ -41,8 +41,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawLines(vector<POINT> & vec, HDC hdc); //플레이어가 새로운 영역에 들어갈 때 선을 그려준다
 BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int& lineNum, bool& isVertical, int way);// 플레이어가 영역 선상에 있는지 확인
 BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical); // 새로운 도형을 만들려고 시작 할 때 시작 위치와 선 번호를 알려준다
-void AddLinePoint(Player* player, vector<POINT> & PlayerPathPoints);
-BOOL LineEnd(vector<POINT> & AreaPoints, Player* player, vector<POINT> & PlayerPathPoints, int & endLineNum, BOOL islinestart); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
+BOOL LineEnd(Player* player, vector<POINT> & PlayerPathPoints); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
 BOOL PlayerDead(vector<POINT> & PlayerPathPoints, Player* player); //선 끼리 충돌하면 플레이어 사망
 void MakeArea(vector<POINT> & PlayerPathPoints, vector<POINT> & AreaPoints); //도형을 만드는 함수
 
@@ -170,10 +169,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     static int playerVel = 5;
     static int playerLineNum = 0;
+    static int startLineNum = 0;
+    static int endLineNum = 0;
+
     static bool isInArea=true;
     static bool isLineVertical=true;
     static bool isLineStart = false;
-    static bool isLineEnd = false;
     
 
 
@@ -197,18 +198,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             if (GetAsyncKeyState(VK_UP) & 0x8000) //위쪽
             {
-                if (isLineStart && player->GetWay() != 6 && player->GetWay() != 12)
+                if (isLineStart)
                 {
-                    PlayerPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point (up)" << endl;
-                    player->PlayerPosUpdate();
+                    PlayerDead(PlayerPathPoints, player);
+
+                    if (player->GetWay() != 6 && player->GetWay() != 12)
+                    {
+                        startLineNum = playerLineNum;
+                        PlayerPathPoints.push_back(player->GetCurPos());
+                        cout << "add line point (up)" << endl;
+                        player->PlayerPosUpdate();
+                    }
                 }
+
 
                 player->SetWay(12);
                 isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
 
+                if (isInArea && isLineStart)
+                {
+                    LineEnd(player, PlayerPathPoints);
+                    endLineNum = playerLineNum;
+                    isLineStart = false;
+                }
+
                 if(!isLineStart)
                     isLineStart=LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
 
                 updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
                 player->SetCurPos(updatePos);
@@ -216,15 +232,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
             {
-                if (isLineStart && player->GetWay() != 6 && player->GetWay() != 12)
+                if (isLineStart)
                 {
-                    PlayerPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point (down)" << endl;
-                    player->PlayerPosUpdate();
+                    PlayerDead(PlayerPathPoints, player);
+
+                    if (player->GetWay() != 6 && player->GetWay() != 12)
+                    {
+                        startLineNum = playerLineNum;
+                        PlayerPathPoints.push_back(player->GetCurPos());
+                        cout << "add line point (down)" << endl;
+                        player->PlayerPosUpdate();
+                    }
                 }
 
                 player->SetWay(6);
                 isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if (isInArea && isLineStart)
+                {
+                    LineEnd(player, PlayerPathPoints);
+                    endLineNum = playerLineNum;
+                    isLineStart = false;
+                }
 
                 if (!isLineStart)
                     isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
@@ -235,15 +264,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
             {
-                if (isLineStart && player->GetWay() != 3 && player->GetWay() != 9)
+                if (isLineStart)
                 {
-                    PlayerPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point (left)" << endl;
-                    player->PlayerPosUpdate();
+                    PlayerDead(PlayerPathPoints, player);
+
+                    if (player->GetWay() != 3 && player->GetWay() != 9)
+                    {
+                        startLineNum = playerLineNum;
+                        PlayerPathPoints.push_back(player->GetCurPos());
+                        cout << "add line point (left)" << endl;
+                        player->PlayerPosUpdate();
+                    }
                 }
 
                 player->SetWay(9);
                 isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if (isInArea && isLineStart)
+                {
+                    LineEnd(player, PlayerPathPoints);
+                    endLineNum = playerLineNum;
+                    isLineStart = false;
+                }
 
                 if (!isLineStart)
                     isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
@@ -254,15 +296,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
             {
-                if (isLineStart && player->GetWay() != 3 && player->GetWay() != 9)
+                if (isLineStart)
                 {
-                    PlayerPathPoints.push_back(player->GetCurPos());
-                    cout << "add line point (right)" << endl;
-                    player->PlayerPosUpdate();
+                    PlayerDead(PlayerPathPoints, player);
+
+                    if (player->GetWay() != 3 && player->GetWay() != 9)
+                    {
+                        startLineNum = playerLineNum;
+                        PlayerPathPoints.push_back(player->GetCurPos());
+                        cout << "add line point (right)" << endl;
+                        player->PlayerPosUpdate();
+                    }
                 }
 
                 player->SetWay(3);
                 isInArea = PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
+
+                if (isInArea && isLineStart)
+                {
+                    LineEnd(player, PlayerPathPoints);
+                    endLineNum = playerLineNum;
+                    isLineStart = false;
+                }
 
                 if (!isLineStart)
                     isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
@@ -375,25 +430,8 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
 {
     for (int i = 0; i < AreaPoints.size(); i++)
     {
-        if (player->GetCurPos().x == AreaPoints[i].x && player->GetCurPos().y == AreaPoints[i].y) // 플레이어가 꼭짓점에 있다.
-        {
-            cout << "플레이어는 꼭짓점에 있습니다" << endl;
 
-            if (way == 6 || way == 12) //위 아래로 이동중
-            {
-                isVertical = false;
-                return TRUE;
-            }
-
-            else if(way == 3 || way == 9)//좌 우로 이동중
-            {
-                isVertical = true;
-                return TRUE;
-            }
-        }
-
-
-        else if (player->GetCurPos().y == AreaPoints[i].y && AreaPoints[i].y == AreaPoints[(i + 1) % AreaPoints.size()].y) // y 선상
+        if (player->GetCurPos().y == AreaPoints[i].y && AreaPoints[i].y == AreaPoints[(i + 1) % AreaPoints.size()].y) // y 선상
         {
             if (player->GetCurPos().x > min(AreaPoints[i].x, AreaPoints[(i + 1) % AreaPoints.size()].x) &&
                 player->GetCurPos().x < max(AreaPoints[i].x, AreaPoints[(i + 1) % AreaPoints.size()].x)) // x 가 선 안에 있다
@@ -417,6 +455,78 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
             }
         }
 
+        if (player->GetCurPos().x == AreaPoints[i].x && player->GetCurPos().y == AreaPoints[i].y) // 플레이어가 꼭짓점에 있다.
+        {
+            cout << "플레이어는 "<< i <<"번 꼭짓점에 있습니다" << endl;
+
+            if (way == 12)
+            {
+                if (AreaPoints[(i + 1) % AreaPoints.size()].y < player->GetCurPos().y ||
+                    AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].y < player->GetCurPos().y)
+                {
+                    isVertical = true;
+                    return TRUE;
+                }
+
+                else
+                {
+                    isVertical = false;
+                    return TRUE;
+                }
+            }
+
+            else if (way == 6)
+            {
+                if (AreaPoints[(i + 1) % AreaPoints.size()].y > player->GetCurPos().y ||
+                    AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].y > player->GetCurPos().y)
+                {
+                    isVertical = true;
+                    return TRUE;
+                }
+
+                else
+                {
+                    isVertical = false;
+                    return TRUE;
+                }
+            }
+
+            else if (way == 3)
+            {
+                if (AreaPoints[(i + 1) % AreaPoints.size()].x < player->GetCurPos().x ||
+                    AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].x < player->GetCurPos().x)
+                {
+                    isVertical = true;
+                    return TRUE;
+                }
+
+                else
+                {
+                    isVertical = false;
+                    return TRUE;
+                }
+            }
+
+            else if (way == 9)
+            {
+                if (AreaPoints[(i + 1) % AreaPoints.size()].x > player->GetCurPos().x ||
+                    AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].x > player->GetCurPos().x)
+                {
+                    isVertical = true;
+                    return TRUE;
+                }
+
+                else
+                {
+                    isVertical = false;
+                    return TRUE;
+                }
+            }
+
+
+
+            
+        }
 
     }
 
@@ -430,317 +540,69 @@ BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool i
     {
         if (isVertical == false)
         {
-            cout << "LineStart(UpDown)" << endl;
+            cout << "LineStart (UpDown)" << endl;
             PlayerPathPoints.push_back(player->GetCurPos());
+            player->PlayerPosUpdate();
+            return TRUE;
         }
-        return TRUE;
     }
     
     else if(way == 3 || way == 9)//좌 우
     {
         if (isVertical == true)
         {
-            cout << "LineStart(LeftRight)" << endl;
+            cout << "LineStart (LeftRight)" << endl;
             PlayerPathPoints.push_back(player->GetCurPos());
+            player->PlayerPosUpdate();
+            return TRUE;
         }
-        return TRUE;
     }
 
     return FALSE;
 }
 
-void AddLinePoint(Player* player, vector<POINT> & PlayerPathPoints)
+BOOL LineEnd(Player* player, vector<POINT> & PlayerPathPoints)
 {
+    cout << "Line End" << endl;
     PlayerPathPoints.push_back(player->GetCurPos());
-}
-
-BOOL LineEnd(vector<POINT>& AreaPoints, Player* player, vector<POINT> & PlayerPathPoints, int& endLineNum, BOOL islinestart)
-{
-    if (islinestart)
-    {
-
-    }
-
-    return 0;
+    return TRUE;
 }
 
 BOOL PlayerDead(vector<POINT>& PlayerPathPoints, Player* player)
 {
-    return 0;
-}
+    if (!PlayerPathPoints.empty())
+    {
+        for (int i = 0; i < PlayerPathPoints.size() - 1; i++)
+        {
+            if (player->GetCurPos().y == PlayerPathPoints[i].y && PlayerPathPoints[i].y == PlayerPathPoints[(i + 1) % PlayerPathPoints.size()].y) // y 선상
+            {
+                if (player->GetCurPos().x > min(PlayerPathPoints[i].x, PlayerPathPoints[(i + 1) % PlayerPathPoints.size()].x) &&
+                    player->GetCurPos().x < max(PlayerPathPoints[i].x, PlayerPathPoints[(i + 1) % PlayerPathPoints.size()].x)) // x 가 선 안에 있다
+                {
+                    cout << "선에 닿아서 플레이어는 사망하였습니다" << endl;
+                    return TRUE;
+                }
+            }
 
-void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints)
-{
-}
+            else if (player->GetCurPos().x == PlayerPathPoints[i].x && PlayerPathPoints[i].x == PlayerPathPoints[(i + 1) % PlayerPathPoints.size()].x) // x 선상
+            {
+                if (player->GetCurPos().y > min(PlayerPathPoints[i].y, PlayerPathPoints[(i + 1) % PlayerPathPoints.size()].y) &&
+                    player->GetCurPos().y < max(PlayerPathPoints[i].y, PlayerPathPoints[(i + 1) % PlayerPathPoints.size()].y)) // y 가 선 안에 있다
+                {
+                    cout << "선에 닿아서 플레이어는 사망하였습니다" << endl;
+                    return TRUE;
+                }
+            }
 
-BOOL CheckMakeObject(vector<vector<POINT>> ObjectPoints, vector<POINT>& vec, Player* player, int& endPoint, bool& newtry)
-{
-     if (player->GetWay() == 6 || player->GetWay() == 12) //위아래
-     {
-         for (int i = 0; i < ObjectPoints.size(); i++)
-         {
-             for (int j = 0; j < ObjectPoints[i].size(); j++)
-             {
-                 if (player->GetCurPos().y == ObjectPoints[i][j % ObjectPoints[i].size()].y &&
-                     ObjectPoints[i][j % ObjectPoints[i].size()].y == ObjectPoints[i][(j+1) % ObjectPoints[i].size()].y) // y값 비교
-                 {
-                     if (player->GetCurPos().x > min(ObjectPoints[i][j % ObjectPoints[i].size()].x, ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x)
-                         && player->GetCurPos().x < max(ObjectPoints[i][j % ObjectPoints[i].size()].x, ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x)) //x값 비교
-                     {
-                         vec.push_back(player->GetCurPos());
-                         newtry = false;
-                         return TRUE;
-                     }
-                 }
-             }
-
-         }
-     }
-
-     else if (player->GetWay() == 3 || player->GetWay() == 9)//좌우
-     {
-         for (int i = 0; i < ObjectPoints.size(); i++)
-         {
-             for (int j = 0; j < ObjectPoints[i].size(); j++)
-             {
-                 if (player->GetCurPos().x == ObjectPoints[i][j % ObjectPoints[i].size()].x &&
-                     ObjectPoints[i][j % ObjectPoints[i].size()].x == ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x) // x값 비교
-                 {
-                     if (player->GetCurPos().y > min(ObjectPoints[i][j % ObjectPoints[i].size()].y, ObjectPoints[i][(j+1) % ObjectPoints[i].size()].y)
-                         && player->GetCurPos().y < max(ObjectPoints[i][j % ObjectPoints[i].size()].y, ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].y)) //y값 비교
-                     {
-                         vec.push_back(player->GetCurPos());
-                         newtry = false;
-                         return TRUE;
-                     }
-                 }
-             }
-         }
-     }
-
-    
+        }
+    }
 
     return FALSE;
 }
 
-void MakeObject(vector<POINT>& vec, Player* player, vector<vector<POINT>>& ObjectPoints, int& endPoint, bool& newtry, RECT window)
+void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints)
 {
-    if (CheckMakeObject(ObjectPoints, vec, player, endPoint, newtry))
-    {
-
-        for (int i = 0; i < vec.size(); i++)
-        {
-            ObjectPoints[0].push_back(vec[i]);
-        }
-
-        //using raycast method
-        //ObjectPoints[0] = RayCastArea(ObjectPoints, window);
-
-        vec = {};
-        vec.push_back(player->GetCurPos());
-
-    }
-}
-
-BOOL NewLineStart(vector<vector<POINT>>& ObjectPoints, Player* player, int way, bool & newtry)
-{
-    if (!newtry)
-    {
-        for (int i = 0; i < ObjectPoints.size(); i++)
-        {
-            for (int j = 0; j < ObjectPoints[i].size(); j++)
-            {
-                if (way == 6 || way == 12) //위아래 이동
-                {
-                    if (player->GetCurPos().x == ObjectPoints[i][j % ObjectPoints[i].size()].x &&
-                        player->GetCurPos().x == ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].x) // x축 동일
-                    {
-                        newtry = false;
-                        return FALSE;
-                    }
-
-                }
-
-                else //좌우 이동
-                {
-                    if (player->GetCurPos().y == ObjectPoints[i][j % ObjectPoints[i].size()].y &&
-                        player->GetCurPos().y == ObjectPoints[i][(j + 1) % ObjectPoints[i].size()].y) // y축 동일
-                    {
-                        newtry = false;
-                        return FALSE;
-                    }
-                }
-            }
-        }
-        newtry = true;
-        return TRUE;
-    }
 
 
-    else
-    {
-        return TRUE;
-    }
-
-  
-
-}
-
-vector<POINT> RayCastArea(vector<vector<POINT>>& ObjectPoints, RECT window)
-{
-    vector<POINT> vec;
-    vector<POINT> answer;
-    bool horizontal = true;
-    bool right = true;
-    int location=0;
-    POINT startP;
-    POINT beforP;
-    POINT pnt = { window.right, window.bottom };
-
-    for (int i = 0; i < ObjectPoints[0].size(); i++)
-    {
-        vec.push_back(ObjectPoints[0][i]);
-    }
-
-    for (int i = 0; i<vec.size(); i++)
-    {
-        pnt.x = (pnt.x < vec[i].x) ? pnt.x : vec[i].x;
-
-        if (pnt.x == vec[i].x)
-        {
-            pnt.y = (pnt.y < vec[i].y) ? pnt.y : vec[i].y;
-
-            if(pnt.y == vec[i].y)
-            location = i;
-        }
-
-    }
-
-    startP = pnt;
-    beforP = pnt;
-    //answer.push_back(pnt);
-    //vec.erase(vec.begin() + location);
-
-    do
-    {
-        if (horizontal)
-        {
-            bool isfirst = true;
-            int count = 0;
-            for (int i = 0; i < vec.size(); i++)
-            {
-                if (beforP.y == vec[i].y)
-                {
-                    if (beforP.x < vec[i].x && right)
-                    {
-
-                        if (isfirst)
-                        {
-                            pnt.x = vec[i].x;
-                            isfirst = false;
-                        }
-
-                        pnt.x = (pnt.x < vec[i].x) ? pnt.x : vec[i].x;
-
-                        if (pnt.x == vec[i].x)
-                        location = i;
-                        count--;
-                        
-                    }
-
-                    else if(!right)
-                    {
-                        if (isfirst)
-                        {
-                            pnt.x = vec[i].x;
-                            isfirst = false;
-                        }
-
-                        pnt.x = (pnt.x < vec[i].x) ? pnt.x : vec[i].x;
-
-                        if (pnt.x == vec[i].x)
-                        location = i;
-
-                        count--;
-                        
-                    }
-
-                }
-                    count++;
-                
-            }
-
-            if (count == vec.size())
-            {
-                right = false;
-                continue;
-            }
-
-            horizontal = false;
-        }
-
-        else
-        {
-            bool isfirst = true;
-            int count = 0;
-            for (int i = 0; i < vec.size(); i++)
-            {
-                if (beforP.x == vec[i].x)
-                {
-                    if (beforP.y > vec[i].y)
-                    {
-
-                        if (isfirst)
-                        {
-                            pnt.y = vec[i].y;
-                            isfirst = false;
-                        }
-
-                        pnt.y = (pnt.y < vec[i].y) ? pnt.y : vec[i].y;
-
-                        if (pnt.y == vec[i].y)
-                        location = i;
-
-                        count--;
-                        
-                    }
-
-                    else 
-                    {
-                        if (isfirst)
-                        {
-                            pnt.y = vec[i].y;
-                            isfirst = false;
-                        }
-
-                        pnt.y = (pnt.y < vec[i].y) ? pnt.y : vec[i].y;
-
-                        if (pnt.y == vec[i].y)
-                        location = i;
-
-                        count--;
-                    }
-                }
-                
-                count++;
-            }
-
-            if (count == vec.size())
-            {
-                right = false;
-            }
-
-            horizontal = true;
-        }
-
-        answer.push_back(pnt);
-        vec.erase(vec.begin() + location);
-        beforP = pnt;
-
-    } while (!(startP.x == pnt.x && startP.y == pnt.y));
-
-    answer.push_back(startP);
-
-    return answer;
 }
 
