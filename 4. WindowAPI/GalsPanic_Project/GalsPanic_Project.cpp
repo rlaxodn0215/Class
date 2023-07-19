@@ -602,7 +602,7 @@ BOOL PlayerDead(vector<POINT>& PlayerPathPoints, Player* player)
 
 void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints)
 {
-
+    
 
 }
 
