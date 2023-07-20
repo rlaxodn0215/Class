@@ -10,6 +10,7 @@
 #include <vector>
 #include<list>
 #include<iostream>
+#include<math.h>
 
 #ifdef UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
@@ -43,7 +44,7 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int& lineNum, 
 BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical); // 새로운 도형을 만들려고 시작 할 때 시작 위치와 선 번호를 알려준다
 BOOL LineEnd(Player* player, vector<POINT> & PlayerPathPoints); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
 BOOL PlayerDead(vector<POINT> & PlayerPathPoints, Player* player); //선 끼리 충돌하면 플레이어 사망
-void MakeArea(vector<POINT> & PlayerPathPoints, vector<POINT> & AreaPoints); //도형을 만드는 함수
+void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum); //도형을 만드는 함수
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -220,6 +221,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
+                    MakeArea(PlayerPathPoints, AreaPoints,startLineNum,endLineNum);
                 }
 
                 if(!isLineStart)
@@ -253,6 +255,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
+                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum);
                 }
 
                 if (!isLineStart)
@@ -285,6 +288,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
+                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum);
                 }
 
                 if (!isLineStart)
@@ -317,6 +321,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
+                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum);
                 }
 
                 if (!isLineStart)
@@ -600,9 +605,48 @@ BOOL PlayerDead(vector<POINT>& PlayerPathPoints, Player* player)
     return FALSE;
 }
 
-void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints)
+void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum)
 {
-    
+    vector<POINT> newAreaPoint;
+
+    for (int i = 0; i < PlayerPathPoints.size(); i++)
+    {
+        newAreaPoint.push_back(PlayerPathPoints[i]);
+    }
+
+    //내적으로 회전 방향을 구한다.
+
+    POINT center = {0,0};
+    for (int i = 0; i < AreaPoints.size(); i++)
+    {
+        center.x += (AreaPoints[i].x / AreaPoints.size());
+        center.y += (AreaPoints[i].y / AreaPoints.size());
+    }
+
+    double totalRadius = 0;
+    for (int i = 0; i < PlayerPathPoints.size() - 1; i++)
+    {
+        double length1 = sqrt((PlayerPathPoints[i].x - center.x) * (PlayerPathPoints[i].x - center.x) +
+            (PlayerPathPoints[i].y - center.y) * (PlayerPathPoints[i].y - center.y));
+        double length2 = sqrt((PlayerPathPoints[i+1].x - center.x) * (PlayerPathPoints[i+1].x - center.x) +
+            (PlayerPathPoints[i+1].y - center.y) * (PlayerPathPoints[i+1].y - center.y));
+        double Cross = (PlayerPathPoints[i].x - center.x) * (PlayerPathPoints[i + 1].y - center.y) -
+            (PlayerPathPoints[i + 1].x - center.x) * (PlayerPathPoints[i].y - center.y);
+        totalRadius += asin(Cross / (length1 * length2));
+    }
+
+    POINT startPoint = PlayerPathPoints[0];
+    POINT endPoint = PlayerPathPoints[PlayerPathPoints.size()-1];
+
+    if (totalRadius < 0)
+    {
+        cout << "rotate counter clockwise" << endl;
+    }
+
+    else
+    {
+        cout << "rotate clockwise" << endl;
+    }
 
 }
 
