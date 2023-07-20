@@ -30,6 +30,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 
 vector<POINT> PlayerPathPoints; //선을 그리는 점들
 vector<POINT> AreaPoints; // 도형을 그리기 위한 점들
+vector<RECT> Colliders; //박스 collider들
 
 HBITMAP screen;
 
@@ -45,7 +46,7 @@ BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool i
 BOOL LineEnd(Player* player, vector<POINT> & PlayerPathPoints); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
 BOOL PlayerDead(vector<POINT> & PlayerPathPoints, Player* player); //선 끼리 충돌하면 플레이어 사망
 void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum); //도형을 만드는 함수
-BOOL Collision(vector<POINT>& AreaPoints, Player* player);
+void Collision(vector<POINT>& AreaPoints, Player* player);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -197,6 +198,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (wParam == TIMER_FIRST)
         {
             POINT updatePos;
+
+            if (GetAsyncKeyState(VK_SPACE) & 0x8000) //
+            {
+
+            }
 
             if (GetAsyncKeyState(VK_UP) & 0x8000) //위쪽
             {
@@ -615,6 +621,7 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
         newAreaPoint.push_back(PlayerPathPoints[i]);
     }
 
+
     //외적으로 회전 방향을 구한다.
 
     POINT center = {0,0};
@@ -669,14 +676,22 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
 
     }
 
+    //if (startLineNum == endLineNum)
+    //{
+    //    newAreaPoint.pop_back();
+    //}
+
     AreaPoints = newAreaPoint;
     PlayerPathPoints = {};
 
 }
 
-BOOL Collision(vector<POINT>& AreaPoints, Player* player)
+void Collision(vector<POINT>& AreaPoints, Player* player)
 {
-    
-    return 0;
+    for (int i = 0; i < AreaPoints.size() - 1; i++)
+    {
+
+    }
 }
+
 
