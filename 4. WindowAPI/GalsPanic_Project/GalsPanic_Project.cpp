@@ -45,6 +45,7 @@ BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool i
 BOOL LineEnd(Player* player, vector<POINT> & PlayerPathPoints); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
 BOOL PlayerDead(vector<POINT> & PlayerPathPoints, Player* player); //선 끼리 충돌하면 플레이어 사망
 void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum); //도형을 만드는 함수
+BOOL Collision(vector<POINT>& AreaPoints, Player* player);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -539,7 +540,7 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
     return FALSE;
 }
 
-BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical)
+BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical) //꼭짓점이면 push할 필요 없다.
 {
     if (way == 6 || way == 12) //위 아래
     {
@@ -614,7 +615,7 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
         newAreaPoint.push_back(PlayerPathPoints[i]);
     }
 
-    //내적으로 회전 방향을 구한다.
+    //외적으로 회전 방향을 구한다.
 
     POINT center = {0,0};
     for (int i = 0; i < AreaPoints.size(); i++)
@@ -638,15 +639,44 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
     POINT startPoint = PlayerPathPoints[0];
     POINT endPoint = PlayerPathPoints[PlayerPathPoints.size()-1];
 
-    if (totalRadius < 0)
+    if (totalRadius < 0) //라인 하나에 start, end있을때 구분하기
     {
         cout << "rotate counter clockwise" << endl;
+
+        int i= endLineNum;
+        while (1)
+        {
+            newAreaPoint.push_back(AreaPoints[i]);
+            if (i == startLineNum) break;
+            if (i == 0) i = AreaPoints.size();
+            i--;
+        }
+
     }
 
     else
     {
         cout << "rotate clockwise" << endl;
+
+        int i = (endLineNum+1)%AreaPoints.size();
+        while (1)
+        {
+            newAreaPoint.push_back(AreaPoints[i]);
+            if (i == startLineNum) break;
+            if (i == AreaPoints.size() - 1) i = -1;
+            i++;
+        }
+
     }
 
+    AreaPoints = newAreaPoint;
+    PlayerPathPoints = {};
+
+}
+
+BOOL Collision(vector<POINT>& AreaPoints, Player* player)
+{
+    
+    return 0;
 }
 
