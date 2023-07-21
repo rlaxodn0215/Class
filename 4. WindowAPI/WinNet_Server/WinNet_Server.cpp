@@ -8,9 +8,30 @@
 
 #include<WinSock2.h>
 #include<stdio.h>
+#include<list>
+#include<vector>
 #pragma comment(lib,"ws2_32.lib")
 
+
+#define WM_ASYNC    WM_USER+1
 #define MAX_LOADSTRING 100
+
+
+std::list<SOCKET> socketList;
+int InitServer(HWND hWnd);
+int CloseServer();
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr);
+
+void SendMessageToClient(char* buffer);
+void ReadMessage(TCHAR* msg, char* buffer);
+void CloseClient(SOCKET socket);
+
+WSADATA wsaData;
+SOCKET s, cs;
+TCHAR msg[200];
+SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
+int size=0, msglen=0;
+char buffer[100];
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -65,7 +86,94 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return (int) msg.wParam;
 }
 
+int InitServer(HWND hWnd)
+{
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
 
+    s = socket(AF_INET, SOCK_STREAM, 0);
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = 20;
+    addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.54");
+
+    bind(s, (LPSOCKADDR)&addr, sizeof(addr));
+
+    if (listen(s, 5) == SOCKET_ERROR)
+    {
+        return 0;
+    }
+
+    WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_ACCEPT);
+
+}
+
+int CloseServer()
+{
+    closesocket(s);
+    WSACleanup();
+    return 0;
+}
+
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr)
+{
+    SOCKET cs;
+    int size;
+    size =sizeof(c_addr);
+    cs = accept(s, (LPSOCKADDR)&c_addr, &size);
+    WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
+
+    socketList.push_back(cs);
+
+    return cs;
+}
+
+void SendMessageToClient(char* buffer)
+{
+    for (std::list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        send(cs, (LPSTR)buffer, strlen(buffer) + 1, 0);
+    }
+}
+
+void ReadMessage(TCHAR* msg, char* buffer)
+{
+    for (std::list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        int msglen = recv(cs, buffer, 100, 0);
+        if (msglen > 0)
+        {
+            buffer[msglen] = NULL;
+#ifdef _UNICODE
+        msglen = MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), 0, 0);
+        MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), msg, msglen);
+        msg[msglen] = NULL;
+#else
+        strcpy_s(msg, buffer);
+
+#endif // _UNICODE
+
+        SendMessageToClient(buffer);
+
+        }
+    }
+
+}
+
+void CloseClient(SOCKET socket)
+{
+    for (std::list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        if (cs == socket)
+        {
+            closesocket(cs);
+            it = socketList.erase(it);
+            break;
+        }
+    }
+}
 
 //
 //  함수: MyRegisterClass()
@@ -133,53 +241,33 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static WSADATA wsaData;
-    static SOCKET s, cs;
-    static TCHAR msg[200];
-    static SOCKADDR_IN addr = { 0 }, C_addr = { 0 };
-    int size, msglen;
-    char buffer[100];
+   
 
     switch (message)
     {
     case WM_CREATE:
     {
-        WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-        s = socket(AF_INET, SOCK_STREAM, 0);
-
-        addr.sin_family = AF_INET;
-        addr.sin_port = 20;
-        addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.54");
-
-        bind(s, (LPSOCKADDR)&addr, sizeof(addr));
-        
-        if (listen(s, 5) == SOCKET_ERROR)
-        {
-            return 0;
-        }
-        
-        size = sizeof(C_addr);
-
-        do
-        {
-            cs = accept(s, (LPSOCKADDR)&C_addr, &size);
-
-        } while (cs == INVALID_SOCKET);
-
-            msglen = recv(cs, buffer, 99, 0);
-            buffer[msglen] = NULL;
-
-#ifdef _UNICODE
-            msglen = MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), 0, 0);
-            MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), msg, msglen);
-            msg[msglen] = NULL;
-#else
-           strcpy_s(msg,buffer);
-
-#endif // _UNICODE
+        return InitServer(hWnd);
 
     }
+        break;
+    case WM_ASYNC:
+        switch (lParam)
+        {
+        case FD_ACCEPT:
+            cs = AcceptSocket(hWnd, s, c_addr);
+            break;
+        case FD_READ:
+            ReadMessage(msg, buffer);
+            InvalidateRect(hWnd, NULL, TRUE);
+            break;
+        case FD_CLOSE:
+            CloseClient(wParam);
+            break;
+        default:
+            break;
+        }
+
         break;
     case WM_COMMAND:
         {
@@ -203,13 +291,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            TextOut(hdc, 10, 10, msg, (int)_tcslen(msg));
+            if(_tcscmp(msg, _T("")))
+                TextOut(hdc, 10, 10, msg, (int)_tcslen(msg));
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
-        closesocket(s);
-        WSACleanup();
+        CloseServer();
         PostQuitMessage(0);
         break;
     default:

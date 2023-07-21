@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinNet_Server", "..\WinNet_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinNet_Client", "..\WinNet_Client\WinNet_Client.vcxproj", "{911D4B74-A065-4211-81D5-5C93540C414F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Problem9", "Problem9\Problem9.vcxproj", "{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{911D4B74-A065-4211-81D5-5C93540C414F}.Release|x64.Build.0 = Release|x64
 		{911D4B74-A065-4211-81D5-5C93540C414F}.Release|x86.ActiveCfg = Release|Win32
 		{911D4B74-A065-4211-81D5-5C93540C414F}.Release|x86.Build.0 = Release|Win32
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Debug|x64.ActiveCfg = Debug|x64
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Debug|x64.Build.0 = Debug|x64
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Debug|x86.ActiveCfg = Debug|Win32
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Debug|x86.Build.0 = Debug|Win32
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Release|x64.ActiveCfg = Release|x64
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Release|x64.Build.0 = Release|x64
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Release|x86.ActiveCfg = Release|Win32
+		{A64FDDD7-E016-4DCD-8217-62CF5DEA7AFA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

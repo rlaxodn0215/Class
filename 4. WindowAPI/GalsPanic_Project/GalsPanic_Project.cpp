@@ -30,7 +30,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 
 vector<POINT> PlayerPathPoints; //선을 그리는 점들
 vector<POINT> AreaPoints; // 도형을 그리기 위한 점들
-vector<RECT> Colliders; //박스 collider들
+vector<int> ColliderWay; //박스 collider들
 
 HBITMAP screen;
 
@@ -45,8 +45,9 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int& lineNum, 
 BOOL LineStart(Player* player, vector<POINT> & PlayerPathPoints, int way, bool isVertical); // 새로운 도형을 만들려고 시작 할 때 시작 위치와 선 번호를 알려준다
 BOOL LineEnd(Player* player, vector<POINT> & PlayerPathPoints); // 새로운 도형을 만들려고 끝날 때 끝난 위치와 선 번호를 알려준다
 BOOL PlayerDead(vector<POINT> & PlayerPathPoints, Player* player); //선 끼리 충돌하면 플레이어 사망
-void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum); //도형을 만드는 함수
-void Collision(vector<POINT>& AreaPoints, Player* player);
+void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum, bool& CCW); //도형을 만드는 함수
+void MakeCollider(vector<POINT>& AreaPoints, vector<int> & ColliderWay, bool CCW); //충돌 영역 넣기 
+BOOL CollisonCheck(const vector<POINT>& AreaPoints, const vector<int>& ColliderWay, const Player* player, const int playerLineNum, const bool isInArea);//충돌 확인
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -178,6 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static bool isInArea=true;
     static bool isLineVertical=true;
     static bool isLineStart = false;
+    static bool CCW = false;
     
 
 
@@ -189,6 +191,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetClientRect(hWnd, &recView);
         SetTimer(hWnd, TIMER_FIRST, 10, NULL);
         GM->StartGame(startCenter, startWidth, startHeight, player,AreaPoints);
+        MakeCollider(AreaPoints, ColliderWay,CCW);
         cout << "Ready for Playing" << endl;
 
     }
@@ -228,19 +231,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
-                    MakeArea(PlayerPathPoints, AreaPoints,startLineNum,endLineNum);
+                    MakeArea(PlayerPathPoints, AreaPoints,startLineNum,endLineNum, CCW);
+                    MakeCollider(AreaPoints, ColliderWay, CCW);
                 }
 
-                if(!isLineStart)
-                    isLineStart=LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+                PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
 
+                if (!CollisonCheck(AreaPoints, ColliderWay, player, playerLineNum, isInArea))
+                {
+                    if (!isLineStart)
+                        isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
 
-                updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
-                player->SetCurPos(updatePos);
+                    updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
+                    player->SetCurPos(updatePos);
+                }
             }
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
             {
+                
                 if (isLineStart)
                 {
                     PlayerDead(PlayerPathPoints, player);
@@ -262,18 +271,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
-                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum);
+                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum, CCW);
+                    MakeCollider(AreaPoints, ColliderWay, CCW);
                 }
 
-                if (!isLineStart)
-                    isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+                PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
 
-                updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
-                player->SetCurPos(updatePos);
+                if (!CollisonCheck(AreaPoints, ColliderWay, player, playerLineNum, isInArea))
+                {
+                    if (!isLineStart)
+                        isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
+                    updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
+                    player->SetCurPos(updatePos);
+                }
             }
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
             {
+
                 if (isLineStart)
                 {
                     PlayerDead(PlayerPathPoints, player);
@@ -295,14 +311,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
-                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum);
+                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum, CCW);
+                    MakeCollider(AreaPoints, ColliderWay, CCW);
                 }
 
-                if (!isLineStart)
-                    isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+                PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
 
-                updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
-                player->SetCurPos(updatePos);
+                if (!CollisonCheck(AreaPoints, ColliderWay, player, playerLineNum, isInArea))
+                {
+                    if (!isLineStart)
+                        isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
+                    updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
+                    player->SetCurPos(updatePos);
+                }
             }
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
@@ -328,14 +350,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     LineEnd(player, PlayerPathPoints);
                     endLineNum = playerLineNum;
                     isLineStart = false;
-                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum);
+                    MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum, CCW);
+                    MakeCollider(AreaPoints, ColliderWay, CCW);
                 }
 
-                if (!isLineStart)
-                    isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+                PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
 
-                updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
-                player->SetCurPos(updatePos);
+                if (!CollisonCheck(AreaPoints, ColliderWay, player, playerLineNum, isInArea))
+                {
+
+                    if (!isLineStart)
+                        isLineStart = LineStart(player, PlayerPathPoints, player->GetWay(), isLineVertical);
+
+                    updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
+                    player->SetCurPos(updatePos);
+                }
             }
 
             InvalidateRect(hWnd, NULL, FALSE);
@@ -477,12 +506,14 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
                     AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].y < player->GetCurPos().y)
                 {
                     isVertical = true;
+                    lineNum = i;
                     return TRUE;
                 }
 
                 else
                 {
                     isVertical = false;
+                    lineNum = i;
                     return TRUE;
                 }
             }
@@ -493,12 +524,14 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
                     AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].y > player->GetCurPos().y)
                 {
                     isVertical = true;
+                    lineNum = i;
                     return TRUE;
                 }
 
                 else
                 {
                     isVertical = false;
+                    lineNum = i;
                     return TRUE;
                 }
             }
@@ -509,12 +542,14 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
                     AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].x < player->GetCurPos().x)
                 {
                     isVertical = true;
+                    lineNum = i;
                     return TRUE;
                 }
 
                 else
                 {
                     isVertical = false;
+                    lineNum = i;
                     return TRUE;
                 }
             }
@@ -525,12 +560,14 @@ BOOL PlayerInAreaLine(vector<POINT> & AreaPoints, Player* player, int & lineNum,
                     AreaPoints[(i - 1 + AreaPoints.size()) % AreaPoints.size()].x > player->GetCurPos().x)
                 {
                     isVertical = true;
+                    lineNum = i;
                     return TRUE;
                 }
 
                 else
                 {
                     isVertical = false;
+                    lineNum = i;
                     return TRUE;
                 }
             }
@@ -612,7 +649,7 @@ BOOL PlayerDead(vector<POINT>& PlayerPathPoints, Player* player)
     return FALSE;
 }
 
-void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum)
+void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int startLineNum, int endLineNum, bool & CCW)
 {
     vector<POINT> newAreaPoint;
 
@@ -649,7 +686,7 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
     if (totalRadius < 0) //라인 하나에 start, end있을때 구분하기
     {
         cout << "rotate counter clockwise" << endl;
-
+        CCW = true;
         int i= endLineNum;
         while (1)
         {
@@ -664,7 +701,7 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
     else
     {
         cout << "rotate clockwise" << endl;
-
+        CCW = false;
         int i = (endLineNum+1)%AreaPoints.size();
         while (1)
         {
@@ -686,12 +723,129 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
 
 }
 
-void Collision(vector<POINT>& AreaPoints, Player* player)
+void MakeCollider(vector<POINT>& AreaPoints, vector<int>& ColliderWay, bool CCW)
 {
-    for (int i = 0; i < AreaPoints.size() - 1; i++)
-    {
+    ColliderWay = {};
 
+    for (int i = 0; i < AreaPoints.size(); i++)
+    {
+        double length1 = sqrt(AreaPoints[i].x * AreaPoints[i].x +AreaPoints[i].y * AreaPoints[i].y);
+        double length2 = sqrt(AreaPoints[(i+1) % AreaPoints.size()].x * AreaPoints[(i + 1) % AreaPoints.size()].x
+            + AreaPoints[(i + 1) % AreaPoints.size()].y * AreaPoints[(i + 1) % AreaPoints.size()].y);
+        double Cross = AreaPoints[i].x * AreaPoints[(i + 1) % AreaPoints.size()].y - AreaPoints[(i + 1) % AreaPoints.size()].x *AreaPoints[i].y;
+        double radius = asin(Cross / (length1 * length2));
+
+        if (AreaPoints[i].x == AreaPoints[(i + 1) % AreaPoints.size()].x) //y축 평행
+        {
+            if (radius > 0)
+            {
+                if (CCW)
+                    ColliderWay.push_back(3);
+                else
+                    ColliderWay.push_back(9);
+            }
+
+            else
+            {
+                if(CCW)
+                    ColliderWay.push_back(9);
+                else
+                    ColliderWay.push_back(3);
+            }
+        }
+
+        else //x축 평행
+        {
+            if (radius > 0)
+            {
+                if (CCW)
+                    ColliderWay.push_back(6);
+                else
+                    ColliderWay.push_back(12);
+            }
+
+            else
+            {
+                if (CCW)
+                    ColliderWay.push_back(12);
+                else
+                    ColliderWay.push_back(6);
+            }
+        }
     }
+
+}
+
+BOOL CollisonCheck(const vector<POINT> & AreaPoints, const vector<int> & ColliderWay, const Player *player, const int playerLineNum, const bool isInArea)
+{
+    if (isInArea)
+    {
+        if (player->GetCurPos().x == AreaPoints[playerLineNum].x && player->GetCurPos().y == AreaPoints[playerLineNum].y) //꼭짓점에 있을때
+        {
+            if (player->GetWay() == ColliderWay[playerLineNum] ||
+                player->GetWay() == ColliderWay[(playerLineNum - 1 + ColliderWay.size()) % ColliderWay.size()]) //플레이어가 collider 방향으로 갈 때
+            {
+
+                if ((player->GetWay() == 6 || player->GetWay() == 12) &&
+                    (AreaPoints[playerLineNum].x == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x)) //선 방향에 있는가? (위 down)
+                {
+                    return FALSE;
+                }
+
+                else if ((player->GetWay() == 3 || player->GetWay() == 9) &&
+                    (AreaPoints[playerLineNum].y == AreaPoints[(playerLineNum + 1 + ColliderWay.size()) % AreaPoints.size()].y)) //선 방향에 있는가? (left right)
+                {
+                    return FALSE;
+                }
+
+                else 
+                {
+                    return TRUE;
+                }
+            }
+
+            else
+            {
+                return FALSE;
+            }
+
+        }
+
+
+        if (player->GetWay() == 12 
+            && (AreaPoints[playerLineNum].y == AreaPoints[(playerLineNum+1) % AreaPoints.size()].y))
+        {
+            if (ColliderWay[playerLineNum] == 12) return TRUE;
+            else return FALSE;
+        }
+
+        else if (player->GetWay() == 6 
+            && (AreaPoints[playerLineNum].y == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].y))
+        {
+            if (ColliderWay[playerLineNum]==6) return FALSE;
+            else return TRUE;
+        }
+
+        else if (player->GetWay() == 9 
+            && (AreaPoints[playerLineNum].x == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x))
+        {
+            if (ColliderWay[playerLineNum]==9) return TRUE;
+            else return FALSE;
+        }
+
+        else if(player->GetWay() == 3 
+            && (AreaPoints[playerLineNum].x == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x))
+        {
+            if (ColliderWay[playerLineNum]==3) return FALSE;
+            else return TRUE;
+        }
+    }
+
+
+    return FALSE;
+    
+
+
 }
 
 

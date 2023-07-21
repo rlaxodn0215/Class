@@ -13,8 +13,10 @@ void GameManager::StartGame(POINT recCenter, int width, int height, Player * pla
 	AreaPoints.push_back(num3);
 	AreaPoints.push_back(num4);
 
-	player->SetBeforePos(num1);
-	player->SetCurPos(num1);
+	POINT playerStartPos = { recCenter.x+15 - width / 2, recCenter.y - height / 2 };
+
+	player->SetBeforePos(playerStartPos);
+	player->SetCurPos(playerStartPos);
 
 	//LinePoints.push_back(GetCurPos());
 

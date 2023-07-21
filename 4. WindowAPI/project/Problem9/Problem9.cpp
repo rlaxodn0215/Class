@@ -1,12 +1,10 @@
-﻿// WinNet_Client.cpp : 애플리케이션에 대한 진입점을 정의합니다.
+﻿// Problem9.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #include "framework.h"
-#include "WinNet_Client.h"
-
+#include "Problem9.h"
 #include<WinSock2.h>
+#include<stdio.h>
 #include<list>
 #include<vector>
 #pragma comment(lib,"ws2_32.lib")
@@ -14,42 +12,40 @@
 #define MAX_LOADSTRING 100
 #define WM_ASYNC    WM_USER+1
 
+std::list<SOCKET> socketList;
+int InitServer(HWND hWnd);
+int CloseServer();
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr);
+
+void SendMessageToClient(char* buffer);
+void ReadMessage(TCHAR* msg, char* buffer);
+void CloseClient(SOCKET socket);
+
+WSADATA wsaData;
+SOCKET s, cs;
+TCHAR msg[200];
+SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
+int size = 0, msglen = 0;
+char buffer[100];
+
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-
-WSADATA wsaData;
-SOCKET s, cs;
-TCHAR msg[200] = { 0 };
-SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
-int size = 0, msglen = 0;
-char buffer[100] = { 0 };
-
-TCHAR str[100] = { 0 };
-int msgCount = 0;
-
-int InitClient(HWND hWnd);
-void CloseClient();
-int SendMessageToServer();
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
-int WinSocketTest_Client();
+INT_PTR CALLBACK DialogServer(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK DialogClient(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-
-    //return WinSocketTest_Client();
-
-
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -57,7 +53,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_WINNETCLIENT, szWindowClass, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_PROBLEM9, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
@@ -66,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINNETCLIENT));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PROBLEM9));
 
     MSG msg;
 
@@ -83,9 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return (int) msg.wParam;
 }
 
-
-
-int InitClient(HWND hWnd)
+int InitServer(HWND hWnd)
 {
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -95,40 +89,86 @@ int InitClient(HWND hWnd)
     addr.sin_port = 20;
     addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.54");
 
-    if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
+    bind(s, (LPSOCKADDR)&addr, sizeof(addr));
+
+    if (listen(s, 5) == SOCKET_ERROR)
     {
         return 0;
     }
 
-    WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_READ);
+    WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_ACCEPT);
 
-    return 1;
 }
 
-void CloseClient()
+int CloseServer()
 {
     closesocket(s);
     WSACleanup();
+    return 0;
 }
 
-int SendMessageToServer()
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr)
 {
-    if (s == INVALID_SOCKET) return 0;
+    SOCKET cs;
+    int size;
+    size = sizeof(c_addr);
+    cs = accept(s, (LPSOCKADDR)&c_addr, &size);
+    WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
 
-#ifdef _UNICODE
-    msglen = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
-    WideCharToMultiByte(CP_ACP, 0, str,-1, buffer, msglen, NULL, NULL);
-    msg[msglen] = NULL;
-#else
-    sstrcpy(buffer, str);
-    msglen = strlen(buffer);
-#endif // 
+    socketList.push_back(cs);
 
-    send(s, (LPSTR)buffer, msglen + 1, 0);
-    msgCount = 0;
-
-    return 1;
+    return cs;
 }
+
+void SendMessageToClient(char* buffer)
+{
+    for (std::list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        send(cs, (LPSTR)buffer, strlen(buffer) + 1, 0);
+    }
+}
+
+void ReadMessage(TCHAR* msg, char* buffer)
+{
+    for (std::list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        int msglen = recv(cs, buffer, 100, 0);
+        if (msglen > 0)
+        {
+            buffer[msglen] = NULL;
+#ifdef _UNICODE
+            msglen = MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), 0, 0);
+            MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), msg, msglen);
+            msg[msglen] = NULL;
+#else
+            strcpy_s(msg, buffer);
+
+#endif // _UNICODE
+
+            SendMessageToClient(buffer);
+
+        }
+    }
+
+}
+
+void CloseClient(SOCKET socket)
+{
+    for (std::list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        if (cs == socket)
+        {
+            closesocket(cs);
+            it = socketList.erase(it);
+            break;
+        }
+    }
+}
+
+
 
 //
 //  함수: MyRegisterClass()
@@ -146,10 +186,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINNETCLIENT));
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PROBLEM9));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WINNETCLIENT);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_PROBLEM9);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -196,59 +236,34 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HWND hDlg = NULL;
 
     switch (message)
     {
     case WM_CREATE:
     {
-
-        return InitClient(hWnd);
+        
     }
-        break;
-    case WM_ASYNC:
-    {
-        switch (lParam)
-        {
-        case FD_READ:
-            msglen = recv(s, buffer, 100, 0);
-            buffer[msglen] = NULL;
-
-#ifdef _UNICODE
-            msglen = MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), 0, 0);
-            MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), msg, msglen);
-            msg[msglen] = NULL;
-#else
-            strcpy_s(msg, buffer);
-
-#endif // _UNICODE
-            InvalidateRect(hWnd, NULL, TRUE);
-            break;
-
-        }
-    }
-        break;
-
-
-    case WM_CHAR:
-        if (wParam == VK_RETURN)
-        {
-           return  SendMessageToServer();
-        }
-
-        str[msgCount++] = wParam;
-        str[msgCount] = NULL;
-        InvalidateRect(hWnd, NULL, true);
-        break;
-
-
+    break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            case IDM_Client:
+                if (!IsWindow(hDlg))
+                {
+                    hDlg = CreateDialog(hInst, MAKEINTRESOURCE(ID_CLIENT), hWnd, DialogClient);
+                    ShowWindow(hDlg, SW_SHOW);
+                }
+                break;
+            case IDM_Server:
+                if (!IsWindow(hDlg))
+                {
+                    hDlg = CreateDialog(hInst, MAKEINTRESOURCE(ID_SERVER), hWnd, DialogServer);
+                    ShowWindow(hDlg, SW_SHOW);
+                }
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
@@ -263,16 +278,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            TextOut(hdc, 10, 10, str, _tcslen(str));
-
-            if (_tcscmp(msg, _T("")))
-                TextOut(hdc, 10, 50, msg, _tcslen(msg));
-
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
-        CloseClient();
+        DestroyWindow(hDlg);
         PostQuitMessage(0);
         break;
     default:
@@ -301,44 +311,66 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-int WinSocketTest_Client()
+INT_PTR CALLBACK DialogServer(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-    WSADATA wsaData;
-    SOCKET s;
-    SOCKADDR_IN addr = { 0 };
-
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    if (s == INVALID_SOCKET)
+    switch (iMsg)
     {
-        MessageBox(NULL, _T("socket failed"), _T("Error"), MB_OK);
-        return 0;
-    }
-    else
+    case ID_SERVERSTART:
     {
-        MessageBox(NULL, _T("socket success"), _T("Success"), MB_OK);
+        InitServer(hDlg);
     }
+    break;
+    case WM_ASYNC:
+        switch (lParam)
+        {
+        case FD_ACCEPT:
+            cs = AcceptSocket(hDlg, s, c_addr);
+            break;
+        case FD_READ:
+            ReadMessage(msg, buffer);
+            InvalidateRect(hDlg, NULL, TRUE);
+            break;
+        case FD_CLOSE:
+            CloseClient(wParam);
+            break;
+        default:
+            break;
+        }
 
-    addr.sin_family = AF_INET;
-    addr.sin_port = 20;
-    addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.54");
-
-    if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
-    {
-        MessageBox(NULL, _T("Connect failed"), _T("Error"), MB_OK);
-        return 0;
-    }
-
-    else
-    {
-        MessageBox(NULL, _T("Connect success"), _T("Success"), MB_OK);
-    }
-
-    send(s, "안녕 server", 12, 0);
-
-    closesocket(s);
-    WSACleanup();
+        break;
     
-    return 1;
+
+    case ID_SENDSERVER:
+    {
+
+    }
+        break;
+
+    case ID_SERVERCANCEL:
+        CloseServer();
+        DestroyWindow(hDlg);
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK DialogClient(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+
+    switch (iMsg)
+    {
+    case ID_SERVERCONNECT:
+    {
+
+    }
+        break;
+
+    case ID_SENDCLIENT:
+        break;
+
+    case ID_CLIENTCANCEL:
+        DestroyWindow(hDlg);
+        break;
+    }
+    return (INT_PTR)FALSE;
 }
