@@ -163,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
 
     static POINT startCenter = { 200,250 };
-    static int startWidth = 150;
+    static int startWidth = 100;
     static int startHeight = 100;
 
     static RECT recView;
@@ -688,62 +688,129 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
     if (totalRadius < 0) //라인 하나에 start, end있을때 구분하기
     {
         cout << "rotate counter clockwise" << endl;
-        CCW = true;
         int i= endLineNum;
-        while (totalRadius>(-2 * PI))
+
+        double length1 = sqrt((PlayerPathPoints.back().x - center.x) * (PlayerPathPoints.back().x - center.x) +
+            (PlayerPathPoints.back().y - center.y) * (PlayerPathPoints.back().y - center.y));
+
+        if (CCW)
         {
-            //if (!(newAreaPoint.back().x == AreaPoints[i].x || newAreaPoint.back().y == AreaPoints[i].y))
-            double length1 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+            i++;
+            double length2 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
                 (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
-            double length2 = sqrt((AreaPoints[(i + 1)% AreaPoints.size()].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) +
-                (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y));
-            double Cross = (AreaPoints[i].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) -
-                (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) * (AreaPoints[i].y - center.y);
+            double Cross = (PlayerPathPoints.back().x - center.x) * (AreaPoints[i].y - center.y) -
+                (AreaPoints[i].x - center.x) * (PlayerPathPoints.back().y - center.y);
             totalRadius += asin(Cross / (length1 * length2));
-            newAreaPoint.push_back(AreaPoints[i]);
-
-
-
-
-            //if (i == startLineNum) //이게 문제다 -> 벡터 각도를 해서 
-            //{
-
-
-            //    break; 
-
-            //}
-
-
-            if (i == 0) i = AreaPoints.size();
-            i--;
         }
 
+        else
+        {
+            double length2 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+                (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
+            double Cross = (PlayerPathPoints.back().x - center.x) * (AreaPoints[i].y - center.y) -
+                (AreaPoints[i].x - center.x) * (PlayerPathPoints.back().y - center.y);
+            totalRadius += asin(Cross / (length1 * length2));
+        }
+
+        while (1)
+        {
+            double length1 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+                (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
+
+            if (CCW)
+            {
+                double length2 = sqrt((AreaPoints[(i +1) % AreaPoints.size()].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) +
+                    (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y));
+                double Cross = (AreaPoints[i].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) -
+                    (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) * (AreaPoints[i].y - center.y);
+                totalRadius += asin(Cross / (length1 * length2));
+                newAreaPoint.push_back(AreaPoints[i]);
+                if (totalRadius < (-2 * 3.141592)) break;
+                if (i+1 == AreaPoints.size()) i = -1;  i++;
+
+            }
+
+            else
+            {
+                double length2 = sqrt((AreaPoints[i - 1].x - center.x) * (AreaPoints[i - 1].x - center.x) +
+                    (AreaPoints[i - 1].y - center.y) * (AreaPoints[i - 1].y - center.y));
+                double Cross = (AreaPoints[i].x - center.x) * (AreaPoints[i - 1].y - center.y) -
+                    (AreaPoints[i - 1].x - center.x) * (AreaPoints[i].y - center.y);
+                totalRadius += asin(Cross / (length1 * length2));
+                newAreaPoint.push_back(AreaPoints[i]);
+                if (totalRadius < (-2 * 3.141592)) break;
+                    if (i == 1) i = AreaPoints.size();  i--;
+
+            }
+
+        }
+
+        CCW = true;
     }
 
     else
     {
         cout << "rotate clockwise" << endl;
-        CCW = false;
+
         int i = (endLineNum+1)%AreaPoints.size();
-        while (1)
+
+        double length1 = sqrt((PlayerPathPoints.back().x - center.x) * (PlayerPathPoints.back().x - center.x) +
+            (PlayerPathPoints.back().y - center.y) * (PlayerPathPoints.back().y - center.y));
+
+        if (CCW)
         {
-            //if (!(newAreaPoint.back().x == AreaPoints[i].x || newAreaPoint.back().y == AreaPoints[i].y))
-            newAreaPoint.push_back(AreaPoints[i]);
-
-
-            if (i == startLineNum) break;//이게 문제다
-
-
-            if (i == AreaPoints.size() - 1) i = -1;
             i++;
+            double length2 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+                (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
+            double Cross = (PlayerPathPoints.back().x - center.x) * (AreaPoints[i].y - center.y) -
+                (AreaPoints[i].x - center.x) * (PlayerPathPoints.back().y - center.y);
+            totalRadius += asin(Cross / (length1 * length2));
         }
 
-    }
+        else
+        {
+            double length2 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+                (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
+            double Cross = (PlayerPathPoints.back().x - center.x) * (AreaPoints[i].y - center.y) -
+                (AreaPoints[i].x - center.x) * (PlayerPathPoints.back().y - center.y);
+            totalRadius += asin(Cross / (length1 * length2));
+        }
 
-    //if (startLineNum == endLineNum)
-    //{
-    //    newAreaPoint.pop_back();
-    //}
+        while (1)
+        {
+            double length1 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+                (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
+
+            if (CCW)
+            {
+                double length2 = sqrt((AreaPoints[i - 1].x - center.x) * (AreaPoints[i - 1].x - center.x) +
+                    (AreaPoints[i - 1].y - center.y) * (AreaPoints[i - 1].y - center.y));
+                double Cross = (AreaPoints[i].x - center.x) * (AreaPoints[i - 1].y - center.y) -
+                    (AreaPoints[i - 1].x - center.x) * (AreaPoints[i].y - center.y);
+                totalRadius += asin(Cross / (length1 * length2));
+                newAreaPoint.push_back(AreaPoints[i]);
+                if (totalRadius > (2 * PI)) break;
+                if (i == 1) i = AreaPoints.size();  i--;
+
+            }
+
+            else
+            {
+                double length2 = sqrt((AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) +
+                    (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y));
+                double Cross = (AreaPoints[i].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) -
+                    (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) * (AreaPoints[i].y - center.y);
+                totalRadius += asin(Cross / (length1 * length2));
+                newAreaPoint.push_back(AreaPoints[i]);
+                if (totalRadius > (2 * PI)) break;
+                if (i + 1 == AreaPoints.size()) i = -1;  i++;
+
+            }
+
+        }
+
+        CCW = false;
+    }
 
     AreaPoints = newAreaPoint;
     PlayerPathPoints = {};
