@@ -690,6 +690,7 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
         int i= endLineNum;
         while (1)
         {
+            //if (!(newAreaPoint.back().x == AreaPoints[i].x || newAreaPoint.back().y == AreaPoints[i].y))
             newAreaPoint.push_back(AreaPoints[i]);
             if (i == startLineNum) break;
             if (i == 0) i = AreaPoints.size();
@@ -705,6 +706,7 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
         int i = (endLineNum+1)%AreaPoints.size();
         while (1)
         {
+            //if (!(newAreaPoint.back().x == AreaPoints[i].x || newAreaPoint.back().y == AreaPoints[i].y))
             newAreaPoint.push_back(AreaPoints[i]);
             if (i == startLineNum) break;
             if (i == AreaPoints.size() - 1) i = -1;
@@ -785,22 +787,37 @@ BOOL CollisonCheck(const vector<POINT> & AreaPoints, const vector<int> & Collide
             if (player->GetWay() == ColliderWay[playerLineNum] ||
                 player->GetWay() == ColliderWay[(playerLineNum - 1 + ColliderWay.size()) % ColliderWay.size()]) //플레이어가 collider 방향으로 갈 때
             {
+                POINT playerMoveableVec[2];
 
-                if ((player->GetWay() == 6 || player->GetWay() == 12) &&
-                    (AreaPoints[playerLineNum].x == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x)) //선 방향에 있는가? (위 down)
+                playerMoveableVec[0] = { AreaPoints[playerLineNum].x - AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x ,
+                     AreaPoints[playerLineNum].y - AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x };
+                playerMoveableVec[1]= { AreaPoints[playerLineNum].x - AreaPoints[(playerLineNum - 1 + AreaPoints.size()) % AreaPoints.size()].x ,
+                     AreaPoints[playerLineNum].y - AreaPoints[(playerLineNum - 1 + AreaPoints.size()) % AreaPoints.size()].y };
+
+
+                if (player->GetWay() == 12 && (playerMoveableVec[0].y< 0 || playerMoveableVec[1].y < 0)) 
                 {
-                    return FALSE;
+                    return TRUE;
                 }
 
-                else if ((player->GetWay() == 3 || player->GetWay() == 9) &&
-                    (AreaPoints[playerLineNum].y == AreaPoints[(playerLineNum + 1 + ColliderWay.size()) % AreaPoints.size()].y)) //선 방향에 있는가? (left right)
+                else if (player->GetWay() == 6 && (playerMoveableVec[0].y > 0 || playerMoveableVec[1].y > 0))
                 {
-                    return FALSE;
+                    return TRUE;
+                }
+
+                else if (player->GetWay() == 3 && (playerMoveableVec[0].x > 0 || playerMoveableVec[1].x > 0))
+                {
+                    return TRUE;
+                }
+
+                else if (player->GetWay() == 9 && (playerMoveableVec[0].x < 0 || playerMoveableVec[1].x < 0))
+                {
+                    return TRUE;
                 }
 
                 else 
                 {
-                    return TRUE;
+                    return FALSE;
                 }
             }
 
@@ -822,8 +839,8 @@ BOOL CollisonCheck(const vector<POINT> & AreaPoints, const vector<int> & Collide
         else if (player->GetWay() == 6 
             && (AreaPoints[playerLineNum].y == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].y))
         {
-            if (ColliderWay[playerLineNum]==6) return FALSE;
-            else return TRUE;
+            if (ColliderWay[playerLineNum]==6) return TRUE;
+            else return FALSE;
         }
 
         else if (player->GetWay() == 9 
@@ -836,8 +853,8 @@ BOOL CollisonCheck(const vector<POINT> & AreaPoints, const vector<int> & Collide
         else if(player->GetWay() == 3 
             && (AreaPoints[playerLineNum].x == AreaPoints[(playerLineNum + 1) % AreaPoints.size()].x))
         {
-            if (ColliderWay[playerLineNum]==3) return FALSE;
-            else return TRUE;
+            if (ColliderWay[playerLineNum]==3) return TRUE;
+            else return FALSE;
         }
     }
 
