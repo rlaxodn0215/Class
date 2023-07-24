@@ -20,6 +20,7 @@
 
 #define MAX_LOADSTRING 100
 #define TIMER_FIRST 1
+#define PI 3.141592
 
 using namespace std;
 
@@ -660,7 +661,6 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
 
 
     //외적으로 회전 방향을 구한다.
-
     POINT center = {0,0};
     for (int i = 0; i < AreaPoints.size(); i++)
     {
@@ -683,16 +683,37 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
     POINT startPoint = PlayerPathPoints[0];
     POINT endPoint = PlayerPathPoints[PlayerPathPoints.size()-1];
 
+
+
     if (totalRadius < 0) //라인 하나에 start, end있을때 구분하기
     {
         cout << "rotate counter clockwise" << endl;
         CCW = true;
         int i= endLineNum;
-        while (1)
+        while (totalRadius>(-2 * PI))
         {
             //if (!(newAreaPoint.back().x == AreaPoints[i].x || newAreaPoint.back().y == AreaPoints[i].y))
+            double length1 = sqrt((AreaPoints[i].x - center.x) * (AreaPoints[i].x - center.x) +
+                (AreaPoints[i].y - center.y) * (AreaPoints[i].y - center.y));
+            double length2 = sqrt((AreaPoints[(i + 1)% AreaPoints.size()].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) +
+                (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y));
+            double Cross = (AreaPoints[i].x - center.x) * (AreaPoints[(i + 1) % AreaPoints.size()].y - center.y) -
+                (AreaPoints[(i + 1) % AreaPoints.size()].x - center.x) * (AreaPoints[i].y - center.y);
+            totalRadius += asin(Cross / (length1 * length2));
             newAreaPoint.push_back(AreaPoints[i]);
-            if (i == startLineNum) break;
+
+
+
+
+            //if (i == startLineNum) //이게 문제다 -> 벡터 각도를 해서 
+            //{
+
+
+            //    break; 
+
+            //}
+
+
             if (i == 0) i = AreaPoints.size();
             i--;
         }
@@ -708,7 +729,11 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
         {
             //if (!(newAreaPoint.back().x == AreaPoints[i].x || newAreaPoint.back().y == AreaPoints[i].y))
             newAreaPoint.push_back(AreaPoints[i]);
-            if (i == startLineNum) break;
+
+
+            if (i == startLineNum) break;//이게 문제다
+
+
             if (i == AreaPoints.size() - 1) i = -1;
             i++;
         }

@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "A_Star.h"
 #include<map>
+#include<queue>
 
 #define MAX_LOADSTRING 100
 
@@ -22,6 +23,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 void DrawBlocks(HDC hdc);
 void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int& count, bool & moving);
+void A_Star();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -128,16 +130,29 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+struct Node
+{
+    POINT num;
+    int G;
+    int H;
+    int F;
+    Node* parent;
+};
+
+map<int, Node*> MP;
+priority_queue<int, vector<int>, greater<int>> Openlist;
+vector<Node*> Closelist;
+
 const int MX = 10;
 int totalBlock[MX][MX] = { 0 };
 POINT obstacleBlcok[10] = { {0,1}, {0,2},{0,3}, {0,4}, {0,5}, {0,6}, {0,7}, {0,8}, {0,9}, {0,10} };
 POINT startPoint = { -1, -1};
 POINT endPoint = { -1, -1 };
-map<POINT, int[3]> values;
 
 int RecLength = 70;
 int offset = 80;
-
+int line = 10;
+int line2 = 14;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -164,6 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         mousePos.y = HIWORD(lParam);
         CheckClick(mousePos, startPoint,endPoint,count,moving);
         InvalidateRect(hWnd, NULL, TRUE);
+        if (moving) A_Star();
     }
         break;
     case WM_COMMAND:
@@ -268,6 +284,7 @@ void DrawBlocks(HDC hdc)
             //텍스트 값을 넣는다.
 
 
+
            
         }
     }
@@ -314,6 +331,22 @@ void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int & count, b
                 return;
             }
         }
+    }
+
+}
+
+
+void A_Star()
+{
+    Node* temp = new Node;
+    temp->G = temp->H = temp->F = 0;
+    temp->num = startPoint;
+    temp->parent = NULL;
+    Closelist.push_back(temp);
+
+    if (totalBlock[startPoint.x - 1][startPoint.y - 1] == 0)
+    {
+        
     }
 
 
