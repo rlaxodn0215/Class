@@ -839,6 +839,11 @@ void MakeArea(vector<POINT>& PlayerPathPoints, vector<POINT>& AreaPoints, int st
         CCW = false;
     }
 
+    if (newAreaPoint.front().x == newAreaPoint.back().x && newAreaPoint.front().y == newAreaPoint.back().y)
+    {
+        newAreaPoint.pop_back();
+    }
+
     AreaPoints = newAreaPoint;
     PlayerPathPoints = {};
 
@@ -894,6 +899,8 @@ void MakeCollider(vector<POINT>& AreaPoints, vector<int>& ColliderWay, bool CCW)
             }
         }
     }
+
+    
 
 }
 
