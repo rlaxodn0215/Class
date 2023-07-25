@@ -234,6 +234,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     isLineStart = false;
                     MakeArea(PlayerPathPoints, AreaPoints,startLineNum,endLineNum, CCW);
                     MakeCollider(AreaPoints, ColliderWay, CCW);
+                    player->SetBeforePos(player->GetCurPos());
                 }
 
                 PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
@@ -274,6 +275,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     isLineStart = false;
                     MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum, CCW);
                     MakeCollider(AreaPoints, ColliderWay, CCW);
+                    player->SetBeforePos(player->GetCurPos());
                 }
 
                 PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
@@ -314,6 +316,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     isLineStart = false;
                     MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum, CCW);
                     MakeCollider(AreaPoints, ColliderWay, CCW);
+                    player->SetBeforePos(player->GetCurPos());
                 }
 
                 PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
@@ -353,6 +356,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     isLineStart = false;
                     MakeArea(PlayerPathPoints, AreaPoints, startLineNum, endLineNum, CCW);
                     MakeCollider(AreaPoints, ColliderWay, CCW);
+                    player->SetBeforePos(player->GetCurPos());
                 }
 
                 PlayerInAreaLine(AreaPoints, player, playerLineNum, isLineVertical, player->GetWay());
