@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{557a4846-3edb-4689-b381-44598d089497}</ProjectGuid>
-    <RootNamespace>AStar</RootNamespace>
+    <ProjectGuid>{5e149f81-37e1-43ee-9205-6fbbaaa8ef70}</ProjectGuid>
+    <RootNamespace>DLLWinTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,21 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="A_Star.h" />
-    <ClInclude Include="Block.h" />
+    <ClInclude Include="DLLWinTest.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="A_Star.cpp" />
-    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="DLLWinTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="A_Star.rc" />
+    <ResourceCompile Include="DLLWinTest.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="A_Star.ico" />
+    <Image Include="DLLWinTest.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

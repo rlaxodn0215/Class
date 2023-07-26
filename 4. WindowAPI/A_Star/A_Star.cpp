@@ -3,8 +3,9 @@
 
 #include "framework.h"
 #include "A_Star.h"
-#include<map>
+#include"Block.h"
 #include<queue>
+#include<map>
 
 #define MAX_LOADSTRING 100
 
@@ -130,23 +131,17 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-struct Node
-{
-    POINT num;
-    int G;
-    int H;
-    int F;
-    Node* parent;
-};
+map<Block, Block> parent;
 
-map<int, Node*> MP;
-priority_queue<int, vector<int>, greater<int>> Openlist;
-vector<Node*> Closelist;
+priority_queue<Block, vector<Block>, greater<Block>> OpenList;
+vector<Block> CloseList;
 
 const int MX = 10;
-int totalBlock[MX][MX] = { 0 };
-POINT obstacleBlcok[10] = { {0,1}, {0,2},{0,3}, {0,4}, {0,5}, {0,6}, {0,7}, {0,8}, {0,9}, {0,10} };
+Block totalBlock[MX][MX];
+POINT obstacleBlcok[10] = { {7,2}, {7,7}, {4,2} ,{4,3}, {4,4},{4,5}, {4,6}, {5,6}, {5,7}, {5,8},  };
+POINT checkArea[8] = { {-1,-1},{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1},{1,1} };
 POINT startPoint = { -1, -1};
+POINT passoverPoint = { -1,-1 };
 POINT endPoint = { -1, -1 };
 
 int RecLength = 70;
@@ -166,9 +161,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
+        for (int i = 0; i < MX; i++)
+        {
+            for (int j = 0; j < MX; j++)
+            {
+                totalBlock[i][j].SetPos({ i,j });
+                totalBlock[i][j].SetStatus(MOVE_ABLE);
+            }
+        }
+
         for (int i = 0; i < 10; i++)
         {
-            totalBlock[obstacleBlcok[i].x][obstacleBlcok[i].y] = 1;
+            totalBlock[obstacleBlcok[i].x][obstacleBlcok[i].y].SetStatus(WALL);
         }
 
     }
@@ -245,7 +249,7 @@ void DrawBlocks(HDC hdc)
         {
             HBRUSH hBrush, oldBrush;
            
-            if (totalBlock[i][j] == 1) // obstacle
+            if (totalBlock[i][j].GetStatus() == WALL) // obstacle
             {
                 hBrush = CreateSolidBrush(RGB(0, 0, 0));
                 oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
@@ -255,7 +259,7 @@ void DrawBlocks(HDC hdc)
                 DeleteObject(hBrush);
             }
 
-            else if(totalBlock[i][j] == 2) // 시작점
+            else if(totalBlock[i][j].GetStatus() == START) // 시작점
             {
                 hBrush = CreateSolidBrush(RGB(255, 0, 0));
                 oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
@@ -265,7 +269,7 @@ void DrawBlocks(HDC hdc)
                 DeleteObject(hBrush);
             }
 
-            else if (totalBlock[i][j] == 3) // 도착점
+            else if (totalBlock[i][j].GetStatus() == END) // 도착점
             {
                 hBrush = CreateSolidBrush(RGB(0, 0, 255));
                 oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
@@ -279,12 +283,18 @@ void DrawBlocks(HDC hdc)
             {
                 Rectangle(hdc, (RecLength * i + offset) - RecLength / 2, (RecLength * j + offset) - RecLength / 2,
                     (RecLength * i + offset) + RecLength / 2, (RecLength * j + offset) + RecLength / 2);
+
+                //텍스트 값을 넣는다.
+                TCHAR temp[10];
+                _stprintf_s(temp, L"%d", totalBlock[i][j].GetG()); // G
+                TextOut(hdc, (RecLength * i + offset) - RecLength / 2 + 15, (RecLength * j + offset) - RecLength / 2 + 10, temp, _tcslen(temp));
+                _stprintf_s(temp, L"%d", totalBlock[i][j].GetH()); // H
+                TextOut(hdc, (RecLength * i + offset) - RecLength / 2 + 45, (RecLength * j + offset) - RecLength / 2 + 10, temp, _tcslen(temp));
+                _stprintf_s(temp, L"%d", totalBlock[i][j].GetF()); // F
+                TextOut(hdc, (RecLength * i + offset) - RecLength / 2 + 30, (RecLength * j + offset) - RecLength / 2 + 40, temp, _tcslen(temp));
             }
 
-            //텍스트 값을 넣는다.
-
-
-
+            
            
         }
     }
@@ -302,14 +312,16 @@ void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int & count, b
                 && mousePos.y >= (RecLength * j + offset) - RecLength / 2 && mousePos.y <= (RecLength * j + offset) + RecLength / 2) // 클릭한 사각형 포인트
             {
                 if (startPos.x == i && startPos.y == j || endPos.x ==i && endPos.y == j) return;
-                if (totalBlock[i][j] == 1) return;
+                if (totalBlock[i][j].GetStatus() == WALL) return;
 
                 if (count == 0)
                 {
                     startPos.x = i;
                     startPos.y = j;
 
-                    totalBlock[startPos.x][startPos.y] = 2;// 시작점
+                    passoverPoint = startPoint;
+
+                    totalBlock[startPos.x][startPos.y].SetStatus(START);// 시작점
 
                     count++;
 
@@ -321,7 +333,7 @@ void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int & count, b
                     endPos.x = i;
                     endPos.y = j;
 
-                    totalBlock[endPos.x][endPos.y] = 3;// 도착점
+                    totalBlock[endPos.x][endPos.y].SetStatus(END);// 도착점
 
                     count--;
 
@@ -338,16 +350,61 @@ void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int & count, b
 
 void A_Star()
 {
-    Node* temp = new Node;
-    temp->G = temp->H = temp->F = 0;
-    temp->num = startPoint;
-    temp->parent = NULL;
-    Closelist.push_back(temp);
+    CloseList.push_back(totalBlock[startPoint.x][startPoint.y]);
 
-    if (totalBlock[startPoint.x - 1][startPoint.y - 1] == 0)
+
+    //while()
+
+    for (int i = 0; i < 8; i++)
     {
-        
+        if (passoverPoint.x + checkArea[i].x >= MX || passoverPoint.x + checkArea[i].x < 0 ||
+            passoverPoint.y + checkArea[i].y >= MX || passoverPoint.y + checkArea[i].y < 0) //배열 범위가 벗어남
+            continue;
+
+        if (totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].GetStatus() == WALL) //벽이 있으면
+            continue;
+
+        Block temp = totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y];
+
+        int g, h;
+
+        int x1 = abs(temp.GetPos().x - totalBlock[startPoint.x][startPoint.y].GetPos().x);
+        int y1 = abs(temp.GetPos().y - totalBlock[startPoint.x][startPoint.y].GetPos().y);
+
+        if (x1 - y1 > 0)
+        {
+            g = 14 * y1 + 10 * (x1 - y1);
+        }
+
+        else
+        {
+            g = 14 * x1 + 10 * (y1 - x1);
+        }
+
+        int x2 = abs(temp.GetPos().x - totalBlock[endPoint.x][endPoint.y].GetPos().x);
+        int y2 = abs(temp.GetPos().y - totalBlock[endPoint.x][endPoint.y].GetPos().y);
+
+        if (x2 - y2 > 0)
+        {
+            h = 14 * y2 + 10 * (x2 - y2);
+        }
+
+        else
+        {
+            h = 14 * x2 + 10 * (y2 - x2);
+        }
+
+        totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetG(g);
+        totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetH(h);
+        totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetF();
+
+        parent[totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y]]
+            = totalBlock[passoverPoint.x][passoverPoint.y];
+
+        OpenList.push(totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y]);
+
     }
 
-
+   
+        
 }
