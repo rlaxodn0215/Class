@@ -133,6 +133,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 priority_queue<Block, vector<Block>, greater<Block>> OpenList;
 vector<Block> CloseList;
+vector<POINT> playerMovePoint;
 
 const int MX = 10;
 Block totalBlock[MX][MX];
@@ -206,6 +207,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             DrawBlocks(hdc);
+            
+
+            
+
             EndPaint(hWnd, &ps);
         }
         break;
@@ -442,6 +447,7 @@ void A_Star()
     {
         temp->SetList(PATH);
         temp = temp->GetParent();
+        //playerMovePoint.push_back()
     }
 
 }
