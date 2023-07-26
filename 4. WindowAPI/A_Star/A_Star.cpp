@@ -25,6 +25,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawBlocks(HDC hdc);
 void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int& count, bool & moving);
 void A_Star();
+void PlayerMove(HDC hdc);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -147,6 +148,7 @@ int RecLength = 70;
 int offset = 80;
 int line = 10;
 int line2 = 14;
+bool playermove = false;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -182,7 +184,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         mousePos.y = HIWORD(lParam);
         CheckClick(mousePos, startPoint,endPoint,count,moving);
         InvalidateRect(hWnd, NULL, TRUE);
-        if (moving) A_Star();
+        if (moving)
+        {
+            A_Star();
+            playermove = true;
+        }
     }
         break;
     case WM_COMMAND:
@@ -207,10 +213,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             DrawBlocks(hdc);
-            
-
-            
-
+            PlayerMove(hdc);
             EndPaint(hWnd, &ps);
         }
         break;
@@ -443,11 +446,31 @@ void A_Star()
 
     Block* temp = totalBlock[endPoint.x][endPoint.y].GetParent();
 
+    playerMovePoint.push_back(endPoint);
     while (temp->GetParent() !=NULL)
     {
         temp->SetList(PATH);
         temp = temp->GetParent();
-        //playerMovePoint.push_back()
+        playerMovePoint.push_back(temp->GetPos());
     }
+    playerMovePoint.push_back(startPoint);
 
+}
+
+void PlayerMove(HDC hdc)
+{
+    static int num = 0;
+
+    while (playermove && playerMovePoint.size() !=num)
+    {
+        HBRUSH hBrush, oldBrush;
+        hBrush = CreateSolidBrush(RGB(255, 0, 255));
+        oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+        Ellipse(hdc, (RecLength * playerMovePoint[num].x + offset) - RecLength / 2, (RecLength * playerMovePoint[num].y + offset) - RecLength / 2,
+            (RecLength * playerMovePoint[num].x + offset) + RecLength / 2, (RecLength * playerMovePoint[num].y + offset) + RecLength / 2);
+        Sleep(500);
+        SelectObject(hdc, oldBrush);
+        DeleteObject(hBrush);
+        num++;
+    }
 }
