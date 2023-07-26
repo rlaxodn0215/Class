@@ -138,6 +138,9 @@
     <ClCompile Include="2023_06_26.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="1주치 3번.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="namesp.h">
