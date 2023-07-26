@@ -8,6 +8,7 @@
 #include<map>
 
 #define MAX_LOADSTRING 100
+#define TIMER_SECOND 2
 
 using namespace std;
 
@@ -25,7 +26,8 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawBlocks(HDC hdc);
 void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int& count, bool & moving);
 void A_Star();
-void PlayerMove(HDC hdc);
+void PlayerMove();
+void DrawPlayer(HDC hdc);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -108,7 +110,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      100, 100, 1024, 1000, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -176,8 +178,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             totalBlock[obstacleBlcok[i].x][obstacleBlcok[i].y].SetStatus(WALL);
         }
 
+        SetTimer(hWnd, TIMER_SECOND, 500, NULL);
+
     }
-        break;
+    break;
+    case WM_TIMER:
+    {
+        if (wParam == TIMER_SECOND)
+        {
+            PlayerMove();
+            InvalidateRect(hWnd, NULL, TRUE);
+        }
+    }
+            break;
     case WM_LBUTTONDOWN:
     {
         mousePos.x = LOWORD(lParam);
@@ -213,11 +226,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             DrawBlocks(hdc);
-            PlayerMove(hdc);
+            DrawPlayer(hdc);
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
+        KillTimer(hWnd, TIMER_SECOND);
         PostQuitMessage(0);
         break;
     default:
@@ -450,27 +464,32 @@ void A_Star()
     while (temp->GetParent() !=NULL)
     {
         temp->SetList(PATH);
-        temp = temp->GetParent();
         playerMovePoint.push_back(temp->GetPos());
+        temp = temp->GetParent();
     }
     playerMovePoint.push_back(startPoint);
+    
 
 }
 
-void PlayerMove(HDC hdc)
+void PlayerMove()
 {
-    static int num = 0;
+    if(playermove && !playerMovePoint.empty())
+    {      
+        playerMovePoint.pop_back();
+    }
+}
 
-    while (playermove && playerMovePoint.size() !=num)
+void DrawPlayer(HDC hdc)
+{
+    if (playermove && !playerMovePoint.empty())
     {
         HBRUSH hBrush, oldBrush;
         hBrush = CreateSolidBrush(RGB(255, 0, 255));
         oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-        Ellipse(hdc, (RecLength * playerMovePoint[num].x + offset) - RecLength / 2, (RecLength * playerMovePoint[num].y + offset) - RecLength / 2,
-            (RecLength * playerMovePoint[num].x + offset) + RecLength / 2, (RecLength * playerMovePoint[num].y + offset) + RecLength / 2);
-        Sleep(500);
+        Ellipse(hdc, (RecLength * playerMovePoint.back().x + offset) - RecLength / 2, (RecLength * playerMovePoint.back().y + offset) - RecLength / 2,
+            (RecLength * playerMovePoint.back().x + offset) + RecLength / 2, (RecLength * playerMovePoint.back().y + offset) + RecLength / 2);
         SelectObject(hdc, oldBrush);
         DeleteObject(hBrush);
-        num++;
     }
 }
