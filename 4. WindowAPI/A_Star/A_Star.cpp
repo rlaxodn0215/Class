@@ -131,15 +131,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-map<Block, Block> parent;
-
 priority_queue<Block, vector<Block>, greater<Block>> OpenList;
 vector<Block> CloseList;
 
 const int MX = 10;
 Block totalBlock[MX][MX];
-POINT obstacleBlcok[10] = { {7,2}, {7,7}, {4,2} ,{4,3}, {4,4},{4,5}, {4,6}, {5,6}, {5,7}, {5,8},  };
-POINT checkArea[8] = { {-1,-1},{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1},{1,1} };
+POINT obstacleBlcok[15] = { {7,2}, {7,7}, {4,2} ,{4,3}, {4,4},{4,5}, {4,6}, {5,6}, {5,7}, {5,8},{2,4},{3,4},{5,4},{6,4},{7,4} };
+POINT checkArea[8] = { {-1,-1},{0,-1},{1,-1},{1,0},{1,1},{0,1},{-1,1},{-1,0} };
 POINT startPoint = { -1, -1};
 POINT passoverPoint = { -1,-1 };
 POINT endPoint = { -1, -1 };
@@ -170,7 +168,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 15; i++)
         {
             totalBlock[obstacleBlcok[i].x][obstacleBlcok[i].y].SetStatus(WALL);
         }
@@ -294,6 +292,16 @@ void DrawBlocks(HDC hdc)
                 TextOut(hdc, (RecLength * i + offset) - RecLength / 2 + 30, (RecLength * j + offset) - RecLength / 2 + 40, temp, _tcslen(temp));
             }
 
+            if (totalBlock[i][j].GetList() == PATH) // 경로
+            {
+                hBrush = CreateSolidBrush(RGB(0, 255, 0));
+                oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+                Rectangle(hdc, (RecLength * i + offset) - RecLength / 2, (RecLength * j + offset) - RecLength / 2,
+                    (RecLength * i + offset) + RecLength / 2, (RecLength * j + offset) + RecLength / 2);
+                SelectObject(hdc, oldBrush);
+                DeleteObject(hBrush);
+            }
+
             
            
         }
@@ -350,61 +358,90 @@ void CheckClick(POINT mousePos, POINT & startPos, POINT & endPos, int & count, b
 
 void A_Star()
 {
+    bool findEndPoint = false;
+
+    totalBlock[startPoint.x][startPoint.y].SetList(CLOSE_LIST);
+    totalBlock[startPoint.x][startPoint.y].SetParent(NULL);
     CloseList.push_back(totalBlock[startPoint.x][startPoint.y]);
 
-
-    //while()
-
-    for (int i = 0; i < 8; i++)
+    while (1)
     {
-        if (passoverPoint.x + checkArea[i].x >= MX || passoverPoint.x + checkArea[i].x < 0 ||
-            passoverPoint.y + checkArea[i].y >= MX || passoverPoint.y + checkArea[i].y < 0) //배열 범위가 벗어남
-            continue;
-
-        if (totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].GetStatus() == WALL) //벽이 있으면
-            continue;
-
-        Block temp = totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y];
-
-        int g, h;
-
-        int x1 = abs(temp.GetPos().x - totalBlock[startPoint.x][startPoint.y].GetPos().x);
-        int y1 = abs(temp.GetPos().y - totalBlock[startPoint.x][startPoint.y].GetPos().y);
-
-        if (x1 - y1 > 0)
+        for (int i = 0; i < 8; i++)
         {
-            g = 14 * y1 + 10 * (x1 - y1);
+            if (passoverPoint.x + checkArea[i].x >= MX || passoverPoint.x + checkArea[i].x < 0 ||
+                passoverPoint.y + checkArea[i].y >= MX || passoverPoint.y + checkArea[i].y < 0) //배열 범위가 벗어남
+                continue;
+
+            if (totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].GetStatus() == WALL ||
+                totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].GetList() == CLOSE_LIST) //벽이나 closelist에 있으면
+                continue;
+
+            Block temp = totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y];
+
+            int g, h;
+
+            int x1 = abs(temp.GetPos().x - totalBlock[passoverPoint.x][passoverPoint.y].GetPos().x);
+            int y1 = abs(temp.GetPos().y - totalBlock[passoverPoint.x][passoverPoint.y].GetPos().y);
+
+            if (x1 - y1 > 0)
+            {
+                g = 14 * y1 + 10 * (x1 - y1);
+            }
+
+            else
+            {
+                g = 14 * x1 + 10 * (y1 - x1);
+            }
+
+            int x2 = abs(temp.GetPos().x - totalBlock[endPoint.x][endPoint.y].GetPos().x);
+            int y2 = abs(temp.GetPos().y - totalBlock[endPoint.x][endPoint.y].GetPos().y);
+
+            if (x2 - y2 > 0)
+            {
+                h = 14 * y2 + 10 * (x2 - y2);
+            }
+
+            else
+            {
+                h = 14 * x2 + 10 * (y2 - x2);
+            }
+
+            if (h == 0)
+            {
+                findEndPoint = true;
+            }
+
+            if (temp.GetList() != OPEN_LIST) //openlist에 있다면
+            {
+                totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].
+                    SetG(g + totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].GetG());
+
+                totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetH(h);
+                totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetF();
+                totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetParent(&totalBlock[passoverPoint.x][passoverPoint.y]);
+                totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetList(OPEN_LIST);
+                OpenList.push(totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y]);
+            }
         }
 
-        else
-        {
-            g = 14 * x1 + 10 * (y1 - x1);
-        }
+        Block temp = OpenList.top();
+        passoverPoint = temp.GetPos();
 
-        int x2 = abs(temp.GetPos().x - totalBlock[endPoint.x][endPoint.y].GetPos().x);
-        int y2 = abs(temp.GetPos().y - totalBlock[endPoint.x][endPoint.y].GetPos().y);
+        if (findEndPoint) // 도착점을 찾았다.
+            break;
 
-        if (x2 - y2 > 0)
-        {
-            h = 14 * y2 + 10 * (x2 - y2);
-        }
-
-        else
-        {
-            h = 14 * x2 + 10 * (y2 - x2);
-        }
-
-        totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetG(g);
-        totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetH(h);
-        totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y].SetF();
-
-        parent[totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y]]
-            = totalBlock[passoverPoint.x][passoverPoint.y];
-
-        OpenList.push(totalBlock[passoverPoint.x + checkArea[i].x][passoverPoint.y + checkArea[i].y]);
+        OpenList.pop();
+        temp.SetList(CLOSE_LIST);
+        CloseList.push_back(temp);
 
     }
 
-   
-        
+    Block* temp = totalBlock[endPoint.x][endPoint.y].GetParent();
+
+    while (temp->GetParent() !=NULL)
+    {
+        temp->SetList(PATH);
+        temp = temp->GetParent();
+    }
+
 }
