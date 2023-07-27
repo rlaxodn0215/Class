@@ -311,6 +311,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         GetClientRect(hWnd, &rectView);
         hEdit = CreateWindow(_T("edit"), NULL, WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_MULTILINE,
             0, 100, rectView.right, rectView.bottom, hWnd, (HMENU)IDC_EDIT_NOTEPAD, hInst, NULL);
+        SetTimer(hWnd, TIMER_FIRST, 100, AniProc);
 
 
 
@@ -541,18 +542,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     }
     break;
-    //case WM_PAINT: //그림 띄우기
-    //{
-    //    hdc = BeginPaint(hWnd, &ps);
-    //    // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
+    case WM_PAINT: //그림 띄우기
+    {
+        hdc = BeginPaint(hWnd, &ps);
+        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
 
-    //    //DrawBitmap(hWnd, hdc);
-    //    DrwaBitmapDoubleBuffering(hWnd, hdc);
-    //    DrawRectText(hdc);
+        DrawBitmap(hWnd, hdc);
+        //DrwaBitmapDoubleBuffering(hWnd, hdc);
+        DrawRectText(hdc);
 
-    //    EndPaint(hWnd, &ps);
-    //}
-    //break;
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY: //종료버튼을 누를 때 발생하는 이벤트
     {
         DeleteBitmap();

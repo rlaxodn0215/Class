@@ -9,6 +9,7 @@
 #include<stdio.h>
 
 #define MAX_LOADSTRING 100
+#define TIMER_FIRST 1
 
 using namespace std;
 
@@ -22,6 +23,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -148,6 +150,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         start = 0;
         lines = 0;
         yPos = 120;
+        SetTimer(hWnd, TIMER_FIRST, 100, AniProc);
         break;
     case WM_KEYDOWN: //눌려있는 상태 값 확인
     {

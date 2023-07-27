@@ -48,7 +48,6 @@ void UpdateFrame(HWND hWnd);
 void DrawRectText(HDC hdc);
 void Update();
 
-VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
 //>> double buffering
 
@@ -78,6 +77,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
 void DrawCircle(HDC hdc, POINT center, int radius)
 {
@@ -271,7 +271,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
         CreateBitmap();
         GetClientRect(hWnd, &recView);
-        //SetTimer(hWnd, TIMER_SECOND, 20, AniProc);
+        SetTimer(hWnd, TIMER_SECOND, 20, AniProc);
 
     }
     break;
@@ -714,33 +714,33 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
 
 
-    //{//수지
-    //    hMenDC2 = CreateCompatibleDC(hMenDC);
-    //    hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hBackImage);
-    //    bx = bitBack.bmWidth;
-    //    by = bitBack.bmHeight;
+    {//수지
+        hMenDC2 = CreateCompatibleDC(hMenDC);
+        hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hBackImage);
+        bx = bitBack.bmWidth;
+        by = bitBack.bmHeight;
 
-    //    BitBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
+        BitBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
 
-    //    SelectObject(hMenDC2, hodBitmap2);
-    //    DeleteDC(hMenDC2);
-    //}
+        SelectObject(hMenDC2, hodBitmap2);
+        DeleteDC(hMenDC2);
+    }
 
-    //{//시공
+    {//시공
 
-    //    hMenDC2 = CreateCompatibleDC(hMenDC);
-    //    hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hTransparentImage);
-    //    bx = bitTransparent.bmWidth;
-    //    by = bitTransparent.bmHeight;
+        hMenDC2 = CreateCompatibleDC(hMenDC);
+        hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hTransparentImage);
+        bx = bitTransparent.bmWidth;
+        by = bitTransparent.bmHeight;
 
-    //    //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
-    //    TransparentBlt(hMenDC, 240, 255, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
-    //    TransparentBlt(hMenDC, 383, 265, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+        //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
+        TransparentBlt(hMenDC, 240, 255, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+        TransparentBlt(hMenDC, 383, 265, bx * 2, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
 
-    //    SelectObject(hMenDC2, hodBitmap2);
-    //    DeleteDC(hMenDC2);
+        SelectObject(hMenDC2, hodBitmap2);
+        DeleteDC(hMenDC2);
 
-    //}
+    }
 
     {//Ani
         hMenDC2 = CreateCompatibleDC(hMenDC);
@@ -752,10 +752,10 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         int yStart = 0;
         static int posX = 150;
         posX += 3;
-        //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
-        //TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
-        //StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
-        //TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
+        TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
+        TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
         DeleteDC(hMenDC2);
