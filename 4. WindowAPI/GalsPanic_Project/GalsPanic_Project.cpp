@@ -925,22 +925,22 @@ BOOL CollisonCheck(const vector<POINT> & AreaPoints, const vector<int> & Collide
                      AreaPoints[playerLineNum].y - AreaPoints[(playerLineNum - 1 + AreaPoints.size()) % AreaPoints.size()].y };
 
 
-                if (player->GetWay() == 12 && (playerMoveableVec[0].y< 0 || playerMoveableVec[1].y < 0)) 
+                if (player->GetWay() == 12 && (playerMoveableVec[0].y<= 0 || playerMoveableVec[1].y <= 0)) 
                 {
                     return TRUE;
                 }
 
-                else if (player->GetWay() == 6 && (playerMoveableVec[0].y > 0 || playerMoveableVec[1].y > 0))
+                else if (player->GetWay() == 6 && (playerMoveableVec[0].y >= 0 || playerMoveableVec[1].y >= 0))
                 {
                     return TRUE;
                 }
 
-                else if (player->GetWay() == 3 && (playerMoveableVec[0].x > 0 || playerMoveableVec[1].x > 0))
+                else if (player->GetWay() == 3 && (playerMoveableVec[0].x >= 0 || playerMoveableVec[1].x >= 0))
                 {
                     return TRUE;
                 }
 
-                else if (player->GetWay() == 9 && (playerMoveableVec[0].x < 0 || playerMoveableVec[1].x < 0))
+                else if (player->GetWay() == 9 && (playerMoveableVec[0].x <= 0 || playerMoveableVec[1].x <= 0))
                 {
                     return TRUE;
                 }
