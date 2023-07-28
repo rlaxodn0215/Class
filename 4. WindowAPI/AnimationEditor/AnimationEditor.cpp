@@ -22,7 +22,8 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawRect(HDC hdc, vector<RECT> & rec);
 void DrawRectInstant(HDC hdc, RECT & rec);
-void ShowInfo();
+void DrawPivot(HDC hdc);
+void ShowInfo(HDC hdc);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -129,24 +130,38 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+POINT startMousePos;
+POINT moveMousePos;
+POINT endMousePos;
+POINT ImageOffset={0,0};
+
+vector<POINT> pivotPos;
+vector<RECT> rec;
+RECT rec2;
+
+HBITMAP hImage;
+BITMAP bit;
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
 
-    static POINT startMousePos;
-    static POINT moveMousePos;
-    static POINT endMousePos;
-    static vector<RECT> rec;
-    static RECT rec2;
-    static bool isHold = false;
-
     switch (message)
     {
     case WM_CREATE:
     {
-        SetTimer(hWnd, TIMER, 20, NULL);
+        hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/수지.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+        }
+
+        GetObject(hImage, sizeof(BITMAP), &bit);
     }
         break;
     case WM_LBUTTONDOWN:
@@ -161,7 +176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             moveMousePos = { LOWORD(lParam), HIWORD(lParam) };
             rec2 = { startMousePos.x, startMousePos.y,moveMousePos.x,moveMousePos.y };
-            InvalidateRect(hWnd, NULL, TRUE);
+            InvalidateRect(hWnd, NULL, FALSE);
         }
     }
         break;
@@ -170,21 +185,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         endMousePos = { LOWORD(lParam), HIWORD(lParam) };
         rec.push_back({ startMousePos.x, startMousePos.y,endMousePos.x,endMousePos.y });
-        InvalidateRect(hWnd, NULL, TRUE);
+        InvalidateRect(hWnd, NULL, FALSE);
     }
         break;
     case WM_RBUTTONDOWN:
     {
-
+        pivotPos.push_back({ LOWORD(lParam), HIWORD(lParam) });
+        InvalidateRect(hWnd, NULL, FALSE);
     }
         break;
-    case WM_TIMER:
-    {
 
-     
-       
-    }
-        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -206,10 +216,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
              hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-             DrawRect(hdc, rec);
-             DrawRectInstant(hdc, rec2);
 
-            EndPaint(hWnd, &ps);
+             HDC hMemDC;
+             HBITMAP hOldBitmap;
+
+             HDC hMemDC2;
+             HBITMAP hOldBitmap2;
+
+             int bx, by;
+
+             hMemDC = CreateCompatibleDC(hdc);
+             hOldBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
+             bx = bit.bmWidth;
+             by = bit.bmHeight;
+             DrawRect(hMemDC, rec);
+             
+             BitBlt(hdc, -ImageOffset.x, -ImageOffset.y, bx, by, hMemDC, 0, 0, SRCCOPY);
+
+             SelectObject(hMemDC, hOldBitmap);
+             DeleteDC(hMemDC);
+
+             DrawRectInstant(hdc, rec2);
+             DrawPivot(hdc);
+             ShowInfo(hdc);
+
+             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
@@ -244,8 +275,11 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 void DrawRect(HDC hdc, vector<RECT> & rec)
 {
     HPEN hPen, oldPen;
-    hPen = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
+    HBRUSH hBrush, hOldBrush;
+    hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
     oldPen = (HPEN)SelectObject(hdc, hPen);
+    hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+    hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
     for (int i = 0; i < rec.size(); i++)
     {
@@ -254,21 +288,73 @@ void DrawRect(HDC hdc, vector<RECT> & rec)
 
     SelectObject(hdc, oldPen);
     DeleteObject(hPen);
+    SelectObject(hdc, hOldBrush);
+    DeleteObject(hBrush);
     
 }
 
 void DrawRectInstant(HDC hdc, RECT& rec)
 {
     HPEN hPen, oldPen;
-    hPen = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
+    HBRUSH hBrush, hOldBrush;
+    hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
     oldPen = (HPEN)SelectObject(hdc, hPen);
+    hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+    hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
     Rectangle(hdc, rec.left, rec.top, rec.right, rec.bottom);
 
     SelectObject(hdc, oldPen);
     DeleteObject(hPen);
+    SelectObject(hdc, hOldBrush);
+    DeleteObject(hBrush);
 }
 
-void ShowInfo()
+void DrawPivot(HDC hdc)
 {
+    int radius = 2;
+
+    HBRUSH hBrush, oldBrush;
+    hBrush = CreateSolidBrush(RGB(255, 0, 0));
+    oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+
+    for (int i = 0; i < pivotPos.size(); i++)
+    {
+        Ellipse(hdc, pivotPos[i].x - radius, pivotPos[i].y - radius, pivotPos[i].x + radius, pivotPos[i].y + radius);
+    }
+   
+    SelectObject(hdc, oldBrush);
+    DeleteObject(hBrush);
+}
+
+void ShowInfo(HDC hdc)
+{
+
+    for (int i = 0; i < rec.size(); i++)
+    {
+        TCHAR temp[20];
+        _stprintf_s(temp, L"[%d,%d]", rec[i].left, rec[i].top);
+        TextOut(hdc, rec[i].left, rec[i].top, temp, _tcslen(temp));
+
+        TCHAR temp1[20];
+        _stprintf_s(temp1, L"[%d,%d]", rec[i].right, rec[i].bottom);
+        TextOut(hdc, rec[i].right, rec[i].bottom, temp1, _tcslen(temp1));
+    }
+
+    TCHAR temp2[20];
+    _stprintf_s(temp2, L"[%d,%d]", rec2.left, rec2.top);
+    TextOut(hdc, rec2.left, rec2.top, temp2, _tcslen(temp2));
+
+    TCHAR temp3[20];
+    _stprintf_s(temp3, L"[%d,%d]", rec2.right, rec2.bottom);
+    TextOut(hdc, rec2.right, rec2.bottom, temp3, _tcslen(temp3));
+
+    for (int i = 0; i < pivotPos.size(); i++)
+    {
+        TCHAR temp4[20];
+        _stprintf_s(temp4, L"[%d,%d]", pivotPos[i].x, pivotPos[i].y);
+        TextOut(hdc, pivotPos[i].x, pivotPos[i].y, temp4, _tcslen(temp4));
+    }
+
+
 }
