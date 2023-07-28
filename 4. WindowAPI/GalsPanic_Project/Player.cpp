@@ -87,5 +87,11 @@ void Player::PlayerCharactorUpdate(HDC hdc)
 	int x2 = curPos.x + radius;
 	int y2 = curPos.y + radius;
 
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
+	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+
 	Ellipse(hdc,x1, y1, x2, y2);
+
+	SelectObject(hdc, oldBrush);
+	DeleteObject(hBrush);
 }

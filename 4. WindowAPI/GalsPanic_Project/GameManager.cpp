@@ -30,7 +30,7 @@ BOOL GameManager::PlayerMoveable()
 void GameManager::DrawLine(HDC hdc)
 {
 	HPEN hPen, oldPen;
-	hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 255));
+	hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
 	oldPen = (HPEN)SelectObject(hdc, hPen);
 
 	MoveToEx(hdc, GetBeforePos().x, GetBeforePos().y, NULL);

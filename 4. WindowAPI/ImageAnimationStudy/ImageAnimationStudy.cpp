@@ -7,6 +7,7 @@
 #include<commdlg.h>
 #include<stdio.h>
 #include<iostream>
+#include"Animation.h"
 
 #pragma comment(lib, "msimg32.lib")
 
@@ -20,7 +21,7 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-const int SPRITE_SIZE_X = 72;
+const int SPRITE_SIZE_X = 70;
 const int SPRITE_SIZE_Y = 100;
 
 int RUN_FRAME_MAX = 0;
@@ -156,7 +157,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        hImage = (HBITMAP)LoadImage(NULL, TEXT("Image/test.bmp"),
+        hImage = (HBITMAP)LoadImage(NULL, TEXT("Image/WindyPlane.bmp"),
             IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
         if (hImage == NULL)
@@ -167,8 +168,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         GetObject(hImage, sizeof(BITMAP), &bit);
 
-        RUN_FRAME_MAX = bit.bmWidth / SPRITE_SIZE_X - 1; //이전 사진으로
-        RUN_FRAME_MIN = 1; //그 전의 사진은 달리기 직전
+        RUN_FRAME_MAX = 2; //이전 사진으로
+        RUN_FRAME_MIN = 0; //그 전의 사진은 달리기 직전
         curframe = RUN_FRAME_MIN;
 
         SPRITE_FRAME_COUNT_X = bit.bmWidth / SPRITE_SIZE_X;
@@ -209,16 +210,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              int bx, by;
              hMemDC = CreateCompatibleDC(hdc);
              holdBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
-             bx = bit.bmWidth/ SPRITE_FRAME_COUNT_X;
+             bx = 100;
              by = bit.bmHeight/ SPRITE_FRAME_COUNT_Y;
 
              int xStart = curframe * bx;
-             int yStart = 0;
+             int yStart = 107*3;
              static int posX = 150;
-             //posX += 1;
-            //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
+
             TransparentBlt(hdc, posX, 150, bx, by, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
-            //TransparentBlt(hdc, 383, 265, bx * 2, by, hMenDC, 0, 0, bx, by, RGB(255, 0, 255));
 
             SelectObject(hMemDC, holdBitmap);
             DeleteDC(hMemDC);

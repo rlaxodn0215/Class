@@ -752,39 +752,37 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         int yStart = 0;
         static int posX = 150;
         posX += 3;
-        BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
+        //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
         TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
-        StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
-        TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        //StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
+        //TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
         DeleteDC(hMenDC2);
     }
     //<< hMenDC 에 그려주기
 
-    //{//>> front image
+    {//>> front image
 
-    //   hMenDC2 = CreateCompatibleDC(hMenDC);
-    //   hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hFrontImage);
-    //   bx = bitFront.bmWidth;
-    //   by = bitFront.bmHeight;
+       hMenDC2 = CreateCompatibleDC(hMenDC);
+       hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hFrontImage);
+       bx = bitFront.bmWidth;
+       by = bitFront.bmHeight;
 
-    //   HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
-    //   HBRUSH oldBrush = (HBRUSH)SelectObject(hMenDC2, hBrush);
+       HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
+       HBRUSH oldBrush = (HBRUSH)SelectObject(hMenDC2, hBrush);
 
-    //   Ellipse(hMenDC2, 250, 100, 750, 500);
+       Ellipse(hMenDC2, 250, 100, 750, 500);
 
-    //   SelectObject(hMenDC2,oldBrush);
-    //   DeleteObject(hBrush);
-    //   
-    //   TransparentBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
+       SelectObject(hMenDC2,oldBrush);
+       DeleteObject(hBrush);
+       
+       TransparentBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, bx, by, RGB(255, 0, 255));
 
-    //   SelectObject(hMenDC2, hodBitmap2);
+       SelectObject(hMenDC2, hodBitmap2);
 
-
-
-    //   DeleteDC(hMenDC2);
-    //}
+       DeleteDC(hMenDC2);
+    }
 
 
     //hdc에 그려주기

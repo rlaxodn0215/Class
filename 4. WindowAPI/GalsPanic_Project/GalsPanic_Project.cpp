@@ -18,6 +18,9 @@
 #pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
 #endif // UNICODE
 
+#pragma comment(lib, "msimg32.lib")
+
+
 #define MAX_LOADSTRING 100
 #define TIMER_FIRST 1
 #define PI 3.141592
@@ -32,8 +35,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 vector<POINT> PlayerPathPoints; //선을 그리는 점들
 vector<POINT> AreaPoints; // 도형을 그리기 위한 점들
 vector<int> ColliderWay; //박스 collider들
-
-HBITMAP screen;
+POINT point[500] = {};
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -131,7 +133,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-        200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+        200, 200, 900, 638, nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)
     {
@@ -154,7 +156,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+HBITMAP hDoubleBufferImage;
 
+HBITMAP hHideImage;
+BITMAP bitHide;
+
+HBITMAP hFrontImage;
+BITMAP bitFront;
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -181,6 +189,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static bool isLineVertical=true;
     static bool isLineStart = false;
     static bool CCW = false;
+
+    static bool first = true;
     
 
 
@@ -193,6 +203,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetTimer(hWnd, TIMER_FIRST, 10, NULL);
         GM->StartGame(startCenter, startWidth, startHeight, player,AreaPoints);
         MakeCollider(AreaPoints, ColliderWay,CCW);
+
+
+        hHideImage = (HBITMAP)LoadImage(NULL, TEXT("Image/수지.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hHideImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러_1"), _T("에러"), MB_OK);
+        }
+
+        GetObject(hHideImage, sizeof(BITMAP), &bitHide);
+
+        hFrontImage = (HBITMAP)LoadImage(NULL, TEXT("Image/Background.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hFrontImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러_2"), _T("에러"), MB_OK);
+        }
+
+        GetObject(hFrontImage, sizeof(BITMAP), &bitFront);
+
+        for (int j = 0; j < AreaPoints.size(); j++)
+        {
+            point[j] = AreaPoints[j];
+        }
+
+
         cout << "Ready for Playing" << endl;
 
     }
@@ -247,6 +287,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     updatePos = { player->GetCurPos().x, player->GetCurPos().y - playerVel };
                     player->SetCurPos(updatePos);
                 }
+
+                
             }
 
             else if (GetAsyncKeyState(VK_DOWN) & 0x8000) //아래쪽
@@ -288,6 +330,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     updatePos = { player->GetCurPos().x, player->GetCurPos().y + playerVel };
                     player->SetCurPos(updatePos);
                 }
+
             }
 
             else if (GetAsyncKeyState(VK_LEFT) & 0x8000) //왼쪽
@@ -329,6 +372,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     updatePos = { player->GetCurPos().x - playerVel, player->GetCurPos().y };
                     player->SetCurPos(updatePos);
                 }
+
             }
 
             else if (GetAsyncKeyState(VK_RIGHT) & 0x8000) //오른쪽
@@ -370,6 +414,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     updatePos = { player->GetCurPos().x + playerVel, player->GetCurPos().y };
                     player->SetCurPos(updatePos);
                 }
+
             }
 
             InvalidateRect(hWnd, NULL, FALSE);
@@ -398,31 +443,67 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-        HDC hMemDC;
-        HBITMAP hOldBitmap;
+        HDC hMemDC1;
+        HBITMAP hOldBitmap1;
+        int bx, by;
 
-        hMemDC = CreateCompatibleDC(hdc);
+        HDC hMemDC2;
+        HBITMAP hOldBitmap2;
 
-        screen = CreateCompatibleBitmap(hdc, recView.right, recView.bottom);
+        {
+           hMemDC1 = CreateCompatibleDC(hdc);
+           if (hDoubleBufferImage == NULL)
+           {
+               hDoubleBufferImage = CreateCompatibleBitmap(hdc, recView.right, recView.bottom);
+           }
 
-        hOldBitmap = (HBITMAP)SelectObject(hMemDC, screen);
+           hOldBitmap1 = (HBITMAP)SelectObject(hMemDC1, hDoubleBufferImage);
+        }
 
-        DrawLines(PlayerPathPoints, hMemDC);
-        GM->DrawLine(hMemDC);
-        GM->PaintArea(hMemDC, AreaPoints);
-        player->PlayerCharactorUpdate(hMemDC);
+        {
+            hMemDC2 = CreateCompatibleDC(hMemDC1);
+            hOldBitmap2 = (HBITMAP)SelectObject(hMemDC2, hHideImage);
+            bx = bitHide.bmWidth;
+            by = bitHide.bmHeight;
 
-        BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMemDC, 0, 0, SRCCOPY);
+            BitBlt(hMemDC1, 0, 0, bx, by, hMemDC2, 0, 0, SRCCOPY);
 
-        SelectObject(hMemDC, hOldBitmap);
-        DeleteDC(hMemDC);
+            SelectObject(hMemDC2, hOldBitmap2);
+            DeleteDC(hMemDC2);
+        }
 
+
+        {
+            hMemDC2 = CreateCompatibleDC(hMemDC1);
+            hOldBitmap2 = (HBITMAP)SelectObject(hMemDC2, hFrontImage);
+
+            bx = bitFront.bmWidth;
+            by = bitFront.bmHeight;
+
+            GM->PaintArea(hMemDC2, AreaPoints);
+
+            TransparentBlt(hMemDC1, 0, 0, bx, by, hMemDC2, 0, 0, bx, by, RGB(255, 0, 255));
+            SelectObject(hMemDC2, hOldBitmap2);
+            DeleteDC(hMemDC2);
+        }
+
+        DrawLines(PlayerPathPoints, hMemDC1);
+        GM->DrawLine(hMemDC1);
+        player->PlayerCharactorUpdate(hMemDC1);
+        
+
+        BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMemDC1, 0, 0, SRCCOPY);
+        SelectObject(hMemDC1, hOldBitmap1);
+        DeleteDC(hMemDC1);
+        
         EndPaint(hWnd, &ps);
     }
     break;
     case WM_DESTROY:
     {
         KillTimer(hWnd, TIMER_FIRST);
+        DeleteObject(hHideImage);
+        DeleteObject(hFrontImage);
         delete GM;
         PostQuitMessage(0);
     }
@@ -456,7 +537,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 void DrawLines(vector<POINT>& vec, HDC hdc)
 {
     HPEN hPen, oldPen;
-    hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 255));
+    hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
     oldPen = (HPEN)SelectObject(hdc, hPen);
 
     if (vec.size() > 1)
