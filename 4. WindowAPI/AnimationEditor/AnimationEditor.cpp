@@ -5,11 +5,13 @@
 #include "AnimationEditor.h"
 #include<vector>
 
+#pragma comment(lib, "msimg32.lib")
+
 using namespace std;
 
 #define MAX_LOADSTRING 100
-#define TIMER 1
-
+#define TIMER_FIRST 1
+ 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
@@ -23,7 +25,13 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawRect(HDC hdc, vector<RECT> & rec);
 void DrawRectInstant(HDC hdc, RECT & rec);
 void DrawPivot(HDC hdc);
-void ShowInfo(HDC hdc);
+void ShowPosInfo(HDC hdc);
+void ShowProc(HDC hdc);
+void CalcAns();
+void ShowAni(HDC hdc);
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
+void Init();
+void SaveData();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -130,6 +138,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+struct AniAns
+{
+    POINT offset;
+    int width;
+    int height;
+    POINT pivot;
+};
+
+vector<AniAns> Datas;
+int frameTotalCount;
+int frameCount;
+
+
 POINT startMousePos;
 POINT moveMousePos;
 POINT endMousePos;
@@ -142,17 +163,17 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
+    static bool showAni=false;
 
     switch (message)
     {
     case WM_CREATE:
     {
-        hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/수지.bmp"),
+        hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/test.bmp"),
             IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
         if (hImage == NULL)
@@ -162,6 +183,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         GetObject(hImage, sizeof(BITMAP), &bit);
+
+        SetTimer(hWnd, TIMER_FIRST, 100, AniProc);
     }
         break;
     case WM_LBUTTONDOWN:
@@ -201,6 +224,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
+            case ID_MAKE_ANI:
+            {
+                CalcAns();
+                showAni = true;
+            }
+                break;
+            case ID_INIT:
+            {
+                Init();
+                showAni = false;
+            }
+                break;
+            case ID_SAVE:
+            {
+                SaveData();
+                showAni = false;
+            }
+                break;
+                
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
@@ -217,28 +259,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-             HDC hMemDC;
-             HBITMAP hOldBitmap;
+             if (showAni)
+             {
+                 ShowAni(hdc);
+             }
 
-             HDC hMemDC2;
-             HBITMAP hOldBitmap2;
-
-             int bx, by;
-
-             hMemDC = CreateCompatibleDC(hdc);
-             hOldBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
-             bx = bit.bmWidth;
-             by = bit.bmHeight;
-             DrawRect(hMemDC, rec);
-             
-             BitBlt(hdc, -ImageOffset.x, -ImageOffset.y, bx, by, hMemDC, 0, 0, SRCCOPY);
-
-             SelectObject(hMemDC, hOldBitmap);
-             DeleteDC(hMemDC);
-
-             DrawRectInstant(hdc, rec2);
-             DrawPivot(hdc);
-             ShowInfo(hdc);
+             else
+             {
+                 ShowProc(hdc);
+             }
 
              EndPaint(hWnd, &ps);
         }
@@ -327,7 +356,7 @@ void DrawPivot(HDC hdc)
     DeleteObject(hBrush);
 }
 
-void ShowInfo(HDC hdc)
+void ShowPosInfo(HDC hdc)
 {
 
     for (int i = 0; i < rec.size(); i++)
@@ -356,5 +385,108 @@ void ShowInfo(HDC hdc)
         TextOut(hdc, pivotPos[i].x, pivotPos[i].y, temp4, _tcslen(temp4));
     }
 
+
+}
+
+void ShowProc(HDC hdc)
+{
+    HDC hMemDC;
+    HBITMAP hOldBitmap;
+
+    HDC hMemDC2;
+    HBITMAP hOldBitmap2;
+
+    int bx, by;
+
+    hMemDC = CreateCompatibleDC(hdc);
+    hOldBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
+    bx = bit.bmWidth;
+    by = bit.bmHeight;
+    DrawRect(hMemDC, rec);
+
+    BitBlt(hdc, -ImageOffset.x, -ImageOffset.y, bx, by, hMemDC, 0, 0, SRCCOPY);
+
+    SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
+
+    DrawRectInstant(hdc, rec2);
+    DrawPivot(hdc);
+    //ShowPosInfo(hdc);
+}
+
+void CalcAns()
+{
+    if (rec.size() != pivotPos.size())
+    {
+        MessageBox(NULL, _T("영역과 pivot의 갯수와 원소 위치는 동일해야 합니다."), _T("에러"), MB_OK);
+        return;
+    }
+
+    frameTotalCount = rec.size();
+
+    for (int i = 0; i < frameTotalCount; i++)
+    {
+        AniAns temp;
+
+        temp.offset = { rec[i].left,rec[i].top };
+        temp.width = rec[i].right - rec[i].left;
+        temp.height = rec[i].bottom - rec[i].top;
+        temp.pivot.x = pivotPos[i].x - rec[i].left;
+        temp.pivot.y= pivotPos[i].y - rec[i].top;
+
+        Datas.push_back(temp);
+    }
+
+
+}
+
+void ShowAni(HDC hdc)
+{
+    HDC hMemDC;
+    HBITMAP holdBitmap;
+
+    hMemDC = CreateCompatibleDC(hdc);
+    holdBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
+
+    POINT showPos = { 250,250 };
+
+    int bx = Datas[frameCount].width;
+    int by = Datas[frameCount].height;
+    int xStart = Datas[frameCount].offset.x;
+    int yStart = Datas[frameCount].offset.y;
+    int posX = showPos.x - Datas[frameCount].pivot.x;
+    int posY = showPos.y - Datas[frameCount].pivot.y;
+
+    TransparentBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
+
+    SelectObject(hMemDC, holdBitmap);
+    DeleteDC(hMemDC);
+}
+
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+{
+    frameCount++;
+    
+    if (frameCount > frameTotalCount)
+    {
+        frameCount = 0;
+    }
+
+    InvalidateRect(hWnd, NULL, TRUE);
+}
+
+void Init()
+{
+    startMousePos = {};
+    moveMousePos = {};
+    endMousePos = {};
+
+    pivotPos.clear();
+    rec.clear();
+    rec2 = {};
+}
+
+void SaveData()
+{
 
 }
