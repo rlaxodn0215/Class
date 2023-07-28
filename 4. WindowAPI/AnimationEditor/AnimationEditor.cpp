@@ -1,43 +1,28 @@
-﻿// ImageAnimationStudy.cpp : 애플리케이션에 대한 진입점을 정의합니다.
+﻿// AnimationEditor.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
 #include "framework.h"
-#include "ImageAnimationStudy.h"
+#include "AnimationEditor.h"
 #include<vector>
-#include<commdlg.h>
-#include<stdio.h>
-#include<iostream>
-#include"Animation.h"
-
-#pragma comment(lib, "msimg32.lib")
-
-#define MAX_LOADSTRING 100
-#define TIMER_FIRST 1
 
 using namespace std;
+
+#define MAX_LOADSTRING 100
+#define TIMER 1
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-const int SPRITE_SIZE_X = 70;
-const int SPRITE_SIZE_Y = 100;
-
-int RUN_FRAME_MAX = 0;
-int RUN_FRAME_MIN = 0;
-int curframe = RUN_FRAME_MIN;
-
-int SPRITE_FRAME_COUNT_X = 0;
-int SPRITE_FRAME_COUNT_Y = 0;
-
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
-
+void DrawRect(HDC hdc, vector<RECT> & rec);
+void DrawRectInstant(HDC hdc, RECT & rec);
+void ShowInfo();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -51,7 +36,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_IMAGEANIMATIONSTUDY, szWindowClass, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_ANIMATIONEDITOR, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
@@ -60,7 +45,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_IMAGEANIMATIONSTUDY));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ANIMATIONEDITOR));
 
     MSG msg;
 
@@ -95,10 +80,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_IMAGEANIMATIONSTUDY));
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ANIMATIONEDITOR));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_IMAGEANIMATIONSTUDY);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_ANIMATIONEDITOR);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -120,7 +105,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-       300, 300, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -144,43 +129,60 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-HBITMAP hImage;
-BITMAP bit;
-
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
 
+    static POINT startMousePos;
+    static POINT moveMousePos;
+    static POINT endMousePos;
+    static vector<RECT> rec;
+    static RECT rec2;
+    static bool isHold = false;
+
     switch (message)
     {
     case WM_CREATE:
     {
-        hImage = (HBITMAP)LoadImage(NULL, TEXT("Image/WindyPlane.bmp"),
-            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+        SetTimer(hWnd, TIMER, 20, NULL);
+    }
+        break;
+    case WM_LBUTTONDOWN:
+    {
+        startMousePos = { LOWORD(lParam), HIWORD(lParam) };
+    }
+    break;
 
-        if (hImage == NULL)
+    case WM_MOUSEMOVE:
+    {
+        if (wParam & MK_LBUTTON)
         {
-            DWORD dwError = GetLastError();
-            MessageBox(NULL, _T("이미지 로드 에러_1"), _T("에러"), MB_OK);
+            moveMousePos = { LOWORD(lParam), HIWORD(lParam) };
+            rec2 = { startMousePos.x, startMousePos.y,moveMousePos.x,moveMousePos.y };
+            InvalidateRect(hWnd, NULL, TRUE);
         }
+    }
+        break;
 
-        GetObject(hImage, sizeof(BITMAP), &bit);
-
-        RUN_FRAME_MAX = 10; //이전 사진으로
-        RUN_FRAME_MIN = 0; //그 전의 사진은 달리기 직전
-        curframe = RUN_FRAME_MIN;
-
-        SPRITE_FRAME_COUNT_X = bit.bmWidth / SPRITE_SIZE_X;
-        SPRITE_FRAME_COUNT_Y = bit.bmHeight / SPRITE_SIZE_Y;
-
-        SetTimer(hWnd, TIMER_FIRST, 500, AniProc);
+    case WM_LBUTTONUP:
+    {
+        endMousePos = { LOWORD(lParam), HIWORD(lParam) };
+        rec.push_back({ startMousePos.x, startMousePos.y,endMousePos.x,endMousePos.y });
+        InvalidateRect(hWnd, NULL, TRUE);
+    }
+        break;
+    case WM_RBUTTONDOWN:
+    {
 
     }
         break;
     case WM_TIMER:
     {
+
+     
+       
     }
         break;
     case WM_COMMAND:
@@ -204,28 +206,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
              hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+             DrawRect(hdc, rec);
+             DrawRectInstant(hdc, rec2);
 
-             HDC hMemDC;
-             HBITMAP holdBitmap;
-             int bx, by;
-             hMemDC = CreateCompatibleDC(hdc);
-             holdBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
-             bx = 205;
-             by = 160;
-
-             int xStart = curframe * bx;
-             int yStart = 0;
-             static int posX = 150;
-
-            TransparentBlt(hdc, posX, 150, bx, by, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
-
-            SelectObject(hMemDC, holdBitmap);
-            DeleteDC(hMemDC);
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
-        KillTimer(hWnd, TIMER_FIRST);
         PostQuitMessage(0);
         break;
     default:
@@ -254,16 +241,34 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+void DrawRect(HDC hdc, vector<RECT> & rec)
 {
-    curframe++;
-    if (curframe > RUN_FRAME_MAX)
+    HPEN hPen, oldPen;
+    hPen = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
+    oldPen = (HPEN)SelectObject(hdc, hPen);
+
+    for (int i = 0; i < rec.size(); i++)
     {
-        curframe = RUN_FRAME_MIN;
+        Rectangle(hdc, rec[i].left, rec[i].top, rec[i].right, rec[i].bottom);
     }
 
-    InvalidateRect(hWnd, NULL, TRUE);
+    SelectObject(hdc, oldPen);
+    DeleteObject(hPen);
+    
 }
 
+void DrawRectInstant(HDC hdc, RECT& rec)
+{
+    HPEN hPen, oldPen;
+    hPen = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
+    oldPen = (HPEN)SelectObject(hdc, hPen);
 
+    Rectangle(hdc, rec.left, rec.top, rec.right, rec.bottom);
 
+    SelectObject(hdc, oldPen);
+    DeleteObject(hPen);
+}
+
+void ShowInfo()
+{
+}
