@@ -12,9 +12,18 @@
 #define IDI_SMALL                       108
 #define IDC_ANIMATIONEDITOR             109
 #define IDR_MAINFRAME                   128
+#define IDD_CHANGEPIVOT                 129
+#define IDC_EDIT_PIVOTNUM               1000
+#define IDC_UP                          1001
+#define IDC_BUTTON2                     1002
+#define IDC_LEFT                        1002
+#define IDC_RIGHT                       1003
+#define IDC_DOWN                        1004
 #define ID_MAKE_ANI                     32774
 #define ID_INIT                         32775
 #define ID_SAVE                         32776
+#define ID_32777                        32777
+#define ID_PIVOTCHANGE                  32778
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -22,9 +31,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        129
-#define _APS_NEXT_COMMAND_VALUE         32777
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_COMMAND_VALUE         32779
+#define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
