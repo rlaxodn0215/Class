@@ -28,9 +28,10 @@ void DrawPivot(HDC hdc);
 void ShowPosInfo(HDC hdc);
 void ShowProc(HDC hdc);
 void CalcAns();
-void ShowAni(HDC hdc);
+void ShowAni(HWND hWnd, HDC hdc);
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 void Init(HWND hWnd);
+INT_PTR CALLBACK Pivot_Change(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 void SaveData();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -146,10 +147,12 @@ struct AniAns
     POINT pivot;
 };
 
+int changePivot[4] = {0}; // up - down - left - right
+int changePivotNum;
+
 vector<AniAns> Datas;
 int frameTotalCount;
 int frameCount;
-
 
 POINT startMousePos;
 POINT moveMousePos;
@@ -237,6 +240,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 showAni = false;
             }
                 break;
+            case ID_PIVOTCHANGE:
+            {
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_CHANGEPIVOT), hWnd, Pivot_Change);
+            }
+                break;
             case ID_SAVE:
             {
                 SaveData();
@@ -262,7 +270,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
              if (showAni)
              {
-                 ShowAni(hdc);
+                 ShowAni(hWnd,hdc);
              }
 
              else
@@ -296,6 +304,57 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK Pivot_Change(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_UP:
+            changePivot[0]++;
+            break;
+        case IDC_DOWN:
+            changePivot[1]++;
+            break;
+        case IDC_LEFT:
+            changePivot[2]++;
+            break;
+        case IDC_RIGHT:
+            changePivot[3]++;
+            break;
+        case IDOK:
+        
+            changePivotNum =  GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE);
+           
+           Datas[changePivotNum].pivot.x += (changePivot[3] - changePivot[2]);
+           Datas[changePivotNum].pivot.y += (changePivot[1] - changePivot[0]);
+
+            changePivot[0] = 0;
+            changePivot[1] = 0;
+            changePivot[2] = 0;
+            changePivot[3] = 0;
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+            break;
+        case IDCANCEL:
+            changePivot[0]=0;
+            changePivot[1]=0;
+            changePivot[2]=0;
+            changePivot[3]=0;
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+            break;
         }
         break;
     }
@@ -441,8 +500,9 @@ void CalcAns()
 
 }
 
-void ShowAni(HDC hdc)
+void ShowAni(HWND hWnd, HDC hdc)
 {
+
     HDC hMemDC;
     HBITMAP holdBitmap;
 
@@ -481,6 +541,7 @@ VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 
 void Init(HWND hWnd)
 {
+
     startMousePos = {};
     moveMousePos = {};
     endMousePos = {};
@@ -488,11 +549,52 @@ void Init(HWND hWnd)
     pivotPos.clear();
     rec.clear();
     rec2 = {};
+    frameCount = 0;
+    frameTotalCount = 0;
+    Datas.clear();
+
+    hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/test.bmp"),
+        IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+    if (hImage == NULL)
+    {
+        DWORD dwError = GetLastError();
+        MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+    }
+
+    GetObject(hImage, sizeof(BITMAP), &bit);
 
     InvalidateRect(hWnd, NULL, TRUE);
+
 }
 
 void SaveData()
 {
+    HANDLE hFile;
+    hFile = CreateFile(_T("test.txt"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, 0, 0);
 
+    int n = rec.size();
+    DWORD size;
+    for (int i = 0; i < n; i++)
+    {
+        TCHAR index[50];
+        _stprintf_s(index, L"Index: %d\n", i);
+        WriteFile(hFile, index, (DWORD)_tcslen(index) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR offset[50];
+        _stprintf_s(offset, L"Offset: [%d, %d]\n", Datas[i].offset.x, Datas[i].offset.y);
+        WriteFile(hFile, offset, (DWORD)_tcslen(offset) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR Width_Height[50];
+        _stprintf_s(Width_Height, L"Width_Height: [%d, %d]\n", Datas[i].width, Datas[i].height);
+        WriteFile(hFile, Width_Height, (DWORD)_tcslen(Width_Height) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR pivot[50];
+        _stprintf_s(pivot, L"Pivot: [%d, %d]\n\n", Datas[i].pivot.x, Datas[i].pivot.y);
+        WriteFile(hFile, pivot, (DWORD)_tcslen(pivot) * sizeof(TCHAR), &size, NULL);
+    }
+
+    MessageBox(NULL, _T("데이터가 저장되었습니다."), _T("알림"), MB_OK);
+
+    CloseHandle(hFile);
 }
