@@ -31,7 +31,7 @@ void CalcAns();
 void ShowAni(HWND hWnd, HDC hdc);
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 void Init(HWND hWnd);
-INT_PTR CALLBACK Pivot_Change(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK Frame_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 void SaveData();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -150,9 +150,14 @@ struct AniAns
 int changePivot[4] = {0}; // up - down - left - right
 int changePivotNum;
 
+
+
 vector<AniAns> Datas;
 int frameTotalCount;
+int frameStart = 0;
+int frameEnd;
 int frameCount;
+int aniSpeed=100;
 
 POINT startMousePos;
 POINT moveMousePos;
@@ -165,6 +170,8 @@ RECT rec2;
 
 HBITMAP hImage;
 BITMAP bit;
+
+HWND hWd;
 
  bool showAni = false;
 
@@ -188,7 +195,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         GetObject(hImage, sizeof(BITMAP), &bit);
 
-        SetTimer(hWnd, TIMER_FIRST, 100, AniProc);
+        SetTimer(hWnd, TIMER_FIRST, aniSpeed, AniProc);
+        hWd = hWnd;
     }
         break;
     case WM_LBUTTONDOWN:
@@ -228,21 +236,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
+            case ID_INIT:
+            {
+                Init(hWnd);
+                showAni = false;
+            }
+            break;
             case ID_MAKE_ANI:
             {
                 CalcAns();
                 showAni = true;
             }
                 break;
-            case ID_INIT:
+            case ID_FRAMESETTINGS:
             {
-                Init(hWnd);
-                showAni = false;
-            }
-                break;
-            case ID_PIVOTCHANGE:
-            {
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_CHANGEPIVOT), hWnd, Pivot_Change);
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_FRAMESETTINGS), hWnd, Frame_Settings);
             }
                 break;
             case ID_SAVE:
@@ -310,48 +318,114 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-INT_PTR CALLBACK Pivot_Change(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK Frame_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
+    {
+        SetDlgItemInt(hDlg, IDC_FRAME_START, 0, FALSE);
+        SetDlgItemInt(hDlg, IDC_FRAME_END, frameEnd, FALSE);
+        SetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, 1, FALSE);
+        SetDlgItemInt(hDlg, IDC_EDIT_SPEED, aniSpeed, FALSE);
+    }
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
+        case ID_CLAMP:
+            if (GetDlgItemInt(hDlg, IDC_FRAME_START, NULL, FALSE) >= 0 &&
+                GetDlgItemInt(hDlg, IDC_FRAME_END, NULL, FALSE) < frameTotalCount)
+            {
+                frameStart = GetDlgItemInt(hDlg, IDC_FRAME_START, NULL, FALSE);
+                frameEnd = GetDlgItemInt(hDlg, IDC_FRAME_END, NULL, FALSE);
+            }
+            else
+            {
+                MessageBox(NULL, _T("프레임 범위를 제대로 입력하세요."), _T("에러"), MB_OK);
+            }
+
+            break;
         case IDC_UP:
-            changePivot[0]++;
+            if (GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) >= 0 &&
+                GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) < frameTotalCount)
+            {
+                changePivotNum = GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE);
+                Datas[changePivotNum].pivot.y++;
+            }
+
+            else
+            {
+                MessageBox(NULL, _T("Pivot번호를 제대로 입력하세요."), _T("에러"), MB_OK);
+            }
+
             break;
         case IDC_DOWN:
-            changePivot[1]++;
+            if (GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) >= 0 &&
+                GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) < frameTotalCount)
+            {
+                changePivotNum = GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE);
+                Datas[changePivotNum].pivot.y--;
+            }
+
+            else
+            {
+                MessageBox(NULL, _T("Pivot번호를 제대로 입력하세요."), _T("에러"), MB_OK);
+            }
             break;
         case IDC_LEFT:
-            changePivot[2]++;
+            if (GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) >= 0 &&
+                GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) < frameTotalCount)
+            {
+                changePivotNum = GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE);
+                Datas[changePivotNum].pivot.x++;
+            }
+            else
+            {
+                MessageBox(NULL, _T("Pivot번호를 제대로 입력하세요."), _T("에러"), MB_OK);
+            }
             break;
         case IDC_RIGHT:
-            changePivot[3]++;
+            if (GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) >= 0 &&
+                GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE) < frameTotalCount)
+            {
+                changePivotNum = GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE);
+                Datas[changePivotNum].pivot.x--;
+            }
+            else
+            {
+                MessageBox(NULL, _T("Pivot번호를 제대로 입력하세요."), _T("에러"), MB_OK);
+            }
+            break;
+        case ID_SPEEDOK:
+        {
+            aniSpeed = GetDlgItemInt(hDlg, IDC_EDIT_SPEED, NULL, FALSE);
+            SetTimer(hWd, TIMER_FIRST, aniSpeed, AniProc);
+        }
+            break;
+        case IDC_SPEED_UP:
+        {
+            SetDlgItemInt(hDlg, IDC_EDIT_SPEED, ++aniSpeed, FALSE);
+            SetTimer(hWd, TIMER_FIRST, aniSpeed, AniProc);
+        }
+            break;
+        case IDC_SPEED_DOWN:
+        {
+            if (aniSpeed > 0)
+            {
+                SetDlgItemInt(hDlg, IDC_EDIT_SPEED, --aniSpeed, FALSE);
+                SetTimer(hWd, TIMER_FIRST, aniSpeed, AniProc);
+            }
+
+            else
+            {
+                MessageBox(NULL, _T("Ani 속도는 음수가 될 수 없습니다."), _T("에러"), MB_OK);
+            }
+        }
             break;
         case IDOK:
-        
-            changePivotNum =  GetDlgItemInt(hDlg, IDC_EDIT_PIVOTNUM, NULL, FALSE);
-           
-           Datas[changePivotNum].pivot.x += (changePivot[3] - changePivot[2]);
-           Datas[changePivotNum].pivot.y += (changePivot[1] - changePivot[0]);
-
-            changePivot[0] = 0;
-            changePivot[1] = 0;
-            changePivot[2] = 0;
-            changePivot[3] = 0;
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-            break;
-        case IDCANCEL:
-            changePivot[0]=0;
-            changePivot[1]=0;
-            changePivot[2]=0;
-            changePivot[3]=0;
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
             break;
@@ -360,6 +434,7 @@ INT_PTR CALLBACK Pivot_Change(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
     }
     return (INT_PTR)FALSE;
 }
+
 
 void DrawRect(HDC hdc, vector<RECT> & rec)
 {
@@ -483,6 +558,7 @@ void CalcAns()
     }
 
     frameTotalCount = rec.size();
+    frameEnd = frameTotalCount-1;
 
     for (int i = 0; i < frameTotalCount; i++)
     {
@@ -520,6 +596,10 @@ void ShowAni(HWND hWnd, HDC hdc)
 
     TransparentBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
 
+    TCHAR temp[20];
+    _stprintf_s(temp, L"Frame_Num: %d", frameCount);
+    TextOut(hdc, 100, 100, temp, _tcslen(temp));
+
     SelectObject(hMemDC, holdBitmap);
     DeleteDC(hMemDC);
 }
@@ -530,10 +610,11 @@ VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
     {
         frameCount++;
 
-        if (frameCount >= frameTotalCount)
+        if (frameCount > frameEnd)
         {
-            frameCount = 0;
+            frameCount = frameStart;
         }
+
 
         InvalidateRect(hWnd, NULL, TRUE);
     }
@@ -578,7 +659,7 @@ void SaveData()
     for (int i = 0; i < n; i++)
     {
         TCHAR index[50];
-        _stprintf_s(index, L"Index: %d\n", i);
+        _stprintf_s(index, L"Frame_Num: %d\n", i);
         WriteFile(hFile, index, (DWORD)_tcslen(index) * sizeof(TCHAR), &size, NULL);
 
         TCHAR offset[50];
@@ -593,6 +674,10 @@ void SaveData()
         _stprintf_s(pivot, L"Pivot: [%d, %d]\n\n", Datas[i].pivot.x, Datas[i].pivot.y);
         WriteFile(hFile, pivot, (DWORD)_tcslen(pivot) * sizeof(TCHAR), &size, NULL);
     }
+
+    TCHAR speed[50];
+    _stprintf_s(speed, L"Ani_Speed: %d\n\n", aniSpeed);
+    WriteFile(hFile, speed, (DWORD)_tcslen(speed) * sizeof(TCHAR), &size, NULL);
 
     MessageBox(NULL, _T("데이터가 저장되었습니다."), _T("알림"), MB_OK);
 
