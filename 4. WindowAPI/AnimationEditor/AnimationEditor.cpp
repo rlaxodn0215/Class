@@ -30,7 +30,7 @@ void ShowProc(HDC hdc);
 void CalcAns();
 void ShowAni(HDC hdc);
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
-void Init();
+void Init(HWND hWnd);
 void SaveData();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -163,11 +163,12 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
+ bool showAni = false;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
-    static bool showAni=false;
 
     switch (message)
     {
@@ -232,7 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case ID_INIT:
             {
-                Init();
+                Init(hWnd);
                 showAni = false;
             }
                 break;
@@ -465,17 +466,20 @@ void ShowAni(HDC hdc)
 
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
-    frameCount++;
-    
-    if (frameCount > frameTotalCount)
+    if (showAni)
     {
-        frameCount = 0;
-    }
+        frameCount++;
 
-    InvalidateRect(hWnd, NULL, TRUE);
+        if (frameCount >= frameTotalCount)
+        {
+            frameCount = 0;
+        }
+
+        InvalidateRect(hWnd, NULL, TRUE);
+    }
 }
 
-void Init()
+void Init(HWND hWnd)
 {
     startMousePos = {};
     moveMousePos = {};
@@ -484,6 +488,8 @@ void Init()
     pivotPos.clear();
     rec.clear();
     rec2 = {};
+
+    InvalidateRect(hWnd, NULL, TRUE);
 }
 
 void SaveData()
