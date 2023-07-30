@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "AnimationEditor.h"
 #include<vector>
+#include<commdlg.h>
 
 #pragma comment(lib, "msimg32.lib")
 
@@ -33,6 +34,7 @@ VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 void Init(HWND hWnd);
 INT_PTR CALLBACK Frame_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK Offset_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK File_Save(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 void SaveData();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -175,12 +177,18 @@ BITMAP bit;
 HWND hWd;
 HDC hc;
 
- bool showAni = false;
+bool showAni = false;
+
+TCHAR fileName[100];
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
+
+    OPENFILENAME SFN;
+    TCHAR str[100], lpstrFile[100] = _T("");
+    TCHAR filter[] = _T("Every File(*.*) \0 *.*\0 Text File\0*.txt;*.doc\0");
 
     switch (message)
     {
@@ -345,23 +353,7 @@ INT_PTR CALLBACK Offset_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
             ImageOffset.x = GetDlgItemInt(hDlg, IDC_OFFSET_X, NULL, FALSE);
             ImageOffset.y = GetDlgItemInt(hDlg, IDC_OFFSET_Y, NULL, FALSE);
 
-            HDC hMemDC;
-            HBITMAP hOldBitmap;
-            int bx, by;
-
-            hMemDC = CreateCompatibleDC(hc);
-            hOldBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
-            bx = bit.bmWidth;
-            by = bit.bmHeight;
-
-            DrawRect(hMemDC, rec);
-            BitBlt(hc, -ImageOffset.x, -ImageOffset.y, bx, by, hMemDC, 0, 0, SRCCOPY);
-
-            SelectObject(hMemDC, hOldBitmap);
-            DeleteDC(hMemDC);
-
-            DrawPivot(hc);
-
+            InvalidateRect(hWd, NULL, TRUE);
 
             return (INT_PTR)TRUE;
             break;
@@ -486,6 +478,26 @@ INT_PTR CALLBACK Frame_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
             break;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK File_Save(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND: 
+        if (LOWORD(wParam) == IDOK)
+        {
+            GetDlgItemText(hDlg, IDC_EDIT_FILENAME, fileName, sizeof(fileName) - 1);
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
         }
         break;
     }
@@ -708,8 +720,10 @@ void Init(HWND hWnd)
 
 void SaveData()
 {
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_SAVEDATA), hWd, File_Save);
+
     HANDLE hFile;
-    hFile = CreateFile(_T("test.txt"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, 0, 0);
+    hFile = CreateFile(fileName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, 0, 0);
 
     int n = rec.size();
     DWORD size;

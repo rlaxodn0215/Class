@@ -20,6 +20,7 @@
 #define IDD_CHANGEPIVOT                 129
 #define IDD_FRAMESETTINGS               129
 #define IDD_OFFSET                      131
+#define IDD_SAVEDATA                    132
 #define IDC_EDIT_PIVOTNUM               1000
 #define IDC_UP                          1001
 #define IDC_BUTTON2                     1002
@@ -31,6 +32,8 @@
 #define IDC_FRAME_START                 1007
 #define IDC_OFFSET_X                    1007
 #define IDC_FRAME_END                   1008
+#define IDC_EDIT1                       1008
+#define IDC_EDIT_FILENAME               1008
 #define IDC_SPEED_DOWN                  1009
 #define IDC_OFFSET_Y                    1009
 #define ID_MAKE_ANI                     32774
@@ -47,9 +50,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
