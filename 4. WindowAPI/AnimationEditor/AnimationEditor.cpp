@@ -211,7 +211,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
     {
-        startMousePos = { LOWORD(lParam), HIWORD(lParam) };
+        startMousePos = { ImageOffset.x + LOWORD(lParam),ImageOffset.y + HIWORD(lParam) };
     }
     break;
 
@@ -219,8 +219,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         if (wParam & MK_LBUTTON)
         {
-            moveMousePos = { LOWORD(lParam), HIWORD(lParam) };
-            rec2 = { startMousePos.x, startMousePos.y,moveMousePos.x,moveMousePos.y };
+            moveMousePos = {LOWORD(lParam),HIWORD(lParam) };
+            rec2 = { startMousePos.x - ImageOffset.x, startMousePos.y - ImageOffset.y, moveMousePos.x, moveMousePos.y };
             InvalidateRect(hWnd, NULL, FALSE);
         }
     }
@@ -228,14 +228,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_LBUTTONUP:
     {
-        endMousePos = { LOWORD(lParam), HIWORD(lParam) };
-        rec.push_back({ startMousePos.x, startMousePos.y,endMousePos.x,endMousePos.y });
+        endMousePos = { ImageOffset.x + LOWORD(lParam),ImageOffset.y + HIWORD(lParam) };
+        rec.push_back({startMousePos.x,startMousePos.y,endMousePos.x,endMousePos.y });
         InvalidateRect(hWnd, NULL, FALSE);
     }
         break;
     case WM_RBUTTONDOWN:
     {
-        pivotPos.push_back({ LOWORD(lParam), HIWORD(lParam) });
+        pivotPos.push_back({ ImageOffset.x + LOWORD(lParam),ImageOffset.y + HIWORD(lParam) });
         InvalidateRect(hWnd, NULL, FALSE);
     }
         break;
@@ -553,7 +553,8 @@ void DrawPivot(HDC hdc)
 
     for (int i = 0; i < pivotPos.size(); i++)
     {
-        Ellipse(hdc, pivotPos[i].x - radius, pivotPos[i].y - radius, pivotPos[i].x + radius, pivotPos[i].y + radius);
+        Ellipse(hdc, pivotPos[i].x - radius - ImageOffset.x, pivotPos[i].y - radius - ImageOffset.y
+            , pivotPos[i].x + radius - ImageOffset.x, pivotPos[i].y + radius - ImageOffset.y);
     }
    
     SelectObject(hdc, oldBrush);
