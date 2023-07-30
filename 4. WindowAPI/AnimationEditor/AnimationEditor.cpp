@@ -32,6 +32,7 @@ void ShowAni(HWND hWnd, HDC hdc);
 VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 void Init(HWND hWnd);
 INT_PTR CALLBACK Frame_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK Offset_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 void SaveData();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -172,6 +173,7 @@ HBITMAP hImage;
 BITMAP bit;
 
 HWND hWd;
+HDC hc;
 
  bool showAni = false;
 
@@ -236,6 +238,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
+            case ID_OFFSET:
+            {
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_OFFSET), hWnd, Offset_Settings);
+            }
+                break;
+
             case ID_INIT:
             {
                 Init(hWnd);
@@ -275,7 +283,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
              hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-
+             hc = hdc;
              if (showAni)
              {
                  ShowAni(hWnd,hdc);
@@ -312,6 +320,55 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK Offset_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        SetDlgItemInt(hDlg, IDC_OFFSET_X, ImageOffset.x, FALSE);
+        SetDlgItemInt(hDlg, IDC_OFFSET_Y, ImageOffset.y, FALSE);
+    }
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case ID_OFFSETOK:
+            ImageOffset.x = GetDlgItemInt(hDlg, IDC_OFFSET_X, NULL, FALSE);
+            ImageOffset.y = GetDlgItemInt(hDlg, IDC_OFFSET_Y, NULL, FALSE);
+
+            HDC hMemDC;
+            HBITMAP hOldBitmap;
+            int bx, by;
+
+            hMemDC = CreateCompatibleDC(hc);
+            hOldBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
+            bx = bit.bmWidth;
+            by = bit.bmHeight;
+
+            DrawRect(hMemDC, rec);
+            BitBlt(hc, -ImageOffset.x, -ImageOffset.y, bx, by, hMemDC, 0, 0, SRCCOPY);
+
+            SelectObject(hMemDC, hOldBitmap);
+            DeleteDC(hMemDC);
+
+            DrawPivot(hc);
+
+
+            return (INT_PTR)TRUE;
+            break;
+        case IDOK:
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+            break;
         }
         break;
     }
