@@ -153,8 +153,6 @@ struct AniAns
 int changePivot[4] = {0}; // up - down - left - right
 int changePivotNum;
 
-
-
 vector<AniAns> Datas;
 int frameTotalCount;
 int frameStart = 0;
@@ -194,7 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/test.bmp"),
+        hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/WindyPlane.bmp"),
             IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
         if (hImage == NULL)
@@ -229,7 +227,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_LBUTTONUP:
     {
         endMousePos = { ImageOffset.x + LOWORD(lParam),ImageOffset.y + HIWORD(lParam) };
-        rec.push_back({startMousePos.x,startMousePos.y,endMousePos.x,endMousePos.y });
+
+        if (startMousePos.x > endMousePos.x && startMousePos.y > endMousePos.y)
+        {
+            rec.push_back({ endMousePos.x,endMousePos.y,startMousePos.x,startMousePos.y });
+        }
+
+        else
+        {
+            rec.push_back({startMousePos.x,startMousePos.y,endMousePos.x,endMousePos.y });
+        }
+
         InvalidateRect(hWnd, NULL, FALSE);
     }
         break;
@@ -350,8 +358,8 @@ INT_PTR CALLBACK Offset_Settings(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         switch (LOWORD(wParam))
         {
         case ID_OFFSETOK:
-            ImageOffset.x = GetDlgItemInt(hDlg, IDC_OFFSET_X, NULL, FALSE);
-            ImageOffset.y = GetDlgItemInt(hDlg, IDC_OFFSET_Y, NULL, FALSE);
+            ImageOffset.x = GetDlgItemInt(hDlg, IDC_OFFSET_X, NULL, TRUE);
+            ImageOffset.y = GetDlgItemInt(hDlg, IDC_OFFSET_Y, NULL, TRUE);
 
             InvalidateRect(hWd, NULL, TRUE);
 
@@ -704,7 +712,7 @@ void Init(HWND hWnd)
     frameTotalCount = 0;
     Datas.clear();
 
-    hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/test.bmp"),
+    hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/WindyPlane.bmp"),
         IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
     if (hImage == NULL)
