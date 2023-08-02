@@ -24,6 +24,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void DrawRect(HDC hdc, vector<RECT> & rec);
+void SetMinArea(HDC hdc);
 void DrawRectInstant(HDC hdc, RECT & rec);
 void DrawPivot(HDC hdc);
 void ShowPosInfo(HDC hdc);
@@ -150,7 +151,7 @@ struct AniAns
     POINT pivot;
 };
 
-int changePivot[4] = {0}; // up - down - left - right
+//int changePivot[4] = {0}; // up - down - left - right
 int changePivotNum;
 
 vector<AniAns> Datas;
@@ -172,10 +173,15 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
+COLORREF transparentColor = RGB(255, 0, 255);
+COLORREF BoxColor = RGB(0, 0, 255);
+COLORREF PivotColor = RGB(255, 0, 0);
+
 HWND hWd;
 HDC hc;
 
 bool showAni = false;
+bool recUpdate = false;
 
 TCHAR fileName[100];
 
@@ -209,12 +215,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
     {
-        startMousePos = { ImageOffset.x + LOWORD(lParam),ImageOffset.y + HIWORD(lParam) };
+        int mousePX = ImageOffset.x + LOWORD(lParam);
+        int mousePY = ImageOffset.y + HIWORD(lParam);
+
+        if (mousePX < 0) mousePX = 0;
+        else if (mousePX > bit.bmWidth) mousePX = bit.bmWidth;
+
+        if (mousePY < 0) mousePY = 0;
+        else if (mousePY > bit.bmHeight) mousePY = bit.bmHeight;
+
+        startMousePos = { mousePX,mousePY };
+
     }
     break;
 
     case WM_MOUSEMOVE:
     {
+
         if (wParam & MK_LBUTTON)
         {
             moveMousePos = {LOWORD(lParam),HIWORD(lParam) };
@@ -226,7 +243,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_LBUTTONUP:
     {
-        endMousePos = { ImageOffset.x + LOWORD(lParam),ImageOffset.y + HIWORD(lParam) };
+        int mousePX = ImageOffset.x + LOWORD(lParam);
+        int mousePY = ImageOffset.y + HIWORD(lParam);
+
+        if (mousePX < 0) mousePX = 0;
+        else if (mousePX > bit.bmWidth) mousePX = bit.bmWidth;
+
+        if (mousePY < 0) mousePY = 0;
+        else if (mousePY > bit.bmHeight) mousePY = bit.bmHeight;
+
+        endMousePos = { mousePX, mousePY };
 
         if (startMousePos.x > endMousePos.x && startMousePos.y > endMousePos.y)
         {
@@ -235,9 +261,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         else
         {
-            rec.push_back({startMousePos.x,startMousePos.y,endMousePos.x,endMousePos.y });
+            rec.push_back({ startMousePos.x,startMousePos.y,endMousePos.x,endMousePos.y });
         }
 
+        recUpdate = false;
         InvalidateRect(hWnd, NULL, FALSE);
     }
         break;
@@ -302,7 +329,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              hc = hdc;
              if (showAni)
              {
-                 ShowAni(hWnd,hdc);
+                 ShowAni(hWnd, hdc);
              }
 
              else
@@ -517,14 +544,14 @@ void DrawRect(HDC hdc, vector<RECT> & rec)
 {
     HPEN hPen, oldPen;
     HBRUSH hBrush, hOldBrush;
-    hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+    hPen = CreatePen(PS_SOLID, 1, BoxColor);
     oldPen = (HPEN)SelectObject(hdc, hPen);
     hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
     hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
     for (int i = 0; i < rec.size(); i++)
     {
-        Rectangle(hdc, rec[i].left, rec[i].top, rec[i].right, rec[i].bottom);
+        Rectangle(hdc, rec[i].left, rec[i].top,rec[i].right, rec[i].bottom);
     }
 
     SelectObject(hdc, oldPen);
@@ -534,11 +561,94 @@ void DrawRect(HDC hdc, vector<RECT> & rec)
     
 }
 
+void SetMinArea(HDC hdc)
+{
+
+    if (!rec.empty() && !recUpdate)
+    {
+        RECT rc = rec.back();
+        bool temp = false;
+
+        for (int i = rc.top; i <= rc.bottom; i++) //top
+        {
+            temp = false;
+            for (int j = rc.left; j <= rc.right; j++)
+            {
+                if (GetPixel(hdc, j, i) != transparentColor)
+                {
+                    rc.top = i;
+                    temp = true;
+                    break;
+                }
+            }
+
+            if (temp) break;
+        }
+
+        for (int i = rc.left; i <= rc.right; i++) //left
+        {
+            temp = false;
+            for (int j = rc.top; j <= rc.bottom; j++)
+            {
+                if (GetPixel(hdc, i, j) != transparentColor)
+                {
+                    rc.left = i;
+                    temp = true;
+                    break;
+                }
+            }
+
+            if (temp) break;
+        }
+
+        for (int i =rc.bottom; i >= rc.top; i--) //bottom
+        {
+            temp = false;
+            for (int j = rc.left; j <= rc.right; j++)
+            {
+                if (GetPixel(hdc, j, i) != transparentColor)
+                {
+                    rc.bottom = i;
+                    temp = true;
+                    break;
+                }
+            }
+
+            if (temp) break;
+        }
+
+        for (int i = rc.right; i >= rc.left; i--) //right
+        {
+            temp = false;
+            for (int j = rc.top; j <= rc.bottom; j++)
+            {
+                if (GetPixel(hdc, i, j) != transparentColor)
+                {
+                    rc.right = i;
+                    temp = true;
+                    break;
+                }
+            }
+
+            if (temp) break;
+        }
+
+        rec2.top=rc.top-ImageOffset.y;
+        rec2.bottom=rc.bottom-ImageOffset.y;
+        rec2.left=rc.left-ImageOffset.x;
+        rec2.right=rc.right-ImageOffset.x;
+
+        rec.pop_back();
+        rec.push_back(rc);
+        recUpdate = true;
+    }
+}
+
 void DrawRectInstant(HDC hdc, RECT& rec)
 {
     HPEN hPen, oldPen;
     HBRUSH hBrush, hOldBrush;
-    hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+    hPen = CreatePen(PS_SOLID, 1, BoxColor);
     oldPen = (HPEN)SelectObject(hdc, hPen);
     hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
     hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
@@ -556,7 +666,7 @@ void DrawPivot(HDC hdc)
     int radius = 2;
 
     HBRUSH hBrush, oldBrush;
-    hBrush = CreateSolidBrush(RGB(255, 0, 0));
+    hBrush = CreateSolidBrush(PivotColor);
     oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
     for (int i = 0; i < pivotPos.size(); i++)
@@ -606,15 +716,14 @@ void ShowProc(HDC hdc)
     HDC hMemDC;
     HBITMAP hOldBitmap;
 
-    HDC hMemDC2;
-    HBITMAP hOldBitmap2;
-
     int bx, by;
 
     hMemDC = CreateCompatibleDC(hdc);
     hOldBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
     bx = bit.bmWidth;
     by = bit.bmHeight;
+
+    SetMinArea(hMemDC);
     DrawRect(hMemDC, rec);
 
     BitBlt(hdc, -ImageOffset.x, -ImageOffset.y, bx, by, hMemDC, 0, 0, SRCCOPY);
@@ -622,7 +731,9 @@ void ShowProc(HDC hdc)
     SelectObject(hMemDC, hOldBitmap);
     DeleteDC(hMemDC);
 
+   // if(!recUpdate)
     DrawRectInstant(hdc, rec2);
+
     DrawPivot(hdc);
     //ShowPosInfo(hdc);
 }
@@ -672,7 +783,7 @@ void ShowAni(HWND hWnd, HDC hdc)
     int posX = showPos.x - Datas[frameCount].pivot.x;
     int posY = showPos.y - Datas[frameCount].pivot.y;
 
-    TransparentBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
+    TransparentBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, bx, by, transparentColor);
 
     TCHAR temp[20];
     _stprintf_s(temp, L"Frame_Num: %d", frameCount);
