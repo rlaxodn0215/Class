@@ -25,12 +25,35 @@ private:
 
 	cVector3		m_vPosition;
 	float			m_fBoxRotY;
+	cVector3		m_vBoxDirection;
+
+
+	// for grid
+	std::vector<cVector3>		m_vecLineVertex;
+	cVector3					m_vAxisXTextPosition;
+	cVector3					m_vAxisZTextPosition;
+
+
+	POINT		m_ptPrevMouse;
+	bool		m_isLButtonDown;
+	float		m_fCameraDistance;
+	cVector3	m_vCamRotAngle;
+
+	float		m_fScale;
 
 public:
 	void SetUp();
 	void Update();
 	void Render(HDC hdc);
 	void WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	bool IsBackSpace(cVector3& v1, cVector3& v2, cVector3& v3);
+
+	void SetGrid();
+	void DrawGrid();
+
+	void Update_Rotation();
+	void Update_Move();
+	void Update_Scale();
 
 };
 
