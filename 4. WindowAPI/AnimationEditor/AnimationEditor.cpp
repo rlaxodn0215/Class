@@ -173,7 +173,7 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
-COLORREF transparentColor = RGB(255, 0, 255);
+COLORREF transparentColor = RGB(0, 255, 0);
 COLORREF BoxColor = RGB(0, 0, 255);
 COLORREF PivotColor = RGB(255, 0, 0);
 
@@ -184,6 +184,7 @@ bool showAni = false;
 bool recUpdate = false;
 
 TCHAR fileName[100];
+TCHAR ImageName[100] = _T("Bitmap/Background.bmp");
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -198,7 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/WindyPlane.bmp"),
+        hImage = (HBITMAP)LoadImage(NULL, ImageName,
             IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
         if (hImage == NULL)
@@ -823,7 +824,7 @@ void Init(HWND hWnd)
     frameTotalCount = 0;
     Datas.clear();
 
-    hImage = (HBITMAP)LoadImage(NULL, TEXT("Bitmap/WindyPlane.bmp"),
+    hImage = (HBITMAP)LoadImage(NULL, ImageName,
         IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
     if (hImage == NULL)
