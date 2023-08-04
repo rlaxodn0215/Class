@@ -14,5 +14,6 @@ public:
 	~Camera();
 
 	void CameraMove(POINT endpoint);
+	void ShowCameraCenter();
 };
 

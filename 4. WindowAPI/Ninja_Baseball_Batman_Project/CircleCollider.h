@@ -19,5 +19,7 @@ public:
 	BOOL OnCollisionEnter();
 	BOOL OnCollisionStay();
 	BOOL OnCollisionExit();
+
+	void ShowCollider();
 };
 

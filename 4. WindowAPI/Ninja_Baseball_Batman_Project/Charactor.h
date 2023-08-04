@@ -52,6 +52,7 @@ public:
 	int GetHP() { return m_Hp; }
 	void SetHP(int hp) { m_Hp = hp; }
 	void ChangeAni(const string & beforeAniName, const string & afterAniName);
+	void ShowCharactorStatus();
 };
 
 class Player : public Charactor
