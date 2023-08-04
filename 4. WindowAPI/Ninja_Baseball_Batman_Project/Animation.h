@@ -2,11 +2,12 @@
 
 #include"framework.h"
 
+using namespace std;
+
 class Animation
 {
 private:
-	TCHAR m_FileName[100];
-	TCHAR m_AniName[50];
+	string m_FileName[100];
 	POINT m_Offset;
 	POINT m_Pivot;
 	int m_Width;
@@ -16,8 +17,8 @@ private:
 
 public:
 	Animation();
-	Animation(TCHAR filename[], TCHAR m_AniName[], POINT offset,
-		POINT pivot, int width, int height, int frameCount, int frameSpeed);
+	Animation(string filename, POINT offset, POINT pivot, 
+		int width, int height, int frameCount, int frameSpeed);
 	~Animation() {};
 
 	void SetFrameSpeed(int frameSpeed) { m_FrameSpeed = frameSpeed; }
@@ -26,7 +27,6 @@ public:
 
 	void StartAni();
 	void StopAni();
-	void ChangeAni(TCHAR beforeAniName[], TCHAR afterAniName[]);
 	void GotoFrame(int frameNum);
 
 };

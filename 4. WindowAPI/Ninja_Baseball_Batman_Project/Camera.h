@@ -4,17 +4,15 @@
 class Camera
 {
 private:
-	POINT m_SpriteOffset;
-	int m_Width;
-	int m_Height;
+	RECT m_SceneArea; //sprite ±‚¡ÿ
 	POINT m_CamCenter;
 	int m_CamMoveOffset;
 
 public:
 	Camera();
-	Camera(POINT spriteOffset, int width, int height, POINT camCenter, int camOffset);
+	Camera(RECT sceneArea, int camOffset);
 	~Camera();
 
-	void CameraMove();
+	void CameraMove(POINT endpoint);
 };
 
