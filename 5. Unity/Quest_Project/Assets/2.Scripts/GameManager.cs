@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -16,7 +17,15 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     private GameObject startTitle;
 
+    [SerializeField]
+    private GameObject gameingTitle;
+
+    [SerializeField]
+    private Button turnButton;
+
     private GameObject playerObj;
+    private int steps;
+    public int Steps { get { return steps; } set { steps = value; } }
 
     public Camera cam;
     Ray ray;
@@ -64,8 +73,10 @@ public class GameManager : Singleton<GameManager>
             }
         }
 
-        if(playerObj !=null)
-        playerObj.GetComponent<Player>().Walkable();
+        if (playerObj != null)
+        {
+            playerObj.GetComponent<Player>().Walkable();
+        }
     }
 
 
@@ -73,6 +84,7 @@ public class GameManager : Singleton<GameManager>
     {
         //UI삭제
         startTitle.SetActive(false);
+        gameingTitle.SetActive(true);
 
         //바닥 생성
         for (int i = 0; i < rows; i++)
@@ -89,6 +101,7 @@ public class GameManager : Singleton<GameManager>
         //플레이어 생성
         playerObj = Instantiate(player, new Vector3(transform.position.x, 1.5f, transform.position.z), Quaternion.identity);
         dest = playerObj.transform.position;
+        steps = playerObj.GetComponent<Player>().AllowMoveSteps;
 
         //적 생성
         for (int i = 0; i < enemyNum;i++)
@@ -107,11 +120,10 @@ public class GameManager : Singleton<GameManager>
         {
             for (int j = 0; j < collums; j++)
             {
-                grid[i, j].gameObject.GetComponent<Renderer>().material.color = Color.grey;
+                grid[i, j].gameObject.GetComponent<Renderer>().material.color = Color.white;
             }
         }
 
-        int steps = playerObj.GetComponent<Player>().AllowMoveSteps;
         int x = (int)playerObj.transform.position.x;
         int z = (int)playerObj.transform.position.z;
         GameObject playerPosBlock = grid[x, z];
@@ -136,5 +148,43 @@ public class GameManager : Singleton<GameManager>
     {
         Debug.Log("게임이 종료됩니다");
         Application.Quit();
+    }
+
+    public void Turn()
+    {
+        if (turnButton.GetComponent<Image>().fillAmount == 1)
+        {
+            turnButton.GetComponent<Image>().fillAmount = 0;
+            turnButton.transform.GetChild(0).gameObject.SetActive(false);
+            turnButton.transform.GetChild(1).gameObject.SetActive(true);
+
+            StartCoroutine(FillingButton());
+            
+        }
+
+        else
+        {
+            Debug.Log("기다리세요...");
+        }
+    }
+
+    private IEnumerator FillingButton()
+    {
+        while (true)
+        {
+            float fillSpeed = 3.5f;
+            turnButton.GetComponent<Image>().fillAmount += fillSpeed * Time.deltaTime;
+           // Debug.Log(turnButton.GetComponent<Image>().fillAmount);
+
+            if (turnButton.GetComponent<Image>().fillAmount >= 1)
+            {
+                turnButton.transform.GetChild(0).gameObject.SetActive(true);
+                turnButton.transform.GetChild(1).gameObject.SetActive(false);
+                break;
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        steps = playerObj.GetComponent<Player>().AllowMoveSteps;
     }
 }
