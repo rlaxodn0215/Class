@@ -173,7 +173,7 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
-COLORREF transparentColor = RGB(0, 255, 0);
+COLORREF transparentColor = RGB(255, 0, 255);
 COLORREF BoxColor = RGB(0, 0, 255);
 COLORREF PivotColor = RGB(255, 0, 0);
 
@@ -184,7 +184,7 @@ bool showAni = false;
 bool recUpdate = false;
 
 TCHAR fileName[100];
-TCHAR ImageName[100] = _T("Bitmap/Background.bmp");
+TCHAR ImageName[100] = _T("Bitmap/StartScene.bmp");
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -848,28 +848,45 @@ void SaveData()
 
     int n = rec.size();
     DWORD size;
+
+    TCHAR length[100];
+    _stprintf_s(length, L"%d\n", n);
+    WriteFile(hFile, length, (DWORD)_tcslen(length) * sizeof(TCHAR), &size, NULL);
+
+    TCHAR transparentColor[100];
+    _stprintf_s(transparentColor, L"%d\n", transparentColor);
+    WriteFile(hFile, transparentColor, (DWORD)_tcslen(transparentColor) * sizeof(TCHAR), &size, NULL);
+
     for (int i = 0; i < n; i++)
     {
-        TCHAR index[50];
-        _stprintf_s(index, L"Frame_Num: %d\n", i);
+        TCHAR index[10];
+        _stprintf_s(index, L"%d\n", i);
         WriteFile(hFile, index, (DWORD)_tcslen(index) * sizeof(TCHAR), &size, NULL);
 
-        TCHAR offset[50];
-        _stprintf_s(offset, L"Offset: [%d, %d]\n", Datas[i].offset.x, Datas[i].offset.y);
-        WriteFile(hFile, offset, (DWORD)_tcslen(offset) * sizeof(TCHAR), &size, NULL);
+        TCHAR offsetX[10];
+        _stprintf_s(offsetX, L"%d\n", Datas[i].offset.x);
+        WriteFile(hFile, offsetX, (DWORD)_tcslen(offsetX) * sizeof(TCHAR), &size, NULL);
 
-        TCHAR Width_Height[50];
-        _stprintf_s(Width_Height, L"Width_Height: [%d, %d]\n", Datas[i].width, Datas[i].height);
-        WriteFile(hFile, Width_Height, (DWORD)_tcslen(Width_Height) * sizeof(TCHAR), &size, NULL);
+        TCHAR offsetY[10];
+        _stprintf_s(offsetY, L"%d\n", Datas[i].offset.y);
+        WriteFile(hFile, offsetY, (DWORD)_tcslen(offsetY) * sizeof(TCHAR), &size, NULL);
 
-        TCHAR pivot[50];
-        _stprintf_s(pivot, L"Pivot: [%d, %d]\n\n", Datas[i].pivot.x, Datas[i].pivot.y);
-        WriteFile(hFile, pivot, (DWORD)_tcslen(pivot) * sizeof(TCHAR), &size, NULL);
+        TCHAR Width[10];
+        _stprintf_s(Width, L"%d\n", Datas[i].width);
+        WriteFile(hFile, Width, (DWORD)_tcslen(Width) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR Height[10];
+        _stprintf_s(Height, L"%d\n", Datas[i].height);
+        WriteFile(hFile, Height, (DWORD)_tcslen(Height) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR pivotX[10];
+        _stprintf_s(pivotX, L"%d\n", Datas[i].pivot.x);
+        WriteFile(hFile, pivotX, (DWORD)_tcslen(pivotX) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR pivotY[10];
+        _stprintf_s(pivotY, L"%d\n", Datas[i].pivot.y);
+        WriteFile(hFile, pivotY, (DWORD)_tcslen(pivotY) * sizeof(TCHAR), &size, NULL);
     }
-
-    TCHAR speed[50];
-    _stprintf_s(speed, L"Ani_Speed: %d\n\n", aniSpeed);
-    WriteFile(hFile, speed, (DWORD)_tcslen(speed) * sizeof(TCHAR), &size, NULL);
 
     MessageBox(NULL, _T("데이터가 저장되었습니다."), _T("알림"), MB_OK);
 

@@ -1,26 +1,41 @@
 ﻿// Ninja_Baseball_Batman_Project.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
-#include "framework.h"
-#include "Ninja_Baseball_Batman_Project.h"
+#include"Headers.h"
+#include"Timers.h"
 
 #define MAX_LOADSTRING 100
+
+#pragma comment(lib, "msimg32.lib")
+
+using namespace std;
+
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
+#endif // UNICODE
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
+
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void Initalize();
-void StartScene();
-void SelectScene();
-void BattleScene();
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
+
+void Initalize(HWND hWnd);
+void SelectStage(int stageNum);
+void ShowStage(HDC hdc);
 void RankScene();
+void EndGame(HWND hWnd);
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -59,7 +74,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     return (int) msg.wParam;
 }
-
 
 
 //
@@ -126,14 +140,41 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+
+Stage* CurStage;
+Sprite* CurStageArea;
+Charactor* CurPlayer;
+vector<RECT> CurLimitArea;
+vector<shared_ptr<Charactor>> CurMonsters;
+map<string, shared_ptr<Sound>> CurSounds;
+map<string, shared_ptr<Animation>> CurAnis;
+
+int StageNum = 0;
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    
+    PAINTSTRUCT ps;
+    HDC hdc;
+    static RECT winRect;
+
     switch (message)
     {
 
     case WM_CREATE:
-        Initalize();
+        {
+            GetClientRect(hWnd, &winRect);
+            Initalize(hWnd);
+            SelectStage(StageNum);
+        }
+        break;
+    case WM_CHAR:
+    {
+        if (StageNum == 0)
+        {
+            cout << "다음 스테이지로..." << endl;
+        }
+    }
         break;
     case WM_COMMAND:
         {
@@ -154,13 +195,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+            hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+            
+
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
+        EndGame(hWnd);
         PostQuitMessage(0);
         break;
     default:
@@ -187,8 +230,80 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+
 }
 
-void Initalize()
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
+    //타이머를 호출한 객체
+
+
+
+    InvalidateRect(hWnd, NULL, TRUE);    
+}
+
+void Initalize(HWND hWnd)
+{
+    CurStage = NULL;
+    CurStageArea = NULL;
+    CurPlayer = NULL;
+    CurLimitArea.clear();
+    CurMonsters.clear();
+    CurSounds.clear();
+    CurAnis.clear();
+}
+
+
+void SelectStage(int stageNum)
+{
+    // 현재 스테이지에 필요한 데이터 옮기고 삭제
+    Stage* tempStage = CurStage;
+    Sprite* tempStageArea = CurStageArea;
+    Charactor* tempCurPlayer = CurPlayer;
+
+    if (stageNum == 0)
+    {
+        CurStageArea = NULL;
+        CurLimitArea.clear();
+        CurMonsters.clear();
+        CurSounds.clear();
+        shared_ptr<Animation> temp(new Animation(_T("Image/UI/StartScene.bmp"), _T("AniData/UI/StartScene.txt")));
+        CurAnis["Moving_Image"] = temp;
+
+        CurStage = new Stage(stageNum, CurStageArea, CurLimitArea, CurMonsters, CurSounds, CurAnis, false);
+    }
+
+    else if (stageNum == 1)
+    {
+        CurAnis.erase("Moving_Image");
+    }
+
+    delete tempStage;
+    delete tempStageArea;
+    delete tempCurPlayer;
+}
+
+void ShowStage(HWND hWnd,HDC hdc)
+{
+    //CurAnis["Moving_Image"]->AniPlay(hWnd, hdc, { 512,384 }, TIMER_TEST, 500, AniProc);
+}
+
+void RankScene()
+{
+}
+
+void EndGame(HWND hWnd)
+{
+    delete CurStage;
+    delete CurStageArea;
+    delete CurPlayer;
+
+    //스마트 포인터를 사용하지 않을 경우
+    //// 메모리 해제
+    //for (const auto & pair : myMap) {
+    //    delete pair.second; // 할당된 메모리 해제
+    //}
+    //myMap.clear(); // map에서 항목 제거
+
+    KillTimer(hWnd, TIMER_TEST);
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include<map>
 #include<string>
-#include"UI.h"
 #include"Camera.h"
 #include"Charactor.h"
 #include"Stage.h"
@@ -14,11 +13,10 @@ private:
 	int m_PlayerLife;
 	int m_PlayerHP;
 	int m_BossMonsterHP;
-	map<string, UI> m_UIs; // 가변적인 data 관련 UI
 
 public:
 	GameManager();
-	GameManager(int playerLife,int playerHP, int curStageNum, int bossMosterHP, map<string, UI>  & UI);
+	GameManager(int playerLife,int playerHP, int curStageNum, int bossMosterHP);
 	~GameManager() {};
 
 	void ShowPlayerLife(const Charactor & player);
