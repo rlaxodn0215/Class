@@ -17,18 +17,19 @@ private:
 	vector<RECT> m_LimitArea;
 	vector<shared_ptr<Charactor>> m_Monsters;
 	map<string, shared_ptr<Sound>> m_BGMs;
-	map<string, shared_ptr<Animation>> m_Animations;
+	map<string, shared_ptr<Animation>> m_MonstersAni;
+	map<string, shared_ptr<Animation>> m_UIAni;
 	bool m_isFinish;
 
 public:
 	Stage() {};
 	Stage(int stageNum, Sprite * stageArea, vector<RECT> & limitArea, vector<shared_ptr<Charactor>>& monsters,
-		map<string, shared_ptr<Sound>> & BGM, map<string, shared_ptr<Animation>> & Anis, bool isFinish);
+		map<string, shared_ptr<Sound>> & BGM, map<string, shared_ptr<Animation>> & monstersAni,
+		map<string, shared_ptr<Animation>> & uiAni, bool isFinish);
 	~Stage();
 	int GetStageNum() { return m_StageNum; }
 	Sprite *GetStageArea() { return m_StageArea; }
 	void SetFinish(bool f) { m_isFinish = f; }
-	BOOL StageStart();
-	BOOL StageEnd();
+	void ShowUIStage(HWND hWnd, HDC hdc, int timerDefine, int delayTime, TIMERPROC func);
 };
 

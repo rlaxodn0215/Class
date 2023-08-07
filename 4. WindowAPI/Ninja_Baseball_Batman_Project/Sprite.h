@@ -27,7 +27,7 @@ public:
 	COLORREF GetTransparentColor() { return m_TransparentColor; }
 
 	Sprite();
-	Sprite(const TCHAR filename[100],const TCHAR dataname[100], int & readIndexNum);
+	Sprite(const TCHAR filename[100],const TCHAR dataname[100], HANDLE hFile, int & readIndexNum, char chbuff[]);
 	~Sprite() {};
 	
 	void ShowSprite(HDC hdc, POINT location);

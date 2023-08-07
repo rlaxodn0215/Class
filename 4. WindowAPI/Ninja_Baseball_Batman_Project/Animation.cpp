@@ -2,6 +2,7 @@
 
 Animation::Animation()
 {
+	m_FrameCurCount = 0;
 }
 
 Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])//파일 입출력으로 정보 자동으로 받아서 저장
@@ -17,6 +18,7 @@ Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])/
 
 	int frameCount;
 	int transparentColor;
+	m_FrameCurCount = 0;
 
 	TCHAR buff[100] = {};
 	char chbuff[100] = {};
@@ -40,16 +42,16 @@ Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])/
 	}
 	i++;
 	frameCount = temp;
-	temp = 0;
-	CloseHandle(hFile);
+	m_FrameTotalCount = temp;
 	
 	for (int j = 0; j < frameCount; j++)
 	{
-		Sprite tempAni = Sprite::Sprite(imageName, textFileName,i);
+		Sprite tempAni = Sprite::Sprite(imageName, textFileName,hFile, i, chbuff);
 		m_Sprites.push_back(tempAni);
 	}
 
-	
+	CloseHandle(hFile);
+
 }
 
 Animation::~Animation()
@@ -57,8 +59,9 @@ Animation::~Animation()
 	
 }
 
-void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location, int spriteIndex)
+void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location,int spriteIndex, float imageRatio, int timerDefine, int delayTime, TIMERPROC func)
 {
+	SetTimer(hWnd, timerDefine, delayTime, func);
 
 	HDC hMemDC;
 	HBITMAP holdBitmap;
@@ -70,10 +73,10 @@ void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location, int spriteIndex)
 	int by = m_Sprites[spriteIndex].GetHeight();
 	int xStart = m_Sprites[spriteIndex].GetOffset().x;
 	int yStart = m_Sprites[spriteIndex].GetOffset().y;
-	int posX = location.x - m_Sprites[spriteIndex].GetPivot().x;
-	int posY = location.y - m_Sprites[spriteIndex].GetPivot().y;
+	int posX = location.x - m_Sprites[spriteIndex].GetPivot().x * imageRatio;
+	int posY = location.y - m_Sprites[spriteIndex].GetPivot().y * imageRatio;
 
-	TransparentBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, bx, by, m_Sprites[spriteIndex].GetTransparentColor());
+	TransparentBlt(hdc, posX, posY, bx * imageRatio, by * imageRatio, hMemDC, xStart, yStart, bx, by, m_Sprites[spriteIndex].GetTransparentColor());
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);

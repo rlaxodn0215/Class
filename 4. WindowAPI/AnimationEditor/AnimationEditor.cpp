@@ -853,10 +853,6 @@ void SaveData()
     _stprintf_s(length, L"%d\n", n);
     WriteFile(hFile, length, (DWORD)_tcslen(length) * sizeof(TCHAR), &size, NULL);
 
-    TCHAR transparentColor[100];
-    _stprintf_s(transparentColor, L"%d\n", transparentColor);
-    WriteFile(hFile, transparentColor, (DWORD)_tcslen(transparentColor) * sizeof(TCHAR), &size, NULL);
-
     for (int i = 0; i < n; i++)
     {
         TCHAR index[10];
@@ -886,6 +882,10 @@ void SaveData()
         TCHAR pivotY[10];
         _stprintf_s(pivotY, L"%d\n", Datas[i].pivot.y);
         WriteFile(hFile, pivotY, (DWORD)_tcslen(pivotY) * sizeof(TCHAR), &size, NULL);
+
+        TCHAR transparentColor[100];
+        _stprintf_s(transparentColor, L"%d\n", transparentColor);
+        WriteFile(hFile, transparentColor, (DWORD)_tcslen(transparentColor) * sizeof(TCHAR), &size, NULL);
     }
 
     MessageBox(NULL, _T("데이터가 저장되었습니다."), _T("알림"), MB_OK);

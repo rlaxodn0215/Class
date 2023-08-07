@@ -28,11 +28,10 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
+VOID CALLBACK AniUIProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
 void Initalize(HWND hWnd);
 void SelectStage(int stageNum);
-void ShowStage(HDC hdc);
 void RankScene();
 void EndGame(HWND hWnd);
 
@@ -143,14 +142,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 Stage* CurStage;
 Sprite* CurStageArea;
+
 Charactor* CurPlayer;
+map<string, shared_ptr<Animation>> CurPlayerAnis;
+
 vector<RECT> CurLimitArea;
+
 vector<shared_ptr<Charactor>> CurMonsters;
+map<string, shared_ptr<Animation>> CurMonstersAnis;
+
 map<string, shared_ptr<Sound>> CurSounds;
-map<string, shared_ptr<Animation>> CurAnis;
+
+map<string, shared_ptr<Animation>> CurUIAnis;
 
 int StageNum = 0;
-
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -197,7 +202,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            
+            CurStage->ShowUIStage(hWnd, hdc,TIMER_TEST,500,AniUIProc);
 
             EndPaint(hWnd, &ps);
         }
@@ -233,11 +238,17 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 }
 
-VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+VOID CALLBACK AniUIProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
-    //타이머를 호출한 객체
+    string aniName ="StartScene";
 
+    int temp = CurUIAnis[aniName]->GetFrameCurCount() + 1;
+    CurUIAnis[aniName]->SetFrameCurCount(temp);
 
+    if (CurUIAnis[aniName]->GetFrameCurCount() >= CurUIAnis[aniName]->GetFrameTotalCount())
+    {
+        CurUIAnis[aniName]->SetFrameCurCount(0);
+    }
 
     InvalidateRect(hWnd, NULL, TRUE);    
 }
@@ -247,10 +258,12 @@ void Initalize(HWND hWnd)
     CurStage = NULL;
     CurStageArea = NULL;
     CurPlayer = NULL;
+    CurPlayerAnis.clear();
     CurLimitArea.clear();
     CurMonsters.clear();
+    CurMonstersAnis.clear();
     CurSounds.clear();
-    CurAnis.clear();
+    CurUIAnis.clear();
 }
 
 
@@ -263,29 +276,21 @@ void SelectStage(int stageNum)
 
     if (stageNum == 0)
     {
-        CurStageArea = NULL;
-        CurLimitArea.clear();
-        CurMonsters.clear();
-        CurSounds.clear();
         shared_ptr<Animation> temp(new Animation(_T("Image/UI/StartScene.bmp"), _T("AniData/UI/StartScene.txt")));
-        CurAnis["Moving_Image"] = temp;
+        CurUIAnis["StartScene"] = temp;
 
-        CurStage = new Stage(stageNum, CurStageArea, CurLimitArea, CurMonsters, CurSounds, CurAnis, false);
+        CurStage = new Stage(stageNum, CurStageArea, CurLimitArea, CurMonsters,
+            CurSounds,CurMonstersAnis, CurUIAnis, false);
     }
 
     else if (stageNum == 1)
     {
-        CurAnis.erase("Moving_Image");
+        CurUIAnis.erase("StartScene");
     }
 
     delete tempStage;
     delete tempStageArea;
     delete tempCurPlayer;
-}
-
-void ShowStage(HWND hWnd,HDC hdc)
-{
-    //CurAnis["Moving_Image"]->AniPlay(hWnd, hdc, { 512,384 }, TIMER_TEST, 500, AniProc);
 }
 
 void RankScene()
