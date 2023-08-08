@@ -18,6 +18,8 @@ public class Player : Charactor, IAction
         moveFinish = true;
     }
 
+    public int PlayerHP { get { return HP; } set { HP = value; } }
+
     void Update()
     {
 
@@ -28,7 +30,7 @@ public class Player : Charactor, IAction
         Vector3 diff = GameManager.Instance.Dest - gameObject.transform.position;
         float count = Mathf.Abs(diff.x) + Mathf.Abs(diff.z);
 
-        if (count < gameObject.GetComponent<Player>().AllowMoveSteps + 1 && count > 0)
+        if (count <= gameObject.GetComponent<Player>().AllowMoveSteps && count > 0)
         {
             //Debug.Log("걸을 수 있습니다.");
             gameObject.GetComponent<Player>().MoveFinish = false;
@@ -56,7 +58,7 @@ public class Player : Charactor, IAction
 
     public override IEnumerator Move()
     {
-        this.transform.position = Vector3.MoveTowards(transform.position,GameManager.Instance.Dest, 1.0f);
+        this.transform.position = Vector3.MoveTowards(transform.position,GameManager.Instance.Dest, 0.025f);
         yield return null;
     }
 

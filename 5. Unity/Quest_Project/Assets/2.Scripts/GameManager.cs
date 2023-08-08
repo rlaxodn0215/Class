@@ -24,6 +24,7 @@ public class GameManager : Singleton<GameManager>
     private Button turnButton;
 
     private GameObject playerObj;
+    public GameObject PlayerObj { get { return playerObj; }set { playerObj = value; } }
     private int steps;
     public int Steps { get { return steps; } set { steps = value; } }
 
@@ -41,7 +42,7 @@ public class GameManager : Singleton<GameManager>
     private GameObject[,] grid = new GameObject[rows, collums];
     
     private const int enemyNum = 5;
-    private List<GameObject> enemys = new List<GameObject>(enemyNum);
+    public List<GameObject> enemys = new List<GameObject>(enemyNum);
 
     void Start()
     {
@@ -152,6 +153,8 @@ public class GameManager : Singleton<GameManager>
 
     public void Turn()
     {
+
+
         if (turnButton.GetComponent<Image>().fillAmount == 1)
         {
             turnButton.GetComponent<Image>().fillAmount = 0;
@@ -164,15 +167,20 @@ public class GameManager : Singleton<GameManager>
 
         else
         {
-            Debug.Log("기다리세요...");
+            //Debug.Log("기다리세요...");
         }
     }
 
     private IEnumerator FillingButton()
     {
+        foreach (GameObject obj in enemys)
+        {
+            obj.GetComponent<Enemy>().Destin = obj.GetComponent<Enemy>().EnemyDest();
+        }
+
         while (true)
         {
-            float fillSpeed = 3.5f;
+            float fillSpeed = 1.0f;
             turnButton.GetComponent<Image>().fillAmount += fillSpeed * Time.deltaTime;
            // Debug.Log(turnButton.GetComponent<Image>().fillAmount);
 
@@ -182,8 +190,19 @@ public class GameManager : Singleton<GameManager>
                 turnButton.transform.GetChild(1).gameObject.SetActive(false);
                 break;
             }
+
+            foreach (GameObject obj in enemys)
+            {
+                if (obj.GetComponent<Enemy>().EnemyMoveable(obj.GetComponent<Enemy>().Destin))
+                {
+                    StartCoroutine(obj.GetComponent<Enemy>().Move());
+                }
+            }
+
             yield return new WaitForSeconds(0.01f);
         }
+
+
 
         steps = playerObj.GetComponent<Player>().AllowMoveSteps;
     }
