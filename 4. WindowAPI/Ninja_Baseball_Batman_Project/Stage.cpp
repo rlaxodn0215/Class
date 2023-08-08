@@ -1,28 +1,20 @@
 #include "Stage.h"
 
-Stage::Stage(int stageNum, Sprite* stageArea, vector<RECT>& limitArea, vector<shared_ptr<Charactor>>& monsters,
-    map<string, shared_ptr<Sound>>& BGM, map<string, shared_ptr<Animation>>& monstersAni,
-    map<string, shared_ptr<Animation>>& uiAni, bool isFinish)
+Stage::Stage(int stageNum, Animation stageArea, vector<RECT>& limitArea, map<string, Sound*>& bgm,
+    map<string, Animation*>& ui, map<string, Animation*>& background, vector<Charactor>& stageMonsters)
 {
     m_StageNum = stageNum;
     m_StageArea = stageArea;
     m_LimitArea = limitArea;
-    m_Monsters = monsters;
-    m_BGMs = BGM;
-    m_MonstersAni = monstersAni;
-    m_UIAni = uiAni;
-    m_isFinish = isFinish;
+    m_BGM = bgm;
+    m_Background = background;
+    m_UI = ui;
+    m_StageMonsters = stageMonsters;
+    m_isFinish = false;
 }
 
 Stage::~Stage()
 {
-    if(m_StageArea !=NULL)
-        delete m_StageArea;
+
 }
 
-void Stage::ShowUIStage(HWND hWnd, HDC hdc, int timerDefine, int delayTime, TIMERPROC func)
-{
-    POINT startsceneLot = { 512, 384 };
-    m_UIAni["StartScene"]->AniPlay(hWnd, hdc, startsceneLot,
-        m_UIAni["StartScene"]->GetFrameCurCount(),2.0f, timerDefine, delayTime, func);
-}

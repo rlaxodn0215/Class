@@ -30,7 +30,7 @@ public:
 	Sprite(const TCHAR filename[100],const TCHAR dataname[100], HANDLE hFile, int & readIndexNum, char chbuff[]);
 	~Sprite() {};
 	
-	void ShowSprite(HDC hdc, POINT location);
+	void ShowSprite(HDC hdc, POINT location, float imageRatio);
 
 };
 

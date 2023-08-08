@@ -5,31 +5,28 @@
 #include"Sound.h"
 #include<vector>
 #include<map>
-#include<memory>
 
 using namespace std;
 
-class Stage:public Sprite //포인터로 Stage 메모리 할당하고, 바뀔 때마다 포인터 바꾸기 
+class Stage //포인터로 Stage 메모리 할당하고, 바뀔 때마다 포인터 바꾸기 / 각 스테이지에 필요한 데이터만 저장
 {
 private:
 	int m_StageNum;
-	Sprite * m_StageArea; //sprite 기준
+	Animation m_StageArea; //sprite 기준
 	vector<RECT> m_LimitArea;
-	vector<shared_ptr<Charactor>> m_Monsters;
-	map<string, shared_ptr<Sound>> m_BGMs;
-	map<string, shared_ptr<Animation>> m_MonstersAni;
-	map<string, shared_ptr<Animation>> m_UIAni;
+	map<string, Sound*> m_BGM;
+	map<string, Animation*> m_UI;
+	map<string, Animation*> m_Background;
+	vector<Charactor> m_StageMonsters;
 	bool m_isFinish;
 
 public:
 	Stage() {};
-	Stage(int stageNum, Sprite * stageArea, vector<RECT> & limitArea, vector<shared_ptr<Charactor>>& monsters,
-		map<string, shared_ptr<Sound>> & BGM, map<string, shared_ptr<Animation>> & monstersAni,
-		map<string, shared_ptr<Animation>> & uiAni, bool isFinish);
+	Stage(int stageNum, Animation stageArea, vector<RECT> & limitArea, map<string, Sound*> & bgm,
+		map<string, Animation*> & ui, map<string, Animation*> & background, vector<Charactor> & stageMonsters);
 	~Stage();
 	int GetStageNum() { return m_StageNum; }
-	Sprite *GetStageArea() { return m_StageArea; }
+	Animation GetStageArea() { return m_StageArea; }
 	void SetFinish(bool f) { m_isFinish = f; }
-	void ShowUIStage(HWND hWnd, HDC hdc, int timerDefine, int delayTime, TIMERPROC func);
 };
 

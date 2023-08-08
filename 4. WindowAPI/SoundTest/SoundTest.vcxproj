@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{764442d5-ecef-43a0-989f-fa9a80d5775d}</ProjectGuid>
-    <RootNamespace>NinjaBaseballBatmanProject</RootNamespace>
+    <ProjectGuid>{17ae2a62-93f4-4ada-a87c-9f959ecaacf0}</ProjectGuid>
+    <RootNamespace>SoundTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,6 +70,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>D:\rlaoxdn\Class\4. WindowAPI\SoundTest\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\rlaoxdn\Class\4. WindowAPI\SoundTest\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -127,41 +131,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="SingletonTemplate.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Collider.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Charactor.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="Headers.h" />
-    <ClInclude Include="Ninja_Baseball_Batman_Project.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Sound.h" />
-    <ClInclude Include="Stage.h" />
+    <ClInclude Include="SoundTest.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Timers.h" />
-    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Charactor.cpp" />
-    <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="Ninja_Baseball_Batman_Project.cpp" />
-    <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="Stage.cpp" />
-    <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="SoundTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Ninja_Baseball_Batman_Project.rc" />
+    <ResourceCompile Include="SoundTest.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Ninja_Baseball_Batman_Project.ico" />
     <Image Include="small.ico" />
+    <Image Include="SoundTest.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

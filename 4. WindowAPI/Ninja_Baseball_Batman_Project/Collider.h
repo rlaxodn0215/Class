@@ -1,16 +1,16 @@
 #pragma once
 #include"framework.h"
-
-class CircleCollider
+class Collider
 {
 private:
 	POINT m_Center;
-	int m_Radius;
+	int m_Width;
+	int m_Height;
 
 public:
-	CircleCollider();
-	CircleCollider(POINT pivot, int width, int height);
-	~CircleCollider();
+	Collider();
+	Collider(POINT pivot, int width, int height);
+	~Collider();
 
 	BOOL OnTriggerEnter();
 	BOOL OnTriggerStay();

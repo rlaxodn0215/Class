@@ -1,2 +1,2 @@
 #pragma once
-#define TIMER_TEST 1
+#define TIMER_STARTSCENE 1

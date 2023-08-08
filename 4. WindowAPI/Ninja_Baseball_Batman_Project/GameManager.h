@@ -4,26 +4,28 @@
 #include"Camera.h"
 #include"Charactor.h"
 #include"Stage.h"
-#include"Sound.h"
+#include"SingletonTemplate.h"
 
-class GameManager //싱글턴으로 만든다.
+class GameManager : public SingletonTemplate<GameManager> //싱글턴으로 만든다.
 {
 private:
-	int m_CurStageNum;
-	int m_PlayerLife;
-	int m_PlayerHP;
-	int m_BossMonsterHP;
+	friend SingletonTemplate; //friend 키워드: SingletonTemplate이 GameManager class의 모든 멤버를 사용할 수 있다
+	GameManager();
+	~GameManager();
 
 public:
-	GameManager();
-	GameManager(int playerLife,int playerHP, int curStageNum, int bossMosterHP);
-	~GameManager() {};
+	Stage* m_CurStage;
+	Player* m_Player;
+	Camera* m_Cam;
 
+	void SetInstance(Stage* curStage, Player* player, Camera* cam);
 	void ShowPlayerLife(const Charactor & player);
 	void ShowPlayerHPbar(const Charactor& player);
-	void ShowPlayerStateUI(const Charactor& player);
 	void ShowBossHPbar(const Charactor& Boss);
+	void ShowPlayerStateUI(const Charactor& player);
+	void ShowPlayerPoints(const Charactor& player);
+	void MoveNextStage();
 	void SlowMotion();
-	void GameOver();
+	void GameOver(); // Rank 포함
 };
 

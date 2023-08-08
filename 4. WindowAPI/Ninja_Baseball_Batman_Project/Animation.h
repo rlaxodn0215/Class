@@ -19,6 +19,7 @@ public:
 	Animation();
 	Animation(const TCHAR imageName[100], const TCHAR textFileName[100]);
 	~Animation();
-	void AniPlay(HWND hWnd, HDC hdc, POINT location, int spriteIndex, float imageRatio, int timerDefine, int delayTime, TIMERPROC func);
+	void AniPlay(HWND hWnd, HDC hdc, POINT location, int spriteIndex, float imageRatio,
+		int timerDefine, int delayTime, TIMERPROC func);
 };
 

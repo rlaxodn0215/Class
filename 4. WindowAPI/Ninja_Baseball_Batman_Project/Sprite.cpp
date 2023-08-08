@@ -105,7 +105,7 @@ Sprite::Sprite(const TCHAR imageName[100],const TCHAR textFileName[100], HANDLE 
 
 }
 
-void Sprite::ShowSprite(HDC hdc, POINT location)
+void Sprite::ShowSprite(HDC hdc, POINT location, float imageRatio)
 {
 	HDC hMemDC;
 	HBITMAP holdBitmap;
@@ -117,10 +117,10 @@ void Sprite::ShowSprite(HDC hdc, POINT location)
 	int by = m_Height;
 	int xStart = m_Offset.x;
 	int yStart = m_Offset.y;
-	int posX = location.x - m_Pivot.x;
-	int posY = location.y - m_Pivot.y;
+	int posX = location.x - m_Pivot.x * imageRatio;
+	int posY = location.y - m_Pivot.y * imageRatio;
 
-	TransparentBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, bx, by, m_TransparentColor);
+	TransparentBlt(hdc, posX, posY, bx * imageRatio, by * imageRatio, hMemDC, xStart, yStart, bx, by, m_TransparentColor);
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);

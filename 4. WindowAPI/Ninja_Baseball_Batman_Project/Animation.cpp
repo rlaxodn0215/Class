@@ -59,7 +59,8 @@ Animation::~Animation()
 	
 }
 
-void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location,int spriteIndex, float imageRatio, int timerDefine, int delayTime, TIMERPROC func)
+void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location, int spriteIndex, float imageRatio,
+	int timerDefine, int delayTime, TIMERPROC func)
 {
 	SetTimer(hWnd, timerDefine, delayTime, func);
 
@@ -80,5 +81,4 @@ void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location,int spriteIndex, floa
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);
-
 }

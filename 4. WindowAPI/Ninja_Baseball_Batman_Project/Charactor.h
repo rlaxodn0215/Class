@@ -4,13 +4,12 @@
 #include<map>
 #include"Animation.h"
 #include"Sound.h"
-#include"CircleCollider.h"
-#include"BoxCollider.h"
+#include"Collider.h"
 #include"Vector3.h"
 
 using namespace std;
 
-enum player
+enum PlayerCharactor
 {
 	JOSE,
 	RYNO,
@@ -18,12 +17,7 @@ enum player
 	STRAW
 };
 
-enum playerState
-{
-
-};
-
-enum monster
+enum MonsterCharactor
 {
 	BASEBALL,
 	BAT,
@@ -34,6 +28,11 @@ enum monster
 	WINDYPLANE
 };
 
+enum playerState
+{
+
+};
+
 class Charactor
 {
 protected:
@@ -42,7 +41,7 @@ protected:
 	int m_MoveSpeed;
 	int m_LookWay;
 	bool m_isAlive;
-	map<string, Animation> CharactorAni;
+	map<string, Animation*> CharactorAni;
 	map<string, Sound> CharactorSound;
 
 public:
@@ -55,41 +54,41 @@ public:
 	void ShowCharactorStatus();
 };
 
-class Player : public Charactor
+class Player : public Charactor // 상태 패턴
 {
-protected:
-	BoxCollider m_BodyColliders;
-	BoxCollider m_AttackColliders;
-	int m_Points;
-
 public:
+	virtual ~Player() = default;
 	virtual void Idle()=0;
 	virtual void Jump()=0;
 	virtual void Damaged()=0;
 	virtual void LowHP()=0;
 	virtual void Dead()=0;
 	virtual void NormalAttack()=0;
+	virtual void JumpAttack()=0;
 	virtual void Sliding()=0;
+	virtual void SlidingAttack()=0;
+	virtual void WakeUpAttack()=0;
 	virtual void HomeRun()=0;
 	virtual void Catch()=0;
+	virtual void CatchAttack()=0;
+	virtual void CatchThrow()=0;
 	virtual void LayDownAttack()=0;
 	virtual void SpecialCatchAttack()=0;
 	virtual void BearHandMode()=0;
 	virtual void BearHandAttack()=0;
+	virtual void CatchDynamite()=0;
 
 };
 
-class Monster : public Charactor
+class Ryno :public Player
 {
-public:
-	virtual void Idle() = 0;
-	virtual void Damaged() = 0;
-	virtual void Dead() = 0;
-	virtual void NormalAttack() = 0;
-};
+private:
+	PlayerCharactor m_Charactor;
+	Collider m_BodyColliders;
+	Collider m_AttackColliders;
+	int m_PlayerLife;
+	int m_Points;
 
-class Ryno : public Player
-{
 public:
 	void Idle();
 	void Jump();
@@ -112,53 +111,18 @@ public:
 	void CatchDynamite();
 };
 
-class Baseball : public Monster
+class Monster : public Charactor
 {
 private:
-	CircleCollider m_BodyCollider;
-	BoxCollider m_AttackCollider;
+	MonsterCharactor m_Charactor;
+	Collider m_BodyColliders;
+	Collider m_AttackColliders;
 
 public:
-
+	Monster();
+	~Monster();
+	void Idle();
+	void Damaged();
+	void Dead();
+	void NormalAttack();
 };
-
-class Bat : public Monster
-{
-
-};
-
-class Card : public Monster
-{
-
-};
-
-class WindyPlane : public Monster
-{
-
-};
-
-
-
-
-
-
-
-
-
-
-class Jose : public Player
-{
-
-};
-
-
-class Roger : public Player
-{
-
-};
-
-class Straw : public Player
-{
-
-};
-

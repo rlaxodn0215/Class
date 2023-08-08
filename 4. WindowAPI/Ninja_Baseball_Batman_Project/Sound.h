@@ -1,5 +1,8 @@
 #pragma once
-class Sound
+class Sound // Sound Data 저장 및 재생
 {
+private:
+
+public:
 };
 

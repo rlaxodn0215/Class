@@ -1,48 +1,25 @@
-﻿// Ninja_Baseball_Batman_Project.cpp : 애플리케이션에 대한 진입점을 정의합니다.
+﻿// SoundTest.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
-#include"Headers.h"
-#include"Timers.h"
+#include "framework.h"
+#include "SoundTest.h"
+#include"windows.h"
+#include"mmsystem.h"
 
 #define MAX_LOADSTRING 100
 
-#pragma comment(lib, "msimg32.lib")
 #pragma comment(lib,"winmm.lib")
-
-using namespace std;
-
-#ifdef UNICODE
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-#else
-#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
-#endif // UNICODE
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-// 다음 레벨로 이동 시 다음 레벨 데이터를 쓰레드로 처리하기
-map<string, Animation*> allAnimations; // 메모리 해제를 어떻게 해야 하나?
-map<string, Sound*> allSounds;
-map<string, Stage*> allStages;
-
-GameManager* gameManager;
-Player* curPlayer;
-Stage* curStage;
-Camera* Cam;
-
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-VOID CALLBACK AniUIProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
-
-void Initalize(HWND hWnd); // 모든 animation, sound, stage 데이터 로드하기
-void ChangeStage(int stageNum);
-void EndGame(HWND hWnd);
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -56,7 +33,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_NINJABASEBALLBATMANPROJECT, szWindowClass, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_SOUNDTEST, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
@@ -65,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_NINJABASEBALLBATMANPROJECT));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOUNDTEST));
 
     MSG msg;
 
@@ -81,6 +58,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     return (int) msg.wParam;
 }
+
 
 
 //
@@ -99,10 +77,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_NINJABASEBALLBATMANPROJECT));
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SOUNDTEST));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_NINJABASEBALLBATMANPROJECT);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_SOUNDTEST);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -124,7 +102,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -148,24 +126,58 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+MCIDEVICEID MusicID = 0;
+MCI_PLAY_PARMS Play = {};
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc;
-    static RECT winRect;
 
+    
+    
     switch (message)
     {
-
     case WM_CREATE:
-        {
-            GetClientRect(hWnd, &winRect);
-            Initalize(hWnd);
-        }
-        break;
-    case WM_CHAR:
     {
+        MCIERROR        Error;
+        MCI_OPEN_PARMS Data = {};
+
+        Data.lpstrDeviceType = _T("mp3");
+        Data.lpstrElementName = _T("test.mp3");
+
+        Error = mciSendCommandA(
+            0,
+            MCI_OPEN,
+            MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
+            (DWORD_PTR)&Data
+        );
+
+        if (Error == 0)
+        {
+            MusicID = Data.wDeviceID;
+        }
+    }
+        break;
+    case WM_KEYDOWN:
+    {
+        switch (wParam)
+        {
+        case VK_F3:
+            Play = {};
+
+            mciSendCommandA(MusicID, MCI_PLAY, MCI_NOTIFY, (DWORD_PTR)&Play);
+             break;
+        // 정지
+        case VK_F4:
+            mciSendCommandA(MusicID, MCI_PAUSE, 0, 0);
+            break;
+
+        // 처음으로
+        case VK_F5:
+            mciSendCommandA(MusicID, MCI_SEEK, MCI_SEEK_TO_START, 0);
+            break;
+        default:
+            break;
+        }
     }
         break;
     case WM_COMMAND:
@@ -187,14 +199,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-            hdc = BeginPaint(hWnd, &ps);
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
-        EndGame(hWnd);
+        //사운드 파일 제거
+        mciSendCommandA(MusicID, MCI_CLOSE, 0, 0);
         PostQuitMessage(0);
         break;
     default:
@@ -221,46 +234,4 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
-
-}
-
-VOID CALLBACK AniUIProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
-{
-    //string aniName ="StartScene";
-
-    //int temp = CurUIAnis[aniName]->GetFrameCurCount() + 1;
-    //CurUIAnis[aniName]->SetFrameCurCount(temp);
-
-    //if (CurUIAnis[aniName]->GetFrameCurCount() >= CurUIAnis[aniName]->GetFrameTotalCount())
-    //{
-    //    CurUIAnis[aniName]->SetFrameCurCount(0);
-    //}
-
-    InvalidateRect(hWnd, NULL, TRUE);    
-}
-
-void Initalize(HWND hWnd) // 모든 animation, sound, stage 데이터 로드하기
-{
-
-
-
-
-
-    //curPlayer = new Player();
-    //Cam = new Camera();
-    //curStage = 
-
-    gameManager->GetInstace();
-    gameManager->GetInstace()->SetInstance(curStage,curPlayer,Cam);
-}
-
-void ChangeStage(int stageNum)
-{
-}
-
-
-void EndGame(HWND hWnd)
-{
-
-    KillTimer(hWnd, TIMER_STARTSCENE);
 }
