@@ -11,7 +11,7 @@ private:
 public:
 	Camera();
 	Camera(RECT sceneArea, int camOffset);
-	~Camera();
+	//~Camera();
 
 	void CameraMove(POINT endpoint);
 	void ShowCameraCenter();

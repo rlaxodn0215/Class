@@ -184,7 +184,7 @@ bool showAni = false;
 bool recUpdate = false;
 
 TCHAR fileName[100];
-TCHAR ImageName[100] = _T("Bitmap/StartScene.bmp");
+TCHAR ImageName[100] = _T("Bitmap/titlescreen.bmp");
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -775,7 +775,7 @@ void ShowAni(HWND hWnd, HDC hdc)
     hMemDC = CreateCompatibleDC(hdc);
     holdBitmap = (HBITMAP)SelectObject(hMemDC, hImage);
 
-    POINT showPos = { 250,250 };
+    POINT showPos = { 500,500 };
 
     int bx = Datas[frameCount].width;
     int by = Datas[frameCount].height;

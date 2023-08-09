@@ -14,11 +14,10 @@ private:
 	~GameManager();
 
 public:
-	Stage* m_CurStage;
+	Stage* m_Stage;
 	Player* m_Player;
 	Camera* m_Cam;
 
-	void SetInstance(Stage* curStage, Player* player, Camera* cam);
 	void ShowPlayerLife(const Charactor & player);
 	void ShowPlayerHPbar(const Charactor& player);
 	void ShowBossHPbar(const Charactor& Boss);

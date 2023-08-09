@@ -1,12 +1,28 @@
 #include "Animation.h"
 
-Animation::Animation()
+int FindNum(int& i, char chbuff[])
 {
-	m_FrameCurCount = 0;
+	int temp = 0;
+
+	while (chbuff[i] != '\n')
+	{
+		temp = 10 * temp + (chbuff[i] - '0');
+		i++;
+	}
+	i++;
+
+	return temp;
 }
 
-Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])//파일 입출력으로 정보 자동으로 받아서 저장
+Animation::Animation()
 {
+	m_ResourceSprite = NULL;
+}
+
+Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])//파일 입출력으로 정보 자동으로 받아서 저장
+{
+	m_ResourceSprite = resource;
+
 	DWORD rbytes;
 
 	HANDLE hFile = CreateFile(textFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, 0);
@@ -16,16 +32,21 @@ Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])/
 		MessageBox(NULL, _T("데이터 파일 로드 에러"), _T("에러"), MB_OK);
 	}
 
-	int frameCount;
 	int transparentColor;
-	m_FrameCurCount = 0;
 
-	TCHAR buff[100] = {};
-	char chbuff[100] = {};
+	TCHAR buff[1000] = {};
+	char chbuff[1000] = {};
 	size_t convertedChars = 0;
 
-	SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
+	
 	ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+
+	//텍스트 직접 수정하면 안됨
+	if (buff[0] == 65279)
+	{
+		SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
+		ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+	}
 
 #ifdef UNICODE
 		wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
@@ -34,20 +55,19 @@ Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])/
 #endif
 
 	int i = 0;
-	int temp = 0;
-	while (chbuff[i] != '\n')
+	m_FrameTotalCount = FindNum(i,chbuff);
+
+	for (int j = 0; j < m_FrameTotalCount; j++)
 	{
-		temp = 10 * temp + (chbuff[i] - '0');
-		i++;
-	}
-	i++;
-	frameCount = temp;
-	m_FrameTotalCount = temp;
-	
-	for (int j = 0; j < frameCount; j++)
-	{
-		Sprite tempAni = Sprite::Sprite(imageName, textFileName,hFile, i, chbuff);
-		m_Sprites.push_back(tempAni);
+		FindNum(i, chbuff);
+		m_Offset.push_back({ FindNum(i, chbuff),FindNum(i, chbuff) });
+		m_Width.push_back(FindNum(i, chbuff));
+		m_Height.push_back(FindNum(i, chbuff));
+		m_Pivot.push_back({ FindNum(i, chbuff) , FindNum(i, chbuff) });
+		if (resource->GetTransparentColor() == NULL)
+			resource->SetTransparentColor((COLORREF)FindNum(i, chbuff));
+		else
+			FindNum(i, chbuff);
 	}
 
 	CloseHandle(hFile);
@@ -56,28 +76,25 @@ Animation::Animation(const TCHAR imageName[100], const TCHAR textFileName[100])/
 
 Animation::~Animation()
 {
-	
+
 }
 
-void Animation::AniPlay(HWND hWnd, HDC hdc, POINT location, int spriteIndex, float imageRatio,
-	int timerDefine, int delayTime, TIMERPROC func)
+void Animation::AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio)
 {
-	SetTimer(hWnd, timerDefine, delayTime, func);
-
 	HDC hMemDC;
 	HBITMAP holdBitmap;
 
 	hMemDC = CreateCompatibleDC(hdc);
-	holdBitmap = (HBITMAP)SelectObject(hMemDC, m_Sprites[spriteIndex].GetAniImage());
+	holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());
 
-	int bx = m_Sprites[spriteIndex].GetWidth();
-	int by = m_Sprites[spriteIndex].GetHeight();
-	int xStart = m_Sprites[spriteIndex].GetOffset().x;
-	int yStart = m_Sprites[spriteIndex].GetOffset().y;
-	int posX = location.x - m_Sprites[spriteIndex].GetPivot().x * imageRatio;
-	int posY = location.y - m_Sprites[spriteIndex].GetPivot().y * imageRatio;
+	int bx = m_Width[spriteIndex];
+	int by = m_Height[spriteIndex];
+	int xStart = m_Offset[spriteIndex].x;
+	int yStart = m_Offset[spriteIndex].y;
+	int posX = location.x - (int)(m_Pivot[spriteIndex].x * imageRatio);
+	int posY = location.y - (int)(m_Pivot[spriteIndex].y * imageRatio);
 
-	TransparentBlt(hdc, posX, posY, bx * imageRatio, by * imageRatio, hMemDC, xStart, yStart, bx, by, m_Sprites[spriteIndex].GetTransparentColor());
+	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart, bx, by, m_ResourceSprite->GetTransparentColor());//m_ResourceSprite->GetTransparentColor()
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);

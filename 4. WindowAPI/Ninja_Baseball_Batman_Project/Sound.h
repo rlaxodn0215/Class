@@ -5,11 +5,11 @@ private:
 
 public:
 	Sound();
-	~Sound();
+	//~Sound();
 
 	void Play();
+	void PlayToBGM();
 	void Stop();
 	void SetVolume();
-
 };
 
