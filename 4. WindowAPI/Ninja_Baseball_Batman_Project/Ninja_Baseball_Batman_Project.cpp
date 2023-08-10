@@ -28,7 +28,6 @@ map<string, shared_ptr<Sound>> Sounds;
 
 GameManager* gameManager;
 Player* curPlayer;
-int curStageNum = 0;
 RECT winRect;
 HBITMAP Screen;
 
@@ -184,6 +183,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_CHAR:
     {
+        if (gameManager->GetInstance()->m_SceneNum == 0)
+        {
+            SceneIndex = SelectScene;
+            gameManager->GetInstance()->m_SceneNum++;
+        }
     }
         break;
     case WM_COMMAND:
@@ -397,17 +401,19 @@ void Initalize(HWND hWnd) // 모든 animation, sound, stage 데이터 로드하�
 
 void TitleScene(HDC hdc) // SceneNum = 0
 {
-    POINT location = {340,220};
-    totalFrame[0] = Animations["title_screen"]->GetFrameTotalCount();
-    Animations["title_screen"]->AniPlay(hdc, location, frameChannel[0], 1.0f);
+    POINT location = { 340, 220 };
+    totalFrame[0] = Animations["Title_screen"]->GetFrameTotalCount();
+    Animations["Title_screen"]->AniPlay(hdc, location, frameChannel[0], 1.0f);
 }
 
 void SelectScene(HDC hdc) // SceneNum = 1
 {
+
 }
 
 void PlayScene(HDC hdc) // SceneNum = 2
 {
+
 }
 
 void EndingScene(HDC hdc) // SceneNum = 3
