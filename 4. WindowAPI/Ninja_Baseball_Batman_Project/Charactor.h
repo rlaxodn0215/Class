@@ -50,6 +50,7 @@ public:
 
 	int GetHP() { return m_Hp; }
 	void SetHP(int hp) { m_Hp = hp; }
+	void Update();
 	void ChangeAni(const string & beforeAniName, const string & afterAniName);
 	void ShowCharactorStatus();
 };

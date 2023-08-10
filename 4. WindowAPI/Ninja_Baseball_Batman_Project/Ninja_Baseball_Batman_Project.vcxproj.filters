@@ -48,9 +48,6 @@
     <ClInclude Include="Vector3.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Stage.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Headers.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -61,6 +58,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="SingletonTemplate.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Stage.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,10 +89,10 @@
     <ClCompile Include="Vector3.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Stage.cpp">
+    <ClCompile Include="Animation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp">
+    <ClCompile Include="Stage.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

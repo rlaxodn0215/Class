@@ -8,7 +8,6 @@
 #include"Charactor.h"
 #include"GameManager.h"
 #include"Sound.h"
-#include"Stage.h"
 #include"Vector3.h"
 #include"Headers.h"
 #include<iostream>

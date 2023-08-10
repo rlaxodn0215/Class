@@ -14,6 +14,7 @@ private:
 	~GameManager();
 
 public:
+	int m_SceneNum;
 	Stage* m_Stage;
 	Player* m_Player;
 	Camera* m_Cam;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include"framework.h"
+#include"Vector3.h"
 #include<string>
 #include<memory>
 
@@ -11,13 +12,13 @@ class Sprite
 private:
 	HBITMAP m_SpriteImage;
 	BITMAP m_SpriteBit;
-	COLORREF m_TransparentColor;
+	Vector3 m_TransparentRGB = {-1, -1, -1};
 
 public:
 	HBITMAP GetSpriteImage() { return m_SpriteImage; }
 	BITMAP GetSpriteBit() { return m_SpriteBit; }
-	COLORREF GetTransparentColor() { return m_TransparentColor; }
-	void SetTransparentColor(COLORREF num) { m_TransparentColor=num; }
+	Vector3 GetTransparentColor() { return m_TransparentRGB; }
+	void SetTransparentColor(Vector3 num) { m_TransparentRGB =num; }
 
 	Sprite();
 	Sprite(const TCHAR imageName[100]);

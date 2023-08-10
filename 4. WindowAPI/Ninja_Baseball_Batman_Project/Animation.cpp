@@ -32,7 +32,6 @@ Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])
 		MessageBox(NULL, _T("데이터 파일 로드 에러"), _T("에러"), MB_OK);
 	}
 
-	int transparentColor;
 
 	TCHAR buff[1000] = {};
 	char chbuff[1000] = {};
@@ -64,10 +63,22 @@ Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])
 		m_Width.push_back(FindNum(i, chbuff));
 		m_Height.push_back(FindNum(i, chbuff));
 		m_Pivot.push_back({ FindNum(i, chbuff) , FindNum(i, chbuff) });
-		if (resource->GetTransparentColor() == NULL)
-			resource->SetTransparentColor((COLORREF)FindNum(i, chbuff));
+
+		Vector3 temp = { -1, -1,-1 };
+		if (resource->GetTransparentColor() == temp)
+		{
+			Vector3 vec;
+			vec.m_Pos_X = FindNum(i, chbuff);
+			vec.m_Pos_Y = FindNum(i, chbuff);
+			vec.m_Pos_Z = FindNum(i, chbuff);
+			resource->SetTransparentColor(vec);
+		}
 		else
+		{
 			FindNum(i, chbuff);
+			FindNum(i, chbuff);
+			FindNum(i, chbuff);
+		}
 	}
 
 	CloseHandle(hFile);
@@ -94,7 +105,9 @@ void Animation::AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRat
 	int posX = location.x - (int)(m_Pivot[spriteIndex].x * imageRatio);
 	int posY = location.y - (int)(m_Pivot[spriteIndex].y * imageRatio);
 
-	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart, bx, by, m_ResourceSprite->GetTransparentColor());//m_ResourceSprite->GetTransparentColor()
+	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
+		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_Pos_X, m_ResourceSprite->GetTransparentColor().m_Pos_Y,
+			m_ResourceSprite->GetTransparentColor().m_Pos_Z));//m_ResourceSprite->GetTransparentColor()
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);

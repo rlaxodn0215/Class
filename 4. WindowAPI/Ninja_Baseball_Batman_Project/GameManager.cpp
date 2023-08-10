@@ -2,6 +2,7 @@
 
 GameManager::GameManager()
 {
+	m_SceneNum = 0;
 	m_Stage = NULL;
 	m_Player = NULL;
 	m_Cam = NULL;

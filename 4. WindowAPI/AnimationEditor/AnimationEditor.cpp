@@ -173,7 +173,11 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
-COLORREF transparentColor = RGB(255, 0, 255);
+int Red = 255;
+int Green = 0;
+int Blue = 255;
+
+COLORREF transparentColor = RGB(Red, Green, Blue);
 COLORREF BoxColor = RGB(0, 0, 255);
 COLORREF PivotColor = RGB(255, 0, 0);
 
@@ -884,7 +888,7 @@ void SaveData()
         WriteFile(hFile, pivotY, (DWORD)_tcslen(pivotY) * sizeof(TCHAR), &size, NULL);
 
         TCHAR transparentColor[100];
-        _stprintf_s(transparentColor, L"%d\n", transparentColor);
+        _stprintf_s(transparentColor, L"%d\n%d\n%d\n", Red,Green,Blue);
         WriteFile(hFile, transparentColor, (DWORD)_tcslen(transparentColor) * sizeof(TCHAR), &size, NULL);
     }
 

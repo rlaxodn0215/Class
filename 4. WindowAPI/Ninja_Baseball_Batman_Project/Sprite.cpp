@@ -4,7 +4,8 @@ Sprite::Sprite()
 {
 	m_SpriteImage = NULL;
 	m_SpriteBit;
-	m_TransparentColor = RGB(0, 0, 0);
+	Vector3 vec = { 0,0,0 };
+	m_TransparentRGB = vec;
 }
 
 Sprite::Sprite(const TCHAR imageName[100])
