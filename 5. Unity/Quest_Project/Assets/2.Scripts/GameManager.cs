@@ -14,6 +14,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     private GameObject gridObject;
 
+    //UI
     [SerializeField]
     private GameObject startTitle;
 
@@ -27,6 +28,8 @@ public class GameManager : Singleton<GameManager>
     public GameObject PlayerObj { get { return playerObj; }set { playerObj = value; } }
     private int steps;
     public int Steps { get { return steps; } set { steps = value; } }
+
+    private bool gameStart = false;
 
     public Camera cam;
     Ray ray;
@@ -70,13 +73,46 @@ public class GameManager : Singleton<GameManager>
             {
                 Debug.Log(hit.transform.position);
                 dest = new Vector3(hit.transform.position.x, 1.5f, hit.transform.position.z);
-             
+
+                if (playerObj != null && gameStart) PlayerWalkable();
             }
         }
 
-        if (playerObj != null)
+    }
+
+    public void PlayerWalkable()
+    {
+        Vector3 diff = dest - playerObj.transform.position;
+        int count = (int)(Mathf.Abs(diff.x) + Mathf.Abs(diff.z));
+
+        if (count <= playerObj.GetComponent<Player>().AllowMoveSteps && steps > 0)
         {
-            playerObj.GetComponent<Player>().Walkable();
+            steps -= count;
+            StartCoroutine(PlayerMove(dest));
+            ShowMoveableBlock();
+        }
+
+        else
+        {
+            Turn();
+            steps = playerObj.GetComponent<Player>().AllowMoveSteps;
+            ShowMoveableBlock();
+        }
+
+    }
+
+    public IEnumerator PlayerMove(Vector3 dest)
+    {
+        while (dest !=playerObj.transform.position)
+        {
+            playerObj.GetComponent<Player>().Move();
+            PlayerObj.GetComponent<Player>().MoveFinish = false;
+            yield return null;
+        }
+
+        if(dest == playerObj.transform.position)
+        {
+            PlayerObj.GetComponent<Player>().MoveFinish = true;
         }
     }
 
@@ -113,9 +149,10 @@ public class GameManager : Singleton<GameManager>
         }
 
         ShowMoveableBlock();
+        gameStart = true;
     }
 
-    public void ShowMoveableBlock()
+    private void ShowMoveableBlock()
     {
         for (int i = 0; i < rows; i++)
         {
@@ -125,8 +162,11 @@ public class GameManager : Singleton<GameManager>
             }
         }
 
-        int x = (int)playerObj.transform.position.x;
-        int z = (int)playerObj.transform.position.z;
+        //int x = (int)playerObj.transform.position.x;
+        //int z = (int)playerObj.transform.position.z;
+        int x = (int)dest.x;
+        int z = (int)dest.z;
+
         GameObject playerPosBlock = grid[x, z];
 
         for (int i = x - steps; i <= x + steps; i++)
@@ -145,65 +185,97 @@ public class GameManager : Singleton<GameManager>
 
     }
 
+    public void Turn()
+    {
+       turnButton.transform.GetChild(0).gameObject.SetActive(false);
+       turnButton.transform.GetChild(1).gameObject.SetActive(true);
+        StartCoroutine(EnemyMove());
+    }
+
+    public IEnumerator EnemyMove()
+    {
+        foreach (GameObject obj in enemys)
+        {
+            obj.GetComponent<Enemy>().Destin = EnemyDest(obj);
+
+            while (EnemyMoveable(obj.GetComponent<Enemy>().Destin, obj))
+            {
+                obj.GetComponent<Enemy>().Move();
+                yield return null;
+            }
+
+        }
+
+        turnButton.transform.GetChild(0).gameObject.SetActive(true);
+        turnButton.transform.GetChild(1).gameObject.SetActive(false);
+    }
+
+    public bool EnemyMoveable(Vector3 dest, GameObject enemy)
+    {
+        if (Vector3.Magnitude(dest - enemy.transform.position) > 0)
+        {
+            return true;
+        }
+
+        else
+        {
+            return false;
+        }
+    }
+
     public void EndScene()
     {
         Debug.Log("게임이 종료됩니다");
         Application.Quit();
     }
 
-    public void Turn()
+    public Vector3 EnemyDest(GameObject enemy)
     {
+        Vector3 diff = GameManager.Instance.Dest - enemy.transform.position;
+        Vector3 min = new Vector3(0, 0, 100);
 
-
-        if (turnButton.GetComponent<Image>().fillAmount == 1)
+        for (int i = -enemy.GetComponent<Enemy>().AllowSteps; i <= enemy.GetComponent<Enemy>().AllowSteps; i++)
         {
-            turnButton.GetComponent<Image>().fillAmount = 0;
-            turnButton.transform.GetChild(0).gameObject.SetActive(false);
-            turnButton.transform.GetChild(1).gameObject.SetActive(true);
+            for (int j = -enemy.GetComponent<Enemy>().AllowSteps; j <= enemy.GetComponent<Enemy>().AllowSteps; j++)
+            {
+                if (transform.position.x + i >= 0 && transform.position.x + i < 20 &&
+                    transform.position.z + i >= 0 && transform.position.z + i < 30)
+                {
+                    if (Mathf.Abs(i) + Mathf.Abs(j) <= enemy.GetComponent<Enemy>().AllowSteps && CheckNearbyObj(enemy, i, j))
+                    {
+                        Vector3 temp = new Vector3(i, 0, j);
+                        Vector3 temp1 = diff - temp;
+                        min = (Vector3.Magnitude(diff - min) < Vector3.Magnitude(temp1)) ? min : temp;
 
-            StartCoroutine(FillingButton());
-            
+                    }
+                }
+
+            }
         }
 
-        else
-        {
-            //Debug.Log("기다리세요...");
-        }
+        return (min + enemy.transform.position);
     }
 
-    private IEnumerator FillingButton()
+    private bool CheckNearbyObj(GameObject enemy, int i, int j)
     {
+        Vector3 point = transform.position + new Vector3(i, 0, j);
+
         foreach (GameObject obj in enemys)
         {
-            obj.GetComponent<Enemy>().Destin = obj.GetComponent<Enemy>().EnemyDest();
+            if (obj.transform.position == point)
+            {
+                return false;
+            }
         }
 
-        while (true)
+        if (Dest == point)
         {
-            float fillSpeed = 1.0f;
-            turnButton.GetComponent<Image>().fillAmount += fillSpeed * Time.deltaTime;
-           // Debug.Log(turnButton.GetComponent<Image>().fillAmount);
-
-            if (turnButton.GetComponent<Image>().fillAmount >= 1)
-            {
-                turnButton.transform.GetChild(0).gameObject.SetActive(true);
-                turnButton.transform.GetChild(1).gameObject.SetActive(false);
-                break;
-            }
-
-            foreach (GameObject obj in enemys)
-            {
-                if (obj.GetComponent<Enemy>().EnemyMoveable(obj.GetComponent<Enemy>().Destin))
-                {
-                    StartCoroutine(obj.GetComponent<Enemy>().Move());
-                }
-            }
-
-            yield return new WaitForSeconds(0.01f);
+            enemy.GetComponent<Enemy>().AttackOther();
+            return false;
         }
 
+        return true;
 
-
-        steps = playerObj.GetComponent<Player>().AllowMoveSteps;
     }
+
 }
