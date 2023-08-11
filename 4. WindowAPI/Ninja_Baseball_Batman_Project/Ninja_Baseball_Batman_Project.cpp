@@ -47,9 +47,9 @@ VOID CALLBACK AniProc0(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 void SettingTimers(HWND hWnd);
 void GetSentence(int& i, char* buff, char* sentence);
 
-void LoadAllSprites(const TCHAR dataFileName[100]);
-void LoadAllAnimations(const TCHAR dataFileName[100]);
-void LoadAllSounds(const TCHAR dataFileName[100]);
+void LoadSprites(const TCHAR dataFileName[100]);
+void LoadAnimations(const TCHAR dataFileName[100]);
+void LoadSounds(const TCHAR dataFileName[100]);
 
 void TitleScene(HDC hdc);
 void SelectScene(HDC hdc);
@@ -142,7 +142,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      200, 200, 700, 500, nullptr, nullptr, hInstance, nullptr);
+      200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -177,7 +177,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_CREATE:
         {
-            GetClientRect(hWnd, &winRect);
             Initalize(hWnd);
         }
         break;
@@ -283,7 +282,7 @@ void SettingTimers(HWND hWnd)
     SetTimer(hWnd, TIMER_0, frameTime[0], AniProc0);
 }
 
-void LoadAllSprites(const TCHAR dataFileName[100])
+void LoadSprites(const TCHAR dataFileName[100])
 {
 
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
@@ -329,7 +328,7 @@ void LoadAllSprites(const TCHAR dataFileName[100])
 
 }
 
-void LoadAllAnimations(const TCHAR dataFileName[100])
+void LoadAnimations(const TCHAR dataFileName[100])
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -372,9 +371,10 @@ void LoadAllAnimations(const TCHAR dataFileName[100])
         Animations[aniName] = shared_ptr<Animation>(new Animation(Sprites[originSprite], uniAddress));
         index++;
     }
+
 }
 
-void LoadAllSounds(const TCHAR dataFileName[100])
+void LoadSounds(const TCHAR dataFileName[100])
 {
 }
 
@@ -382,14 +382,7 @@ void Initalize(HWND hWnd) // 모든 animation, sound, stage 데이터 로드하�
 {
     SettingTimers(hWnd);
 
-    //모든 스프라이트 로드
-    LoadAllSprites(_T("AniData/All_Sprites.txt"));
-
-    //모든 애니메이션 로드
-    LoadAllAnimations(_T("AniData/All_Animations.txt"));
-
-    //모든 소리 로드
-
+    GetClientRect(hWnd, &winRect);
 
     //게임 매니저 생성
     gameManager->GetInstance();
@@ -401,13 +394,40 @@ void Initalize(HWND hWnd) // 모든 animation, sound, stage 데이터 로드하�
 
 void TitleScene(HDC hdc) // SceneNum = 0
 {
-    POINT location = { 340, 220 };
+    Screen = NULL;
+
+    Sprites.clear();
+    Animations.clear();
+    Sounds.clear();
+
+    LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
+    LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"));
+    //모든 소리 로드
+
+    POINT location = { 35, 0 };
     totalFrame[0] = Animations["Title_screen"]->GetFrameTotalCount();
-    Animations["Title_screen"]->AniPlay(hdc, location, frameChannel[0], 1.0f);
+    Animations["Title_screen"]->AniPlay(hdc, location, frameChannel[0], 1.55f);
 }
 
 void SelectScene(HDC hdc) // SceneNum = 1
 {
+    Screen = NULL;
+
+    Sprites.clear();
+    Animations.clear();
+    Sounds.clear();
+
+    LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
+    LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"));
+
+    for (int i = 20; i <= 900; i += 30)
+    {
+        for (int j = 0; j <= 630; j += 35)
+        {
+            Animations["Select_background"]->AniPlay(hdc, {i,j}, 0, 1.55f);
+        }
+    }
+
 
 }
 

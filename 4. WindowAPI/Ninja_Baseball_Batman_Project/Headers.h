@@ -3,7 +3,7 @@
 #include "Ninja_Baseball_Batman_Project.h"
 #include"Sprite.h"
 #include"Animation.h"
-#include"Collider.h"
+#include"BoxCollider.h"
 #include"Camera.h"
 #include"Charactor.h"
 #include"GameManager.h"

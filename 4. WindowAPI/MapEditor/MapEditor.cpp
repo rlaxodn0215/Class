@@ -98,7 +98,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -122,9 +122,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+{    
+    static TCHAR temp2[20] = _T("xx");
+    static int x = 0;
+    static int y = 0;
     switch (message)
     {
+    case WM_LBUTTONDOWN:
+    {
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        _stprintf_s(temp2, L"[%d,%d]", x, y);
+    }
+    break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -147,6 +157,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+            TextOut(hdc, x, y, temp2, _tcslen(temp2));
             EndPaint(hWnd, &ps);
         }
         break;

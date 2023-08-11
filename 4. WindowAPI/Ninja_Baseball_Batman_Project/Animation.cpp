@@ -4,7 +4,7 @@ int FindNum(int& i, char chbuff[])
 {
 	int temp = 0;
 
-	while (chbuff[i] != '\n')
+	while (chbuff[i] != '\n' && chbuff[i] != '\0')
 	{
 		temp = 10 * temp + (chbuff[i] - '0');
 		i++;
@@ -90,7 +90,7 @@ Animation::~Animation()
 
 }
 
-void Animation::AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio)
+void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float imageRatio)
 {
 	HDC hMemDC;
 	HBITMAP holdBitmap;
@@ -102,8 +102,8 @@ void Animation::AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRat
 	int by = m_Height[spriteIndex];
 	int xStart = m_Offset[spriteIndex].x;
 	int yStart = m_Offset[spriteIndex].y;
-	int posX = location.x - (int)(m_Pivot[spriteIndex].x * imageRatio);
-	int posY = location.y - (int)(m_Pivot[spriteIndex].y * imageRatio);
+	int posX = offset_location.x;
+	int posY = offset_location.y;
 
 	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
 		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_Pos_X, m_ResourceSprite->GetTransparentColor().m_Pos_Y,

@@ -85,8 +85,8 @@ class Ryno :public Player
 {
 private:
 	PlayerCharactor m_Charactor;
-	Collider m_BodyColliders;
-	Collider m_AttackColliders;
+	BoxCollider m_BodyColliders;
+	BoxCollider m_AttackColliders;
 	int m_PlayerLife;
 	int m_Points;
 
@@ -114,16 +114,18 @@ public:
 
 class Monster : public Charactor
 {
-private:
-	MonsterCharactor m_Charactor;
-	Collider m_BodyColliders;
-	Collider m_AttackColliders;
-
 public:
-	Monster();
 	~Monster();
 	void Idle();
 	void Damaged();
 	void Dead();
 	void NormalAttack();
+};
+
+class Baseball :public Monster
+{
+private:
+	MonsterCharactor m_Charactor;
+	CircleCollider m_BodyColliders;
+	BoxCollider m_AttackColliders;
 };
