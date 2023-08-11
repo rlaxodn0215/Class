@@ -28,9 +28,28 @@ enum MonsterCharactor
 	WINDYPLANE
 };
 
-enum playerState
+enum PlayerStatus
 {
-
+	BORN,
+	IDLE,
+	MOVE,
+	NORMAL_ATTACK,
+	JUMP,
+	JUMP_ATTACK,
+	DAMAGED,
+	LAY_DOWN,
+	DEAD,
+	SLIDE,
+	SLIDE_ATTACK,
+	HOME_RUN,
+	CATCH,
+	CATCH_ATTACK,
+	SPECIAL_CATCH_ATTACK,
+	CATCH_THROW,
+	LAYDOWN_ATTACK,
+	BEARHAND_MODE,
+	BEARHAND_ATTACK,
+	CATCH_DYNAMITE
 };
 
 class Charactor
@@ -39,45 +58,53 @@ protected:
 	Vector3 m_Position;
 	int m_Hp;
 	int m_MoveSpeed;
-	int m_LookWay;
+	bool m_isLookRight;// false == left
 	bool m_isAlive;
-	map<string, Animation*> CharactorAni;
-	map<string, Sound> CharactorSound;
+	map<string, shared_ptr<Animation>> m_CharactorAnis;
+	map<string, shared_ptr<Sound>> m_CharactorSounds;
+	shared_ptr<Animation> m_CurAni;
+	shared_ptr<Sound> m_CurSound;
 
 public:
-	Charactor();
-	virtual~Charactor();
+	Charactor() = default;
+	Charactor(Vector3 pos, int hp, int moveSpeed, bool lookright, bool alive, 
+		map<string, shared_ptr<Animation>> charactorAni, map<string, shared_ptr<Sound>> charactorSound);
+	virtual~Charactor() = default;
 
 	int GetHP() { return m_Hp; }
 	void SetHP(int hp) { m_Hp = hp; }
-	void Update();
-	void ChangeAni(const string & beforeAniName, const string & afterAniName);
-	void ShowCharactorStatus();
+	void MoveUpdate();
+	void ChangeAni(const string aniName);
 };
 
 class Player : public Charactor // 상태 패턴
 {
+protected:
+	PlayerStatus m_PlayerStatus;
+
 public:
+	Player() = default;
 	virtual ~Player() = default;
-	virtual void Idle()=0;
-	virtual void Jump()=0;
-	virtual void Damaged()=0;
-	virtual void LowHP()=0;
-	virtual void Dead()=0;
-	virtual void NormalAttack()=0;
-	virtual void JumpAttack()=0;
-	virtual void Sliding()=0;
-	virtual void SlidingAttack()=0;
-	virtual void WakeUpAttack()=0;
-	virtual void HomeRun()=0;
-	virtual void Catch()=0;
-	virtual void CatchAttack()=0;
-	virtual void CatchThrow()=0;
-	virtual void LayDownAttack()=0;
-	virtual void SpecialCatchAttack()=0;
-	virtual void BearHandMode()=0;
-	virtual void BearHandAttack()=0;
-	virtual void CatchDynamite()=0;
+	PlayerStatus GetPlayerStatus() { return m_PlayerStatus; }
+	void SetPlayerStatus(int i) { m_PlayerStatus = (PlayerStatus)i; }
+
+	virtual BOOL Idle()=0;
+	virtual BOOL Jump()=0;
+	virtual BOOL Damaged()=0;
+	virtual BOOL Dead()=0;
+	virtual BOOL NormalAttack()=0;
+	virtual BOOL JumpAttack()=0;
+	virtual BOOL Sliding()=0;
+	virtual BOOL SlidingAttack()=0;
+	virtual BOOL HomeRun()=0;
+	virtual BOOL Catch()=0;
+	virtual BOOL CatchAttack()=0;
+	virtual BOOL CatchThrow()=0;
+	virtual BOOL LayDownAttack()=0;
+	virtual BOOL SpecialCatchAttack()=0;
+	virtual BOOL BearHandMode()=0;
+	virtual BOOL BearHandAttack()=0;
+	virtual BOOL CatchDynamite()=0;
 
 };
 
@@ -91,35 +118,34 @@ private:
 	int m_Points;
 
 public:
-	void Idle();
-	void Jump();
-	void Damaged();
-	void LowHP();
-	void Dead();
-	void NormalAttack();
-	void JumpAttack();
-	void Sliding();
-	void SlidingAttack();
-	void WakeUpAttack();
-	void HomeRun();
-	void Catch();
-	void CatchAttack();
-	void CatchThrow();
-	void LayDownAttack();
-	void SpecialCatchAttack();
-	void BearHandMode();
-	void BearHandAttack();
-	void CatchDynamite();
+	BOOL Idle() override;
+	BOOL Jump() override;
+	BOOL Damaged() override;
+	BOOL Dead() override;
+	BOOL NormalAttack() override;
+	BOOL JumpAttack() override;
+	BOOL Sliding() override;
+	BOOL SlidingAttack() override;
+	BOOL HomeRun() override;
+	BOOL Catch() override;
+	BOOL CatchAttack() override;
+	BOOL CatchThrow() override;
+	BOOL LayDownAttack() override;
+	BOOL SpecialCatchAttack() override;
+	BOOL BearHandMode() override;
+	BOOL BearHandAttack() override;
+	BOOL CatchDynamite() override;
 };
 
 class Monster : public Charactor
 {
 public:
-	~Monster();
-	void Idle();
-	void Damaged();
-	void Dead();
-	void NormalAttack();
+	Monster() = default;
+	virtual ~Monster() = default;
+	virtual void Idle()=0;
+	virtual void Damaged()=0;
+	virtual void Dead()=0;
+	virtual void NormalAttack()=0;
 };
 
 class Baseball :public Monster
@@ -128,4 +154,9 @@ private:
 	MonsterCharactor m_Charactor;
 	CircleCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
+public:
+	void Idle();
+	void Damaged();
+	void Dead();
+	void NormalAttack();
 };

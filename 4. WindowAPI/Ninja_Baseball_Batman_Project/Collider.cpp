@@ -163,7 +163,7 @@ BOOL BoxCollider::OnTrigger(Collider& other, int zOffsetDelta)
 			BOOL yAxis = FALSE;
 
 			if (m_Area.left <= boxOther->GetArea().left)
-			{
+			{                   
 				if (m_Area.right >= boxOther->GetArea().left) xAxis = TRUE;
 				else xAxis = FALSE;
 			}
@@ -240,29 +240,59 @@ BOOL BoxCollider::OnCollision(Collider& other, int zOffsetDelta)
 
 			BOOL xAxis = FALSE;
 			BOOL yAxis = FALSE;
+			int xDiff = 0;
+			int yDiff = 0;
 
 			if (m_Area.left <= boxOther->GetArea().left)
 			{
-				if (m_Area.right >= boxOther->GetArea().left) xAxis = TRUE;
+				if (m_Area.right >= boxOther->GetArea().left)
+				{
+					xDiff = boxOther->GetArea().left - m_Area.right;
+					if (xDiff > (boxOther->GetArea().right - boxOther->GetArea().left)) xDiff = 0;
+					xAxis = TRUE;
+				}
 				else xAxis = FALSE;
 			}
 
 			else
 			{
-				if (m_Area.left <= boxOther->GetArea().right) xAxis = TRUE;
+				if (m_Area.left <= boxOther->GetArea().right)
+				{
+					xDiff = boxOther->GetArea().right - m_Area.left;
+					if (xDiff > (boxOther->GetArea().right - boxOther->GetArea().left)) xDiff = 0;
+					xAxis = TRUE;
+				}
 				else xAxis = FALSE;
 			}
 
 			if (m_Area.top <= boxOther->GetArea().top)
 			{
-				if (m_Area.bottom >= boxOther->GetArea().top) yAxis = TRUE;
+				if (m_Area.bottom >= boxOther->GetArea().top)
+				{
+					yDiff = boxOther->GetArea().top - m_Area.bottom;
+					if (yDiff > boxOther->GetArea().bottom - boxOther->GetArea().top) yDiff = 0;
+					yAxis = TRUE;
+				}
 				else yAxis = FALSE;
 			}
 
 			else
 			{
-				if (m_Area.top <= boxOther->GetArea().bottom) yAxis = TRUE;
+				if (m_Area.top <= boxOther->GetArea().bottom)
+				{
+					yDiff = boxOther->GetArea().bottom - m_Area.top;
+					if(yDiff > boxOther->GetArea().bottom - boxOther->GetArea().top) yDiff = 0;
+					yAxis = TRUE;
+				}
 				else yAxis = FALSE;
+			}
+
+			if (xAxis && yAxis)
+			{
+				m_Area.left += xDiff;
+				m_Area.top += yDiff;
+				m_Area.right += xDiff;
+				m_Area.bottom += yDiff;
 			}
 
 			return (xAxis && yAxis);

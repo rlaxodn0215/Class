@@ -11,11 +11,11 @@
 
 using namespace std;
 
-//#ifdef UNICODE
-//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-//#else
-//#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
-//#endif // UNICODE
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
+#endif // UNICODE
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -43,6 +43,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 VOID CALLBACK AniProc0(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
+VOID CALLBACK ComboCheck(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
 void SettingTimers(HWND hWnd);
 void GetSentence(int& i, char* buff, char* sentence);
@@ -56,7 +57,7 @@ void SelectScene(HDC hdc);
 void PlayScene(HDC hdc);
 void EndingScene(HDC hdc);
 
-void Initalize(HWND hWnd); // 모든 animation, sound, stage 데이터 로드하기
+void Initalize(HWND hWnd);
 void EndGame(HWND hWnd);
 
 void (*SceneIndex)(HDC);
@@ -178,6 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         {
             Initalize(hWnd);
+            curPlayer = new Ryno();
         }
         break;
     case WM_CHAR:
@@ -189,6 +191,45 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }
         break;
+    case WM_KEYUP:
+    {
+        if (wParam == VK_UP)
+        {
+            cout << "UP_release" << endl;
+            gameManager->GetInstance()->m_ComboFlag[0] = true;
+        }
+
+        if (wParam == VK_DOWN)
+        {
+            cout << "DOWN_release" << endl;
+            gameManager->GetInstance()->m_ComboFlag[1] = true;
+        }
+
+        if (wParam == VK_LEFT)
+        {
+            cout << "LEFT_release" << endl;
+            gameManager->GetInstance()->m_ComboFlag[2] = true;
+        }
+
+        if (wParam == VK_RIGHT)
+        {
+            cout << "RIGHT_release" << endl;
+            gameManager->GetInstance()->m_ComboFlag[3] = true;
+        }
+
+        if (wParam == 0x41)
+        {
+            cout << "ATTACK_release" << endl;
+            gameManager->GetInstance()->m_ComboFlag[4] = true;
+        }
+
+        if (wParam == 0x53)
+        {
+            cout << "JUMP_release" << endl;
+            gameManager->GetInstance()->m_ComboFlag[5] = true;
+        }
+    }
+    break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -233,6 +274,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+        delete curPlayer;
         EndGame(hWnd);
         PostQuitMessage(0);
         break;
@@ -280,6 +322,7 @@ void GetSentence(int & i, char * buff, char * sentence)
 void SettingTimers(HWND hWnd)
 {
     SetTimer(hWnd, TIMER_0, frameTime[0], AniProc0);
+    SetTimer(hWnd, TIMER_1, 20, ComboCheck);
 }
 
 void LoadSprites(const TCHAR dataFileName[100])
@@ -444,6 +487,7 @@ void EndingScene(HDC hdc) // SceneNum = 3
 void EndGame(HWND hWnd)
 {
     KillTimer(hWnd, TIMER_0);
+    KillTimer(hWnd, TIMER_1);
     gameManager->Release();
 }
 
@@ -458,3 +502,9 @@ VOID CALLBACK AniProc0(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 
     InvalidateRect(hWnd, NULL, FALSE);
 }
+
+VOID CALLBACK ComboCheck(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+{
+    gameManager->GetInstance()->CheckCombo(curPlayer);
+}
+
