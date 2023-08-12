@@ -7,7 +7,7 @@ abstract public class Charactor : MonoBehaviour
     public int HP;
     public int Attack;
     abstract public void Move();
-    abstract public void AttackOther();
+    abstract public bool AttackOther(int length);
 }
 
 interface IAction
