@@ -567,20 +567,20 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void CreateBitmap()
 {
-    //수지
-    {
-        hBackImage = (HBITMAP)LoadImage(NULL, TEXT("Images/수지.bmp"),
-            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    ////수지
+    //{
+    //    hBackImage = (HBITMAP)LoadImage(NULL, TEXT("Images/수지.bmp"),
+    //        IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
-        if (hBackImage == NULL)
-        {
-            DWORD dwError = GetLastError();
-            MessageBox(NULL, _T("이미지 로드 에러_1"), _T("에러"), MB_OK);
-            return;
-        }
+    //    if (hBackImage == NULL)
+    //    {
+    //        DWORD dwError = GetLastError();
+    //        MessageBox(NULL, _T("이미지 로드 에러_1"), _T("에러"), MB_OK);
+    //        return;
+    //    }
 
-        GetObject(hBackImage, sizeof(BITMAP), &bitBack);
-    }
+    //    GetObject(hBackImage, sizeof(BITMAP), &bitBack);
+    //}
 
 
     //시공
@@ -807,7 +807,7 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
-        DeleteDC(hMenDC2);
+        DeleteDC(hMenDC2);  
     }
     //<< hMenDC 에 그려주기
 

@@ -15,21 +15,39 @@ private:
 	~GameManager();
 
 public:
+	map<string, shared_ptr<Sprite>> Sprites;
+	map<string, shared_ptr<Animation>> Animations;
+	map<string, shared_ptr<Sound>> Sounds;
+
+	vector<shared_ptr<Animation>> Timer_ani;
 	int m_SceneNum = 0;
-	POINT m_Cursor = { 50,150 }; //(50,150), +220
+	void(GameManager:: * m_Scene)(HDC,HBITMAP&);
+	
 	Stage* m_Stage;
 	Player* m_Player;
 	Camera* m_Cam;
 
+	POINT m_Cursor = { 50,150 }; //(50,150), +220
 	int m_SelectPosX[4] = {50,285,520,755};
 	bool m_SelectFlag = false;
 	bool m_KeyFlag[6] = {};
-	bool m_ComboFlag[6] = {}; //
-	int m_Timer = 20*10;
+	bool m_ComboFlag[6] = {}; 
+	int m_TimerFrame = 0;
+	int m_SelectTimer = 20*10;
 	int m_ComboTimerCount = 0;
 
+	void GetSentence(int& i, char* buff, char* sentence);
+	void LoadSprites(const TCHAR dataFileName[100]);
+	void LoadAnimations(const TCHAR dataFileName[100]);
+	void LoadSounds(const TCHAR dataFileName[100]);
+	
+	void TitleScene(HDC hdc, HBITMAP & screen);
+	void SelectScene(HDC hdc, HBITMAP & screen);
+	void PlayScene(HDC hdc, HBITMAP & screen);
+	void EndingScene(HDC hdc, HBITMAP & screen);
+
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
-	void CheckKeyInput(Player * player, int sceneNum);
+	void CheckKeyInput();
 	void CheckKeyRelease(WPARAM wParam);
 	void ShowPlayerLife(const Charactor & player);
 	void ShowPlayerHPbar(const Charactor& player);

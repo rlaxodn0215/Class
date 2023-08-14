@@ -12,7 +12,6 @@
 #include"Sound.h"
 #include"Vector3.h"
 #include<iostream>
-#include"ResourceManager.h"
 
 #define MAX_LOADSTRING 100
 #define TIMER 1
@@ -33,13 +32,9 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-ResourceManager* resourceManager;
 GameManager* gameManager;
-Player* curPlayer;
-RECT winRect;
 HBITMAP Screen;
-
-int TimerFrame = 0;
+RECT winRect;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -48,21 +43,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
-void GetSentence(int& i, char* buff, char* sentence);
-
-void LoadSprites(const TCHAR dataFileName[100]);
-void LoadAnimations(const TCHAR dataFileName[100]);
-void LoadSounds(const TCHAR dataFileName[100]);
-
-void TitleScene(HDC hdc);
-void SelectScene(HDC hdc);
-void PlayScene(HDC hdc);
-void EndingScene(HDC hdc);
-
 void Initalize(HWND hWnd);
 void EndGame(HWND hWnd);
 
-void (*SceneIndex)(HDC);
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -182,21 +165,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             Initalize(hWnd);
             SetTimer(hWnd, TIMER, 10, Timer);
-            curPlayer = new Ryno();
         }
         break;
     case WM_CHAR:
-    {
-        if (gameManager->GetInstance()->m_SceneNum == 0)
+        if (gameManager !=NULL &&  gameManager->GetInstance()->m_SceneNum == 0)
         {
+            gameManager->GetInstance()->m_Scene = &GameManager::SelectScene;
             gameManager->GetInstance()->m_SceneNum++;
-            SceneIndex = SelectScene;
 
-            resourceManager->GetInstance()->Sprites.clear();
-            resourceManager->GetInstance()->Animations.clear();
-            resourceManager->GetInstance()->Sounds.clear();
+            gameManager->GetInstance()->Sprites.clear();
+            gameManager->GetInstance()->Animations.clear();
+            gameManager->GetInstance()->Sounds.clear();
         }
-    }
         break;
     case WM_KEYUP:
     {
@@ -224,30 +204,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            HDC hMemDC;
-            HBITMAP hOldBitmap;
 
-            hMemDC = CreateCompatibleDC(hdc);
+             HDC hMemDC;
+             HBITMAP hOldBitmap;
 
-            if (Screen == NULL)
-                Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
+             hMemDC = CreateCompatibleDC(hdc);
 
-            hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
-            /////////////////////////////////////////////////////////////////////
+             if (Screen == NULL)
+                 Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
 
-            SceneIndex(hMemDC);
+             hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
+             /////////////////////////////////////////////////////////////////////
 
-            ////////////////////////////////////////////////////////////////////
-            BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
+             (gameManager->*(gameManager->GetInstance()->m_Scene))(hMemDC,Screen);
 
-            SelectObject(hMemDC, hOldBitmap);
-            DeleteDC(hMemDC);
+             ////////////////////////////////////////////////////////////////////
+             BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
 
+             SelectObject(hMemDC, hOldBitmap);
+             DeleteDC(hMemDC);
+            
             EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
-        delete curPlayer;
         EndGame(hWnd);
         PostQuitMessage(0);
         break;
@@ -278,279 +258,27 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 }
 
-void GetSentence(int & i, char * buff, char * sentence)
-{
-    int index = 0;
-    while (buff[i] != '\t' && buff[i] != '\r')
-    {
-        if (buff[i] == '\0') return;
-        sentence[index] = buff[i];
-        index++; i++;
-    }
-    sentence[index] = '\0';
-    i++;
-    return;
-}
-
-void LoadSprites(const TCHAR dataFileName[100])
-{
-
-    HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
-
-    if (hFile == NULL)
-    {
-        MessageBox(NULL, _T("Sprite 데이터 파일 로드 에러"), _T("에러"), MB_OK);
-    }
-
-    DWORD rbytes;
-    TCHAR buff[2000] = {};
-    char chbuff[2000] = {};
-    size_t convertedChars = 0;
-
-    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-    if (buff[0] == 65279)
-    {
-        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-    }
-
-#ifdef UNICODE
-    wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
-#else
-    strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
-#endif
-
-    int index = 0;
-    int length = strlen(chbuff);
-    while (chbuff[index++] != '\n');
-    while (1)
-    {
-        char name[100], address[200];
-        GetSentence(index, chbuff,name);
-        if (buff[index] == '\0') break;
-        GetSentence(index, chbuff,address);
-        TCHAR uniAddress[200] = {};
-        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-        resourceManager->GetInstance()->Sprites[name] = shared_ptr<Sprite>(new Sprite(uniAddress));
-        index++;
-    }
-
-}
-
-void LoadAnimations(const TCHAR dataFileName[100])
-{
-    HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
-
-    if (hFile == NULL)
-    {
-        MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
-    }
-
-    DWORD rbytes;
-    TCHAR buff[5000] = {};
-    char chbuff[5000] = {};
-    size_t convertedChars = 0;
-
-    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-    if (buff[0] == 65279)
-    {
-        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-    }
-
-#ifdef UNICODE
-    wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
-#else
-    strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
-#endif
-
-    int index = 0;
-    int length = strlen(chbuff);
-    while (chbuff[index++] != '\n');
-    while (1)
-    {
-        char aniName[100], originSprite[100], address[200];
-        GetSentence(index, chbuff, aniName);
-        if (buff[index] == '\0') break;
-        GetSentence(index, chbuff, originSprite);
-        GetSentence(index, chbuff, address);
-        TCHAR uniAddress[200] = {};
-        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-        resourceManager->GetInstance()->Animations[aniName] = shared_ptr<Animation>(new Animation(resourceManager->GetInstance()->Sprites[originSprite], uniAddress));
-        index++;
-    }
-
-}
-
-void LoadSounds(const TCHAR dataFileName[100])
-{
-}
-
-void Initalize(HWND hWnd) // 모든 animation, sound, stage 데이터 로드하기
+void Initalize(HWND hWnd)
 {
     GetClientRect(hWnd, &winRect);
-
-    //리소스 매니저 생성
-    resourceManager->GetInstance();
-
-    //게임 매니저 생성
-    gameManager->GetInstance();
-
-    //함수 포인터를 TitleSceen으로
-    SceneIndex = TitleScene;
-
+    gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 됮 않는다.
 }
-
-void TitleScene(HDC hdc) // SceneNum = 0
-{
-    Screen = NULL;
-
-    resourceManager->GetInstance()->Sprites.clear();
-    resourceManager->GetInstance()->Animations.clear();
-    resourceManager->GetInstance()->Sounds.clear();
-
-    LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
-    LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"));
-    //모든 소리 로드
-
-    static int totalFrame = 0;
-    static int curFrame = 0;
-    if(totalFrame==0) totalFrame = resourceManager->GetInstance()->Animations["Title_screen"]->GetFrameTotalCount();
-    if(!(TimerFrame % 50))
-        if (curFrame < totalFrame-1) curFrame++;
-        else curFrame = 0;
-    
-    resourceManager->GetInstance()->Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f);
-    cout << curFrame << endl;
-}
-
-void SelectScene(HDC hdc) // SceneNum = 1
-{
-    Screen = NULL;
-
-    if (resourceManager->GetInstance()->Sprites.empty() || resourceManager->GetInstance()->Animations.empty())
-    {
-        LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"));
-
-        // 타이머 애니 로드
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_zero"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_one"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_two"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_three"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_four"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_five"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_six"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_seven"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_eight"]);
-        resourceManager->GetInstance()->Timer_ani.push_back(resourceManager->GetInstance()->Animations["Num_nine"]);
-    }
-    for (int i = 20; i <= 900; i += 30)
-    {
-        for (int j = 0; j <= 630; j += 35)
-        {
-            resourceManager->GetInstance()->Animations["Select_background"]->AniPlay(hdc, {i,j}, 0, 1.55f);
-        }
-    }
-
-
-    if (!gameManager->GetInstance()->m_SelectFlag && gameManager->GetInstance()->m_Timer > 0)
-    {
-        static int totalFrame = 0;
-        static int curFrame = 0;
-        if (totalFrame == 0) totalFrame = resourceManager->GetInstance()->Animations["1P_select"]->GetFrameTotalCount();
-        //if (!(TimerFrame % 2))
-            if (curFrame < totalFrame - 1) curFrame++;
-            else curFrame = 0;
-        
-        resourceManager->GetInstance()->Animations["1P_select"]->AniPlay(hdc, gameManager->GetInstance()->m_Cursor,curFrame, 3.0f);
-        
-        resourceManager->GetInstance()->Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-        resourceManager->GetInstance()->Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-        resourceManager->GetInstance()->Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-        resourceManager->GetInstance()->Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
-
-        gameManager->GetInstance()->ShowTimer(hdc, resourceManager->GetInstance()->Timer_ani);
-    }
-
-    else
-    {
-        if (gameManager->GetInstance()->m_Cursor.x == gameManager->GetInstance()->m_SelectPosX[0])
-        {
-            resourceManager->GetInstance()->Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
-        }
-
-        else if (gameManager->GetInstance()->m_Cursor.x == gameManager->GetInstance()->m_SelectPosX[1])
-        {
-            resourceManager->GetInstance()->Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
-        }
-
-
-        else if (gameManager->GetInstance()->m_Cursor.x == gameManager->GetInstance()->m_SelectPosX[2])
-        {
-            resourceManager->GetInstance()->Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
-        }
-
-        else
-        {
-            resourceManager->GetInstance()->Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-            resourceManager->GetInstance()->Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-
-        }
-    }
-    
-
-    resourceManager->GetInstance()->Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f);
-    resourceManager->GetInstance()->Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f);
-    resourceManager->GetInstance()->Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f);
-    resourceManager->GetInstance()->Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f);
-    
-    resourceManager->GetInstance()->Animations["Player_select_deco"]->AniPlay(hdc, {50,65}, 0, 3.0f);
-    resourceManager->GetInstance()->Animations["Player"]->AniPlay(hdc, {100,40}, 0, 3.0f);
-    resourceManager->GetInstance()->Animations["Player_select_deco"]->AniPlay(hdc, {920,65}, 0, 3.0f);
-    resourceManager->GetInstance()->Animations["Select"]->AniPlay(hdc, {620,40}, 0, 3.0f);
-
-
-}
-
-void PlayScene(HDC hdc) // SceneNum = 2
-{
-
-}
-
-void EndingScene(HDC hdc) // SceneNum = 3
-{
-}
-
 
 void EndGame(HWND hWnd)
 {
     KillTimer(hWnd, TIMER);
     gameManager->Release();
-    resourceManager->Release();
 }
-
 
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
-    gameManager->GetInstance()->CheckKeyInput(curPlayer, gameManager->GetInstance()->m_SceneNum);
-    if (TimerFrame >= 1000) TimerFrame = 0;
-    TimerFrame++;
-    InvalidateRect(hWnd, NULL, FALSE);
     
-    //cout << TimerFrame << endl;
+    gameManager->GetInstance()->CheckKeyInput();
+
+    if (gameManager->GetInstance()->m_TimerFrame >= 1000)
+        gameManager->GetInstance()->m_TimerFrame = 0;
+    gameManager->GetInstance()->m_TimerFrame++;
+
+    InvalidateRect(hWnd, NULL, FALSE);
 }
 

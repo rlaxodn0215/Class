@@ -3,6 +3,7 @@
 GameManager::GameManager()
 {
 	m_SceneNum = 0;
+    m_Scene = &GameManager::TitleScene;
 	m_Stage = NULL;
 	m_Player = NULL;
 	m_Cam = NULL;
@@ -21,62 +22,314 @@ GameManager::~GameManager()
 	delete m_Cam;
 }
 
+void GameManager::GetSentence(int& i, char* buff, char* sentence)
+{
+    int index = 0;
+    while (buff[i] != '\t' && buff[i] != '\r')
+    {
+        if (buff[i] == '\0') return;
+        sentence[index] = buff[i];
+        index++; i++;
+    }
+    sentence[index] = '\0';
+    i++;
+    return;
+}
+
+void GameManager::LoadSprites(const TCHAR dataFileName[100])
+{
+
+    HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+
+    if (hFile == NULL)
+    {
+        MessageBox(NULL, _T("Sprite 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+    }
+
+    DWORD rbytes;
+    TCHAR buff[2000] = {};
+    char chbuff[2000] = {};
+    size_t convertedChars = 0;
+
+    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+
+    if (buff[0] == 65279)
+    {
+        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
+        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+    }
+
+#ifdef UNICODE
+    wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
+#else
+    strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
+#endif
+
+    int index = 0;
+    int length = strlen(chbuff);
+    while (chbuff[index++] != '\n');
+    while (1)
+    {
+        char name[100], address[200];
+        GetSentence(index, chbuff, name);
+        if (buff[index] == '\0') break;
+        GetSentence(index, chbuff, address);
+        TCHAR uniAddress[200] = {};
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
+        Sprites[name] = shared_ptr<Sprite>(new Sprite(uniAddress));
+        index++;
+    }
+
+}
+
+void GameManager::LoadAnimations(const TCHAR dataFileName[100])
+{
+    HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+
+    if (hFile == NULL)
+    {
+        MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+    }
+
+    DWORD rbytes;
+    TCHAR buff[5000] = {};
+    char chbuff[5000] = {};
+    size_t convertedChars = 0;
+
+    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+
+    if (buff[0] == 65279)
+    {
+        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
+        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+    }
+
+#ifdef UNICODE
+    wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
+#else
+    strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
+#endif
+
+    int index = 0;
+    int length = strlen(chbuff);
+    while (chbuff[index++] != '\n');
+    while (1)
+    {
+        char aniName[100], originSprite[100], address[200];
+        GetSentence(index, chbuff, aniName);
+        if (buff[index] == '\0') break;
+        GetSentence(index, chbuff, originSprite);
+        GetSentence(index, chbuff, address);
+        TCHAR uniAddress[200] = {};
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
+        Animations[aniName]= shared_ptr<Animation>(new Animation(Sprites[originSprite], uniAddress));
+        index++;
+    }
+
+}
+
+void GameManager::LoadSounds(const TCHAR dataFileName[100])
+{
+}
+
+void GameManager::TitleScene(HDC hdc, HBITMAP & screen) // SceneNum = 0
+{
+    screen = NULL;
+
+    //Sprites.clear();
+    //Animations.clear();
+    //Sounds.clear();
+
+    LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
+    LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"));
+    //모든 소리 로드
+
+    static int totalFrame = 0;
+    static int curFrame = 0;
+    if (totalFrame == 0) totalFrame = Animations["Title_screen"]->GetFrameTotalCount();
+    if (!(m_TimerFrame % 50))
+        if (curFrame < totalFrame - 1) curFrame++;
+        else curFrame = 0;
+
+    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f);
+    //cout << curFrame << endl;
+}
+
+void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
+{
+    screen = NULL;
+
+    if (Sprites.empty() || Animations.empty())
+    {
+        LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
+        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"));
+
+        // 타이머 애니 로드
+        Timer_ani.push_back(Animations["Num_zero"]);
+        Timer_ani.push_back(Animations["Num_one"]);
+        Timer_ani.push_back(Animations["Num_two"]);
+        Timer_ani.push_back(Animations["Num_three"]);
+        Timer_ani.push_back(Animations["Num_four"]);
+        Timer_ani.push_back(Animations["Num_five"]);
+        Timer_ani.push_back(Animations["Num_six"]);
+        Timer_ani.push_back(Animations["Num_seven"]);
+        Timer_ani.push_back(Animations["Num_eight"]);
+        Timer_ani.push_back(Animations["Num_nine"]);
+    }
+    for (int i = 20; i <= 900; i += 30)
+    {
+        for (int j = 0; j <= 630; j += 35)
+        {
+            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f);
+        }
+    }
+
+
+    if (!m_SelectFlag && m_SelectTimer > 0)
+    {
+        static int totalFrame = 0;
+        static int curFrame = 0;
+        if (totalFrame == 0) totalFrame = Animations["1P_select"]->GetFrameTotalCount();
+        //if (!(TimerFrame % 2))
+        if (curFrame < totalFrame - 1) curFrame++;
+        else curFrame = 0;
+
+        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f);
+
+        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
+        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
+        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
+        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+
+        ShowTimer(hdc, Timer_ani);
+    }
+
+    else
+    {
+        if (m_Cursor.x == m_SelectPosX[0])
+        {
+            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+        }
+
+        else if (m_Cursor.x == m_SelectPosX[1])
+        {
+            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+        }
+
+
+        else if (m_Cursor.x == m_SelectPosX[2])
+        {
+            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+        }
+
+        else
+        {
+            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
+
+        }
+    }
+
+
+    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f);
+    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f);
+    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f);
+    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f);
+
+    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f);
+    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f);
+    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f);
+
+
+}
+
+void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
+{
+
+}
+
+void GameManager::EndingScene(HDC hdc, HBITMAP & screen) // SceneNum = 3
+{
+}
+
 void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
 {
-    int temp = m_Timer / 10;
+    int temp = m_SelectTimer / 10;
 
     int tens = temp / 10;
     int ones = temp % 10;
 
     if (tens > 0)
     {
-        timerAni[tens]->AniPlay(hdc, { 455,65 }, 0, 3.5f);
+        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f);
         timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f);
     }
 
     else
     {
-        timerAni[ones]->AniPlay(hdc, { 485,65 }, 0, 3.5f);
+        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f);
     }
     
 }
 
-void GameManager::CheckKeyInput(Player * player, int sceneNum)
+void GameManager::CheckKeyInput()
 {
-    if (sceneNum == 0)
-    {
-
-    }
-
-    else if (sceneNum == 1 && m_SelectFlag==false)
+    if (m_SceneNum == 1)
     {
         static int selectNum = 0;
 
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 && !m_SelectFlag)
         {
             cout << "LEFT_SELECT" << endl;
-            if (selectNum > 0)
+            if (selectNum > 0 && !m_KeyFlag[2])
+            {
                 m_Cursor.x = m_SelectPosX[--selectNum];
+                m_KeyFlag[2] = true;
+            }
 
         }
 
-        if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && !m_SelectFlag)
         {
             cout << "RIGHT_SELECT" << endl;
-            if (selectNum < 3)
+            if (selectNum < 3 && !m_KeyFlag[3])
+            {
                 m_Cursor.x = m_SelectPosX[++selectNum];
+                m_KeyFlag[3] = true;
+            }
         }
 
-        if (GetAsyncKeyState(0x41) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000)
+        if (GetAsyncKeyState(0x41) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000 && !m_SelectFlag)
         {
             cout << "SELECTED!!" << endl;
+            m_SelectTimer = 0;
             m_SelectFlag = true;
+
         }
 
-        m_Timer -= 1;
+        if (m_SelectTimer <= -20)
+        {
+            cout << "플레이 씬으로..." << endl;
+            m_SceneNum = 2;
+            m_Scene = &GameManager::PlayScene;
+        }
+
+        m_SelectTimer--;
     }
 
-    else if (sceneNum == 2)
+    else if (m_SceneNum == 2)
     {
         if (m_ComboFlag[0] || m_ComboFlag[1] || m_ComboFlag[2] ||
             m_ComboFlag[3] || m_ComboFlag[4] || m_ComboFlag[5])
@@ -147,41 +400,50 @@ void GameManager::CheckKeyInput(Player * player, int sceneNum)
     }
 }
 
-void GameManager::CheckKeyRelease(WPARAM wParam)
+void GameManager::CheckKeyRelease( WPARAM wParam)
 {
+
     if (wParam == VK_UP)
     {
         cout << "UP_release" << endl;
         m_ComboFlag[0] = true;
+        m_KeyFlag[0] = false;
     }
 
     if (wParam == VK_DOWN)
     {
         cout << "DOWN_release" << endl;
         m_ComboFlag[1] = true;
+        m_KeyFlag[1] = false;
     }
 
     if (wParam == VK_LEFT)
     {
         cout << "LEFT_release" << endl;
         m_ComboFlag[2] = true;
+        m_KeyFlag[2] = false;
+
     }
 
     if (wParam == VK_RIGHT)
     {
         cout << "RIGHT_release" << endl;
         m_ComboFlag[3] = true;
+        m_KeyFlag[3] = false;
     }
 
     if (wParam == 0x41)
     {
         cout << "ATTACK_release" << endl;
         m_ComboFlag[4] = true;
+        m_KeyFlag[4] = false;
     }
 
     if (wParam == 0x53)
     {
         cout << "JUMP_release" << endl;
         m_ComboFlag[5] = true;
+        m_KeyFlag[5] = false;
     }
+    
 }
