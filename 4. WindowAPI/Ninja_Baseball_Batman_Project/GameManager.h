@@ -16,13 +16,21 @@ private:
 
 public:
 	int m_SceneNum = 0;
+	POINT m_Cursor = { 50,150 }; //(50,150), +220
 	Stage* m_Stage;
 	Player* m_Player;
 	Camera* m_Cam;
-	bool m_ComboFlag[6] = {}; //
-	int m_TimerCount = 0;
 
-	void CheckCombo(Player * player);
+	int m_SelectPosX[4] = {50,285,520,755};
+	bool m_SelectFlag = false;
+	bool m_KeyFlag[6] = {};
+	bool m_ComboFlag[6] = {}; //
+	int m_Timer = 500;
+	int m_ComboTimerCount = 0;
+
+	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
+	void CheckKeyInput(Player * player, int sceneNum);
+	void CheckKeyRelease(WPARAM wParam);
 	void ShowPlayerLife(const Charactor & player);
 	void ShowPlayerHPbar(const Charactor& player);
 	void ShowBossHPbar(const Charactor& Boss);
