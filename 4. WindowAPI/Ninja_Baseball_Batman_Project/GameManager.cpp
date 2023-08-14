@@ -23,7 +23,7 @@ GameManager::~GameManager()
 
 void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
 {
-    int temp = m_Timer / 50;
+    int temp = m_Timer / 10;
 
     int tens = temp / 10;
     int ones = temp % 10;

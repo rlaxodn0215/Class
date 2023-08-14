@@ -415,9 +415,15 @@ void TitleScene(HDC hdc) // SceneNum = 0
     LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"));
     //모든 소리 로드
 
-    resourceManager->GetInstance()->Animations["Title_screen"]->AniPlay(hdc, { 35, 0 },
-        (TimerFrame / 50) % resourceManager->GetInstance()->Animations["Title_screen"]->GetFrameTotalCount(), 1.55f);
-    cout << "picture" << endl;
+    static int totalFrame = 0;
+    static int curFrame = 0;
+    if(totalFrame==0) totalFrame = resourceManager->GetInstance()->Animations["Title_screen"]->GetFrameTotalCount();
+    if(!(TimerFrame % 50))
+        if (curFrame < totalFrame-1) curFrame++;
+        else curFrame = 0;
+    
+    resourceManager->GetInstance()->Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f);
+    cout << curFrame << endl;
 }
 
 void SelectScene(HDC hdc) // SceneNum = 1
@@ -449,10 +455,17 @@ void SelectScene(HDC hdc) // SceneNum = 1
         }
     }
 
+
     if (!gameManager->GetInstance()->m_SelectFlag && gameManager->GetInstance()->m_Timer > 0)
     {
-        resourceManager->GetInstance()->Animations["1P_select"]->AniPlay(hdc, gameManager->GetInstance()->m_Cursor,
-            (TimerFrame / 10) % resourceManager->GetInstance()->Animations["1P_select"]->GetFrameTotalCount(), 3.0f);
+        static int totalFrame = 0;
+        static int curFrame = 0;
+        if (totalFrame == 0) totalFrame = resourceManager->GetInstance()->Animations["1P_select"]->GetFrameTotalCount();
+        //if (!(TimerFrame % 2))
+            if (curFrame < totalFrame - 1) curFrame++;
+            else curFrame = 0;
+        
+        resourceManager->GetInstance()->Animations["1P_select"]->AniPlay(hdc, gameManager->GetInstance()->m_Cursor,curFrame, 3.0f);
         
         resourceManager->GetInstance()->Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
         resourceManager->GetInstance()->Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);

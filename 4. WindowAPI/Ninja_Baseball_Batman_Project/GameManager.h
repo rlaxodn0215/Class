@@ -25,7 +25,7 @@ public:
 	bool m_SelectFlag = false;
 	bool m_KeyFlag[6] = {};
 	bool m_ComboFlag[6] = {}; //
-	int m_Timer = 500;
+	int m_Timer = 20*10;
 	int m_ComboTimerCount = 0;
 
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);

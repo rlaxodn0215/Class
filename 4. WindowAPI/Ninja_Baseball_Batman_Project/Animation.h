@@ -19,7 +19,7 @@ public:
 	shared_ptr<Sprite> GetResourceSprite() { return m_ResourceSprite; }
 	
 	Animation();
-	Animation(shared_ptr< Sprite> resource, const TCHAR textFileName[100]);
+	Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100]);
 	~Animation();
 	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio);
 };
