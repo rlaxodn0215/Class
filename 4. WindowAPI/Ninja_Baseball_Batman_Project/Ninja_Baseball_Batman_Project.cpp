@@ -536,6 +536,8 @@ VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
     gameManager->GetInstance()->CheckKeyInput(curPlayer, gameManager->GetInstance()->m_SceneNum);
     if (TimerFrame >= 1000) TimerFrame = 0;
     TimerFrame++;
+    InvalidateRect(hWnd, NULL, FALSE);
+    
     //cout << TimerFrame << endl;
 }
 
