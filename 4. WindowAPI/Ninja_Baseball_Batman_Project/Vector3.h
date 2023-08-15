@@ -12,10 +12,7 @@ public:
 
 	bool operator==(const Vector3& other)const
 	{
-		return((m_Pos_X == other.m_Pos_X) &&
-			(m_Pos_Y == other.m_Pos_Y) &&
-			(m_Pos_Z == other.m_Pos_Z));
+		return((m_Pos_X == other.m_Pos_X) && (m_Pos_Y == other.m_Pos_Y) && (m_Pos_Z == other.m_Pos_Z));
 	}
-
 };
 

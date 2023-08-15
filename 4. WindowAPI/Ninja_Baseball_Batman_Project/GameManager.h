@@ -21,8 +21,8 @@ public:
 
 	vector<shared_ptr<Animation>> Timer_ani;
 	int m_SceneNum = 0;
+
 	void(GameManager:: * m_Scene)(HDC,HBITMAP&);
-	
 	Stage* m_Stage;
 	Player* m_Player;
 	Camera* m_Cam;
@@ -50,10 +50,10 @@ public:
 	void CheckKeyInput();
 	void CheckKeyRelease(WPARAM wParam);
 	void ShowPlayerLife(const Charactor & player);
-	void ShowPlayerHPbar(const Charactor& player);
-	void ShowBossHPbar(const Charactor& Boss);
-	void ShowPlayerStateUI(const Charactor& player);
-	void ShowPlayerPoints(const Charactor& player);
+	void ShowPlayerHPbar(const Charactor & player);
+	void ShowBossHPbar(const Charactor & Boss);
+	void ShowPlayerStateUI(const Charactor & player);
+	void ShowPlayerPoints(const Charactor & player);
 	void MoveNextStage();
 	void SlowMotion();
 	void GameOver(); // Rank Æ÷ÇÔ

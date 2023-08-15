@@ -6,6 +6,7 @@
 #include"Sound.h"
 #include"Collider.h"
 #include"Vector3.h"
+#include"GameManager.h"
 
 using namespace std;
 
@@ -58,37 +59,39 @@ protected:
 	Vector3 m_Position;
 	int m_Hp;
 	int m_MoveSpeed;
-	bool m_isLookRight;// false == left
-	bool m_isAlive;
-	map<string, shared_ptr<Animation>> m_CharactorAnis;
-	map<string, shared_ptr<Sound>> m_CharactorSounds;
+	bool m_isLookRight = true;// false == left
+	bool m_isAlive = true;
 	shared_ptr<Animation> m_CurAni;
 	shared_ptr<Sound> m_CurSound;
 
 public:
 	Charactor() = default;
-	Charactor(Vector3 pos, int hp, int moveSpeed, bool lookright, bool alive, 
-		map<string, shared_ptr<Animation>> charactorAni, map<string, shared_ptr<Sound>> charactorSound);
-	virtual~Charactor() = default;
+	Charactor(Vector3 pos, int hp, int moveSpeed);
+	~Charactor() = default;
 
 	int GetHP() { return m_Hp; }
 	void SetHP(int hp) { m_Hp = hp; }
-	void MoveUpdate();
-	void ChangeAni(const string aniName);
 };
 
 class Player : public Charactor // 상태 패턴
 {
 protected:
-	PlayerStatus m_PlayerStatus;
+	PlayerStatus m_PlayerStatus = BORN;
 
 public:
 	Player() = default;
+	Player(Vector3 pos, int hp, int moveSpeed);
+
 	virtual ~Player() = default;
 	PlayerStatus GetPlayerStatus() { return m_PlayerStatus; }
 	void SetPlayerStatus(int i) { m_PlayerStatus = (PlayerStatus)i; }
 
+	BOOL (Player::* PlayerPlaying)();
+
+	//플레이어 위치, 콜라이더 위치, 데미지 등등...
+	virtual BOOL Born() = 0;
 	virtual BOOL Idle()=0;
+	virtual BOOL Move() = 0;
 	virtual BOOL Jump()=0;
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
@@ -103,6 +106,7 @@ public:
 	virtual BOOL LayDownAttack()=0;
 	virtual BOOL SpecialCatchAttack()=0;
 	virtual BOOL BearHandMode()=0;
+	virtual BOOL BearHandMove()=0;
 	virtual BOOL BearHandAttack()=0;
 	virtual BOOL CatchDynamite()=0;
 
@@ -111,14 +115,19 @@ public:
 class Ryno :public Player
 {
 private:
-	PlayerCharactor m_Charactor;
+	PlayerCharactor m_Charactor = RYNO;
 	BoxCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
-	int m_PlayerLife;
-	int m_Points;
+	int m_PlayerLife = 3;
+	int m_Points = 0;
 
 public:
+	Ryno() = default;
+	Ryno(Vector3 pos, int hp, int moveSpeed);
+
+	BOOL Born() override;
 	BOOL Idle() override;
+	BOOL Move() override;
 	BOOL Jump() override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
@@ -133,6 +142,7 @@ public:
 	BOOL LayDownAttack() override;
 	BOOL SpecialCatchAttack() override;
 	BOOL BearHandMode() override;
+	BOOL BearHandMove() override;
 	BOOL BearHandAttack() override;
 	BOOL CatchDynamite() override;
 };
@@ -142,6 +152,7 @@ class Monster : public Charactor
 public:
 	Monster() = default;
 	virtual ~Monster() = default;
+	void MoveUpdate();
 	virtual void Idle()=0;
 	virtual void Damaged()=0;
 	virtual void Dead()=0;
@@ -154,6 +165,7 @@ private:
 	MonsterCharactor m_Charactor;
 	CircleCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
+
 public:
 	void Idle();
 	void Damaged();

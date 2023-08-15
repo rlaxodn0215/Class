@@ -33,7 +33,9 @@ private:
 
 public:
 	POINT GetCenter() { return m_Center; }
+	void SetCenter(POINT center) { m_Center = center; }
 	int GetRadius() { return m_Radius; }
+	void SetRadius(int r) { m_Radius = r; }
 
 	CircleCollider();
 	CircleCollider(POINT center, int radius);
@@ -52,6 +54,7 @@ private:
 
 public:
 	RECT GetArea() { return m_Area; }
+	void SetArea(RECT area) { m_Area = area; }
 
 	BoxCollider();
 	BoxCollider(RECT area);

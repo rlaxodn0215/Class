@@ -2,8 +2,10 @@
 
 GameManager::GameManager()
 {
-	m_SceneNum = 0;
-    m_Scene = &GameManager::TitleScene;
+    ///
+	m_SceneNum = 2;
+    m_Scene = &GameManager::PlayScene;
+    ///
 	m_Stage = NULL;
 	m_Player = NULL;
 	m_Cam = NULL;
@@ -66,7 +68,6 @@ void GameManager::LoadSprites(const TCHAR dataFileName[100])
 #endif
 
     int index = 0;
-    int length = strlen(chbuff);
     while (chbuff[index++] != '\n');
     while (1)
     {
@@ -92,8 +93,8 @@ void GameManager::LoadAnimations(const TCHAR dataFileName[100])
     }
 
     DWORD rbytes;
-    TCHAR buff[5000] = {};
-    char chbuff[5000] = {};
+    TCHAR buff[10000] = {};
+    char chbuff[10000] = {};
     size_t convertedChars = 0;
 
     ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
@@ -111,7 +112,6 @@ void GameManager::LoadAnimations(const TCHAR dataFileName[100])
 #endif
 
     int index = 0;
-    int length = strlen(chbuff);
     while (chbuff[index++] != '\n');
     while (1)
     {
@@ -257,6 +257,18 @@ void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
 
 void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
 {
+    screen = NULL;
+
+    if (Sprites.empty() || Animations.empty())
+    {
+        LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"));
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations.txt"));
+    }
+
+    Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
+    Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
+
+
 
 }
 
@@ -286,7 +298,12 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
 
 void GameManager::CheckKeyInput()
 {
-    if (m_SceneNum == 1)
+    if (m_SceneNum == 0)
+    {
+
+    }
+
+    else if (m_SceneNum == 1)
     {
         static int selectNum = 0;
 
@@ -316,7 +333,6 @@ void GameManager::CheckKeyInput()
             cout << "SELECTED!!" << endl;
             m_SelectTimer = 0;
             m_SelectFlag = true;
-
         }
 
         if (m_SelectTimer <= -20)
@@ -324,6 +340,10 @@ void GameManager::CheckKeyInput()
             cout << "플레이 씬으로..." << endl;
             m_SceneNum = 2;
             m_Scene = &GameManager::PlayScene;
+            Sprites.clear();
+            Animations.clear();
+            Sounds.clear();
+            m_Player = new Ryno(Vector3(50,400,-1),100,20);
         }
 
         m_SelectTimer--;
@@ -400,7 +420,7 @@ void GameManager::CheckKeyInput()
     }
 }
 
-void GameManager::CheckKeyRelease( WPARAM wParam)
+void GameManager::CheckKeyRelease(WPARAM wParam)
 {
 
     if (wParam == VK_UP)
@@ -446,4 +466,36 @@ void GameManager::CheckKeyRelease( WPARAM wParam)
         m_KeyFlag[5] = false;
     }
     
+}
+
+void GameManager::ShowPlayerLife(const Charactor& player)
+{
+}
+
+void GameManager::ShowPlayerHPbar(const Charactor& player)
+{
+}
+
+void GameManager::ShowBossHPbar(const Charactor& Boss)
+{
+}
+
+void GameManager::ShowPlayerStateUI(const Charactor& player)
+{
+}
+
+void GameManager::ShowPlayerPoints(const Charactor& player)
+{
+}
+
+void GameManager::MoveNextStage()
+{
+}
+
+void GameManager::SlowMotion()
+{
+}
+
+void GameManager::GameOver()
+{
 }

@@ -45,9 +45,6 @@
     <ClInclude Include="Camera.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Animation.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -58,6 +55,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,9 +83,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Vector3.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Animation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -93,6 +90,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
