@@ -3,8 +3,8 @@
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 2;
-    m_Scene = &GameManager::PlayScene;
+	m_SceneNum = 0;
+    m_Scene = &GameManager::TitleScene;
     ///
 	m_Stage = NULL;
 	m_Player = NULL;
@@ -263,10 +263,27 @@ void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
     {
         LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"));
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations.txt"));
+
+        map<string, shared_ptr<Animation>> temp;
+        temp["Ryno_born"] = Animations["Ryno_born"];
+        temp["Ryno_idle"] = Animations["Ryno_idle"];
+        temp["Ryno_walk"] = Animations["Ryno_walk"];
+        temp["Ryno_slide"] = Animations["Ryno_slide"];
+        temp["Ryno_jump"] = Animations["Ryno_jump"];
+        temp["Ryno_damaged"] = Animations["Ryno_damaged"];
+        temp["Ryno_damaged1"] = Animations["Ryno_damaged1"];
+        temp["Ryno_dead"] = Animations["Ryno_dead"];
+        temp["Ryno_attack"] = Animations["Ryno_attack"];
+
+        map<string, shared_ptr<Sound>> temp1;
+
+        m_Player = new Ryno(Vector3(100, 500, -1), 100, 5, temp, temp1);
     }
 
     Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
     Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
+
+    m_Player->ShowCharactor(hdc,4, m_TimerFrame);
 
 
 
@@ -274,6 +291,9 @@ void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
 
 void GameManager::EndingScene(HDC hdc, HBITMAP & screen) // SceneNum = 3
 {
+
+
+
 }
 
 void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
@@ -343,7 +363,6 @@ void GameManager::CheckKeyInput()
             Sprites.clear();
             Animations.clear();
             Sounds.clear();
-            m_Player = new Ryno(Vector3(50,400,-1),100,20);
         }
 
         m_SelectTimer--;
@@ -371,21 +390,31 @@ void GameManager::CheckKeyInput()
 
         if (GetAsyncKeyState(VK_UP) & 0x8000)
         {
+            m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X, m_Player->GetPos().m_Pos_Y - m_Player->GetMoveSpeed()/2, -1));
+            m_Player->Move();
             cout << "UP" << endl;
         }
 
         if (GetAsyncKeyState(VK_DOWN) & 0x8000)
         {
+            m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X, m_Player->GetPos().m_Pos_Y + m_Player->GetMoveSpeed()/2, -1));
+            m_Player->Move();
             cout << "DOWN" << endl;
         }
 
         if (GetAsyncKeyState(VK_LEFT) & 0x8000)
         {
             if (m_ComboFlag[2] == false)
+            {
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X - m_Player->GetMoveSpeed(), m_Player->GetPos().m_Pos_Y, -1));
+                m_Player->Move();
                 cout << "LEFT" << endl;
+            }
             else
             {
                 m_ComboTimerCount = 0;
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X - (m_Player->GetMoveSpeed()) * 2, m_Player->GetPos().m_Pos_Y, -1));
+                m_Player->Sliding();
                 cout << "LEFT RUN" << endl;
 
             }
@@ -394,10 +423,16 @@ void GameManager::CheckKeyInput()
         if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
         {
             if (m_ComboFlag[3] == false)
+            {
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X + m_Player->GetMoveSpeed(), m_Player->GetPos().m_Pos_Y, -1));
+                m_Player->Move();
                 cout << "RIGHT" << endl;
+            }
             else
             {
                 m_ComboTimerCount = 0;
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X + (m_Player->GetMoveSpeed())*2, m_Player->GetPos().m_Pos_Y, -1));
+                m_Player->Move(); //sliding¿Ã πÆ¡¶...
                 cout << "RIGHT RUN" << endl;
 
             }

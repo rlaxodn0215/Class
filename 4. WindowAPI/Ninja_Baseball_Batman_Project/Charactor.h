@@ -6,7 +6,6 @@
 #include"Sound.h"
 #include"Collider.h"
 #include"Vector3.h"
-#include"GameManager.h"
 
 using namespace std;
 
@@ -61,16 +60,25 @@ protected:
 	int m_MoveSpeed;
 	bool m_isLookRight = true;// false == left
 	bool m_isAlive = true;
+	map<string, shared_ptr<Animation>> m_Animations;
+	map<string, shared_ptr<Sound>> m_Sounds;
 	shared_ptr<Animation> m_CurAni;
+	vector<POINT> m_CurAniShowOffset;
 	shared_ptr<Sound> m_CurSound;
 
 public:
 	Charactor() = default;
-	Charactor(Vector3 pos, int hp, int moveSpeed);
+	Charactor(Vector3 pos, int hp, int moveSpeed,
+		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
 	~Charactor() = default;
 
+	Vector3 GetPos() { return m_Position; }
+	void SetPos(Vector3 vec) { m_Position = vec; }
 	int GetHP() { return m_Hp; }
 	void SetHP(int hp) { m_Hp = hp; }
+	int GetMoveSpeed() { return m_MoveSpeed; }
+
+	void ShowCharactor(HDC hdc, int frameTime, int Timer);
 };
 
 class Player : public Charactor // 상태 패턴
@@ -80,13 +88,14 @@ protected:
 
 public:
 	Player() = default;
-	Player(Vector3 pos, int hp, int moveSpeed);
+	Player(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
+		: Charactor(pos, hp, moveSpeed, anis, sounds) {};
 
 	virtual ~Player() = default;
 	PlayerStatus GetPlayerStatus() { return m_PlayerStatus; }
 	void SetPlayerStatus(int i) { m_PlayerStatus = (PlayerStatus)i; }
 
-	BOOL (Player::* PlayerPlaying)();
+	//BOOL (Player::* PlayerPlaying)();
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
 	virtual BOOL Born() = 0;
@@ -123,7 +132,9 @@ private:
 
 public:
 	Ryno() = default;
-	Ryno(Vector3 pos, int hp, int moveSpeed);
+	Ryno(Vector3 pos, int hp, int moveSpeed, 
+		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
+		: Player(pos, hp, moveSpeed, anis, sounds) { Born();};
 
 	BOOL Born() override;
 	BOOL Idle() override;

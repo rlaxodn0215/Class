@@ -16,6 +16,8 @@ private:
 
 public:
 	int GetFrameTotalCount() { return m_FrameTotalCount; }
+	vector<int> GetWidths() { return m_Width; }
+	vector<int> GetHeights() { return m_Height; }
 	shared_ptr<Sprite> GetResourceSprite() { return m_ResourceSprite; }
 	
 	Animation();

@@ -1,28 +1,56 @@
 #include "Charactor.h"
 
-Charactor::Charactor(Vector3 pos, int hp, int moveSpeed)
+Charactor::Charactor(Vector3 pos, int hp, int moveSpeed,
+	map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
 {
 	m_Position = pos;
 	m_Hp = hp;
 	m_MoveSpeed = moveSpeed;
+	m_Animations = anis;
+	m_Sounds = sounds;
 	m_CurAni = NULL;
 	m_CurSound = NULL;
 }
 
-Player::Player(Vector3 pos, int hp, int moveSpeed) : Charactor(pos,hp,moveSpeed) {}
+void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer)
+{
+	static int totalFrame = 0;
+	static int curFrame = 0;
+	totalFrame = m_CurAni->GetFrameTotalCount();
+	if (!(Timer % TimeDivRatio))
+		if (curFrame < totalFrame - 1) curFrame++;
+		else curFrame = 0;
 
-Ryno::Ryno(Vector3 pos, int hp, int moveSpeed) : Player(pos, hp, moveSpeed) {}
-
+	m_CurAni->AniPlay(hdc,m_CurAniShowOffset[curFrame], curFrame, 3.0f);
+}
 
 BOOL Ryno::Born()
 {
-	m_CurAni = GameManager::GetInstance()->Animations["Ryno_born"];
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_born"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i]/2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
+
 	return 0;
 }
 
 BOOL Ryno::Idle()
 {
-	m_CurAni = GameManager::GetInstance()->Animations["Ryno_idle"];
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_idle"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
+
 	RECT collderPos = {Charactor::m_Position.m_Pos_X, Charactor::m_Position.m_Pos_Y, 
 		Charactor::m_Position.m_Pos_X + 20, Charactor::m_Position.m_Pos_Y + 20};
 	m_BodyColliders.SetArea(collderPos);
@@ -31,45 +59,95 @@ BOOL Ryno::Idle()
 
 BOOL Ryno::Move()
 {
-	m_CurAni = GameManager::GetInstance()->Animations["Ryno_walk"];
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_walk"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
+
 	return 0;
 }
 
 BOOL Ryno::Jump()
 {
-	m_CurAni = GameManager::GetInstance()->Animations["Ryno_jump"];
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_jump"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
 	return 0;
 }
 
 BOOL Ryno::Damaged()
 {
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
 	int n = rand() % 2;
-	if(n) m_CurAni = GameManager::GetInstance()->Animations["Ryno_damaged"];
-	else m_CurAni = GameManager::GetInstance()->Animations["Ryno_damaged1"];
+	if(n) m_CurAni = m_Animations["Ryno_damaged"];
+	else m_CurAni = m_Animations["Ryno_damaged1"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
 
 	return 0;
 }
 
 BOOL Ryno::Dead()
 {
-	m_CurAni = GameManager::GetInstance()->Animations["Ryno_dead"];
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_dead"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
 	return 0;
 }
 
 BOOL Ryno::NormalAttack()
 {
-	m_CurAni = GameManager::GetInstance()->Animations["Ryno_attack"];
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_attack"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
 	return 0;
 }
 
 BOOL Ryno::JumpAttack()
 {
-	//m_CurAni = GameManager::GetInstance()->Animations["Ryno_dead"];
 	return 0;
 }
 
 BOOL Ryno::Sliding()
 {
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Ryno_slide"];
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Pos_Y - m_CurAni->GetHeights()[i] });
+	}
+
 	return 0;
 }
 
@@ -132,6 +210,7 @@ void Monster::MoveUpdate()
 {
 }
 
+
 void Baseball::Idle()
 {
 }
@@ -147,3 +226,5 @@ void Baseball::Dead()
 void Baseball::NormalAttack()
 {
 }
+
+
