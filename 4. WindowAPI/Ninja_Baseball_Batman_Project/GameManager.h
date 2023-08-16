@@ -28,10 +28,13 @@ public:
 	Camera* m_Cam;
 
 	POINT m_Cursor = { 50,150 }; //(50,150), +220
-	int m_SelectPosX[4] = {50,285,520,755};
+	int m_SelectPosX[4] = {50,290,530,765};
 	bool m_SelectFlag = false;
+
 	bool m_KeyFlag[6] = {}; //0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: ATTACK, 5: JUMP
 	bool m_ComboFlag[6] = {}; 
+	bool m_AniWait;
+
 	int m_TimerFrame = 0;
 	int m_SelectTimer = 20*10;
 	int m_ComboTimerCount = 0;
@@ -46,6 +49,7 @@ public:
 	void PlayScene(HDC hdc, HBITMAP & screen);
 	void EndingScene(HDC hdc, HBITMAP & screen);
 
+	void Gravity(int g);
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
 	void CheckKeyInput();
 	void CheckKeyRelease(WPARAM wParam);

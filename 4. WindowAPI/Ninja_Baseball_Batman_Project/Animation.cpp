@@ -68,9 +68,9 @@ Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])
 		if (resource->GetTransparentColor() == temp)
 		{
 			Vector3 vec;
-			vec.m_Pos_X = FindNum(i, chbuff);
-			vec.m_Pos_Y = FindNum(i, chbuff);
-			vec.m_Pos_Z = FindNum(i, chbuff);
+			vec.m_X = FindNum(i, chbuff);
+			vec.m_Y = FindNum(i, chbuff);
+			vec.m_Z = FindNum(i, chbuff);
 			resource->SetTransparentColor(vec);
 		}
 		else
@@ -106,8 +106,8 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 	int posY = offset_location.y;
 
 	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
-		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_Pos_X, m_ResourceSprite->GetTransparentColor().m_Pos_Y,
-			m_ResourceSprite->GetTransparentColor().m_Pos_Z));//m_ResourceSprite->GetTransparentColor()
+		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
+			m_ResourceSprite->GetTransparentColor().m_Z));//m_ResourceSprite->GetTransparentColor()
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);

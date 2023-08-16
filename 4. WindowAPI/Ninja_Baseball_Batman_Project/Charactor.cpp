@@ -12,19 +12,51 @@ Charactor::Charactor(Vector3 pos, int hp, int moveSpeed,
 	m_CurSound = NULL;
 }
 
-void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer)
+void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait)
 {
+
 	static int totalFrame = 0;
 	static int curFrame = 0;
 	totalFrame = m_CurAni->GetFrameTotalCount();
-	if (!(Timer % TimeDivRatio))
+
+	if (aniWait)
 	{
-		if (curFrame < totalFrame - 1) curFrame++;
-		else curFrame = 0;
+		static int tempTimer = 0;
+
+		if (!(Timer % TimeDivRatio) && curFrame < totalFrame - 1)
+		{
+			curFrame++;
+		}
+
+		if (curFrame < totalFrame)
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f);
+
+		if (curFrame == totalFrame - 1)
+		{
+			tempTimer++;
+			if (tempTimer> TimeDivRatio * 2.5f)
+			{
+				aniWait = false;
+				tempTimer = 0;
+			}
+		}
 	}
 
-	if(curFrame< totalFrame)
-		m_CurAni->AniPlay(hdc,m_CurAniShowOffset[curFrame], curFrame, 3.0f);
+	else
+	{
+		if (!(Timer % TimeDivRatio))
+		{
+			if (curFrame < totalFrame - 1) curFrame++;
+			else curFrame = 0;
+		}
+
+		if (curFrame < totalFrame)
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f);
+	}
+	
+
+	
+
 }
 
 BOOL Ryno::Born()
@@ -36,8 +68,8 @@ BOOL Ryno::Born()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i]/2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i]/2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
 	return 0;
@@ -52,12 +84,12 @@ BOOL Ryno::Idle()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
-	RECT collderPos = {Charactor::m_Position.m_Pos_X, Charactor::m_Position.m_Pos_Y, 
-		Charactor::m_Position.m_Pos_X + 20, Charactor::m_Position.m_Pos_Y + 20};
+	RECT collderPos = {Charactor::m_Position.m_X, Charactor::m_Position.m_Y, 
+		Charactor::m_Position.m_X + 20, Charactor::m_Position.m_Y + 20};
 	m_BodyColliders.SetArea(collderPos);
 	return 0;
 }
@@ -71,8 +103,8 @@ BOOL Ryno::Move()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
 	return 0;
@@ -87,26 +119,30 @@ BOOL Ryno::Run()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
 	return 0;
 }
 
-BOOL Ryno::Jump()
+BOOL Ryno::Jump(bool & keydown)
 {
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
 	m_CurAni = m_Animations["Ryno_jump"];
 	m_CurAniSpeed = 4;
 
+	if(!keydown)
+		m_Velocity.m_Y = -100;
+
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Y - m_CurAni->GetHeights()[i] });
 	}
 
+	if (m_Velocity.m_Y == 100) keydown = false;
 
 	return 0;
 }
@@ -122,8 +158,8 @@ BOOL Ryno::Damaged()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
 	return 0;
@@ -138,8 +174,8 @@ BOOL Ryno::Dead()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 	return 0;
 }
@@ -153,8 +189,8 @@ BOOL Ryno::NormalAttack()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 	return 0;
 }
@@ -174,8 +210,8 @@ BOOL Ryno::SlidingAttack()
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
 	return 0;
@@ -186,12 +222,12 @@ BOOL Ryno::HomeRun()
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
 	m_CurAni = m_Animations["Ryno_homerun"];
-	m_CurAniSpeed = 4;
+	m_CurAniSpeed = 10;
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_Pos_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Pos_Z - m_CurAni->GetHeights()[i] });
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
 	return 0;
@@ -222,30 +258,16 @@ BOOL Ryno::SpecialCatchAttack()
 	return 0;
 }
 
-BOOL Ryno::BearHandMode()
-{
-	return 0;
-}
-
-BOOL Ryno::BearHandMove()
-{
-	return 0;
-}
-
-BOOL Ryno::BearHandAttack()
-{
-	return 0;
-}
-
 BOOL Ryno::CatchDynamite()
 {
 	return 0;
 }
 
+
+
 void Monster::MoveUpdate()
 {
 }
-
 
 void Baseball::Idle()
 {

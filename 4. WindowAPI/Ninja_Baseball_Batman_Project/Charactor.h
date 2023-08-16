@@ -84,8 +84,9 @@ public:
 	void SetHP(int hp) { m_Hp = hp; }
 	int GetMoveSpeed() { return m_MoveSpeed; }
 	int GetAniSpeed() { return m_CurAniSpeed; }
+	bool GetLookRight() { return m_isLookRight; }
 
-	void ShowCharactor(HDC hdc, int frameTime, int Timer);
+	void ShowCharactor(HDC hdc, int frameTime, int Timer, bool & aniWait);
 };
 
 class Player : public Charactor // 상태 패턴
@@ -109,7 +110,7 @@ public:
 	virtual BOOL Idle()=0;
 	virtual BOOL Move() = 0;
 	virtual BOOL Run() = 0;
-	virtual BOOL Jump()=0;
+	virtual BOOL Jump(bool & keydown)=0;
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
 	virtual BOOL NormalAttack()=0;
@@ -121,9 +122,6 @@ public:
 	virtual BOOL CatchThrow()=0;
 	virtual BOOL LayDownAttack()=0;
 	virtual BOOL SpecialCatchAttack()=0;
-	virtual BOOL BearHandMode()=0;
-	virtual BOOL BearHandMove()=0;
-	virtual BOOL BearHandAttack()=0;
 	virtual BOOL CatchDynamite()=0;
 
 };
@@ -147,7 +145,7 @@ public:
 	BOOL Idle() override;
 	BOOL Move() override;
 	BOOL Run() override;
-	BOOL Jump() override;
+	BOOL Jump(bool & keydown) override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
 	BOOL NormalAttack() override;
@@ -159,9 +157,6 @@ public:
 	BOOL CatchThrow() override;
 	BOOL LayDownAttack() override;
 	BOOL SpecialCatchAttack() override;
-	BOOL BearHandMode() override;
-	BOOL BearHandMove() override;
-	BOOL BearHandAttack() override;
 	BOOL CatchDynamite() override;
 };
 

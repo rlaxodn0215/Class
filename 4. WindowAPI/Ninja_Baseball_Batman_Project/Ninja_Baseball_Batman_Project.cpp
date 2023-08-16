@@ -273,6 +273,7 @@ void EndGame(HWND hWnd)
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
     gameManager->GetInstance()->CheckKeyInput();
+    gameManager->GetInstance()->Gravity(5);
 
     if (gameManager->GetInstance()->m_TimerFrame >= 1000)
         gameManager->GetInstance()->m_TimerFrame = 0;

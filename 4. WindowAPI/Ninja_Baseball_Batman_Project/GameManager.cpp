@@ -274,10 +274,7 @@ void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
     Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
     Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
 
-    m_Player->ShowCharactor(hdc,m_Player->GetAniSpeed(), m_TimerFrame);
-
-
-
+    m_Player->ShowCharactor(hdc,m_Player->GetAniSpeed(), m_TimerFrame,m_AniWait);
 }
 
 void GameManager::EndingScene(HDC hdc, HBITMAP & screen) // SceneNum = 3
@@ -304,6 +301,17 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
     {
         timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f);
     }
+    
+}
+
+void GameManager::Gravity(int g)
+{
+   if (m_Player->GetPos().m_Y < m_Player->GetPos().m_Z)
+   {
+       m_Player->SetVel(m_Player->GetVel() + Vector3(0,g,0));
+       m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+       //cout << m_Player->GetVel().m_Y << endl;
+   }
     
 }
 
@@ -378,63 +386,97 @@ void GameManager::CheckKeyInput()
             }
 
         }
-
-        m_Player->Idle();
-        m_Player->SetVel(Vector3(0, 0, 0));
-        m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
-
-        if (GetAsyncKeyState(VK_UP) & 0x8000)
+        if (!m_AniWait && !m_KeyFlag[5])
         {
-            m_Player->SetVel(Vector3(m_Player->GetVel().m_Pos_X, 0, -m_Player->GetMoveSpeed() / 1.5f));
+            m_Player->Idle();
+            m_Player->SetVel(Vector3(0, 0, 0));
             m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
-            m_Player->Move();
-            cout << "UP" << endl;
+            m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
         }
 
-        if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+        if (GetAsyncKeyState(VK_UP) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
         {
-            m_Player->SetVel(Vector3(m_Player->GetVel().m_Pos_X, 0, m_Player->GetMoveSpeed() / 1.5f));
+            m_KeyFlag[0] = true;
+            m_Player->SetVel(Vector3(m_Player->GetVel().m_X, 0, -m_Player->GetMoveSpeed() / 1.5f));
             m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+            m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
+
+            if(!m_KeyFlag[5])
             m_Player->Move();
+
+            cout << "UP" << endl;
+            //cout << m_Player->GetPos() << endl;
+        }
+
+        if (GetAsyncKeyState(VK_DOWN) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
+        {
+            m_KeyFlag[1] = true;
+            m_Player->SetVel(Vector3(m_Player->GetVel().m_X, 0, m_Player->GetMoveSpeed() / 1.5f));
+            m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+            m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
+
+            if (!m_KeyFlag[5])
+            m_Player->Move();
+
             cout << "DOWN" << endl;
         }
 
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
         {
+            m_KeyFlag[2] = true;
+
             if (m_ComboFlag[2] == false)
             {
-                m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed(), m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed(), 0, m_Player->GetVel().m_Z));
                 m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
+
+                if (!m_KeyFlag[5])
                 m_Player->Move();
+
                 cout << "LEFT" << endl;
             }
             else
             {
                 m_ComboTimerCount = 0;
-                m_Player->SetVel(Vector3(- m_Player->GetMoveSpeed()*2, m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetVel(Vector3(- m_Player->GetMoveSpeed()*2, 0, m_Player->GetVel().m_Z));
                 m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
+
+                if (!m_KeyFlag[5])
                 m_Player->Run();
+
                 cout << "LEFT RUN" << endl;
 
             }
         }
 
-        if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
         {
+            m_KeyFlag[3] = true;
+
             if (m_ComboFlag[3] == false)
             {
-                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed(), m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed(), 0, m_Player->GetVel().m_Z));
                 m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
+
+                if (!m_KeyFlag[5])
                 m_Player->Move();
+
                 cout << "RIGHT" << endl;
-               // cout << m_Player->GetVel() << endl;
+                //cout << m_Player->GetPos() << endl;
             }
             else
             {
                 m_ComboTimerCount = 0;
-                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed()*2, m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed()*2, 0, m_Player->GetVel().m_Z));
                 m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+                m_Player->SetPos(Vector3(m_Player->GetPos().m_X, m_Player->GetPos().m_Z, m_Player->GetPos().m_Z));
+
+                if (!m_KeyFlag[5])
                 m_Player->Run();
+
                 cout << "RIGHT RUN" << endl;
                 //cout << m_Player->GetVel()<< endl;
 
@@ -443,20 +485,30 @@ void GameManager::CheckKeyInput()
 
         if (GetAsyncKeyState(0x41) & 0x8000) // a
         {
+            m_KeyFlag[4] = true;
             m_Player->NormalAttack();
             cout << "ATTACK" << endl;
         }
 
-        if (GetAsyncKeyState(0x53) & 0x8000) // s
+        if (GetAsyncKeyState(0x53) & 0x8000 || m_KeyFlag[5]) // s
         {   
-            m_Player->Jump();
+            m_Player->Jump(m_KeyFlag[5]);
+            m_KeyFlag[5] = true;
             cout << "JUMP" << endl;
         }
 
         if (m_ComboFlag[4] && m_ComboFlag[5])
         {
             m_Player->HomeRun();
+
+            if(m_Player->GetLookRight())
+                m_Player->SetPos(m_Player->GetPos() + Vector3(10,0,0) );
+            else
+                m_Player->SetPos(m_Player->GetPos() + Vector3(-10, 0, 0));
+
             cout << "HOME_RUN" << endl;
+            m_AniWait = true;
+            m_KeyFlag[5] = false;
         }
     }
 }
@@ -504,7 +556,7 @@ void GameManager::CheckKeyRelease(WPARAM wParam)
     {
         cout << "JUMP_release" << endl;
         m_ComboFlag[5] = true;
-        m_KeyFlag[5] = false;
+        //m_KeyFlag[5] = false;
     }
     
 }
