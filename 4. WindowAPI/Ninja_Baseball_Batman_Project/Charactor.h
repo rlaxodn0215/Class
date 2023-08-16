@@ -85,7 +85,9 @@ public:
 	int GetMoveSpeed() { return m_MoveSpeed; }
 	int GetAniSpeed() { return m_CurAniSpeed; }
 	bool GetLookRight() { return m_isLookRight; }
+	void SetLookRight(bool way) { m_isLookRight = way; }
 
+	void Update();
 	void ShowCharactor(HDC hdc, int frameTime, int Timer, bool & aniWait);
 };
 

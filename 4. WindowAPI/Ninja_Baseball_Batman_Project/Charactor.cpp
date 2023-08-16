@@ -12,6 +12,11 @@ Charactor::Charactor(Vector3 pos, int hp, int moveSpeed,
 	m_CurSound = NULL;
 }
 
+void Charactor::Update()
+{
+	m_Position = m_Position + m_Velocity;
+}
+
 void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait)
 {
 
@@ -133,21 +138,23 @@ BOOL Ryno::Jump(bool & keydown, bool & jumping)
 	m_CurAni = m_Animations["Ryno_jump"];
 	m_CurAniSpeed = 4;
 
-	if (!jumping)
-	{
-		m_Velocity.m_Y = -40;
-		jumping = true;
-	}
-
-	if (m_Velocity.m_Y >= 40)
+	if (jumping && m_Position.m_Y >= m_Position.m_Z)
 	{
 		m_Velocity.m_Y = 0;
+		m_Position.m_Y = m_Position.m_Z;
 		keydown = false;
 		jumping = false;
 		//return 0;
 	}
 
+	if (!jumping && keydown)
+	{
+		m_Velocity.m_Y = -30;
+		jumping = true;
+	}
+
 	cout << m_Velocity.m_Y << endl;
+	cout << m_Position.m_Y << ", " << m_Position.m_Z << endl;
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{

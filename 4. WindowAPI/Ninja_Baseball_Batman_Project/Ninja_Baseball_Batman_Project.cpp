@@ -164,7 +164,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         {
             Initalize(hWnd);
-            SetTimer(hWnd, TIMER, 15, Timer);
+            SetTimer(hWnd, TIMER, 10, Timer);
         }
         break;
     case WM_CHAR:
@@ -273,7 +273,7 @@ void EndGame(HWND hWnd)
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
     gameManager->GetInstance()->CheckKeyInput();
-    gameManager->GetInstance()->Gravity(5);
+    gameManager->GetInstance()->Gravity(2);
 
     if (gameManager->GetInstance()->m_TimerFrame >= 1000)
         gameManager->GetInstance()->m_TimerFrame = 0;
