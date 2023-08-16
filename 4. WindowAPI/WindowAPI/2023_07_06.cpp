@@ -755,7 +755,7 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
         //TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
         StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
-        TransparentBlt(hdc, posX, 150, -bx, by, hMenDC, xStart, yStart, bx, by, RGB(255, 0, 255));
+        TransparentBlt(hdc, posX, 150, bx, by, hMenDC, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
         DeleteDC(hMenDC2);

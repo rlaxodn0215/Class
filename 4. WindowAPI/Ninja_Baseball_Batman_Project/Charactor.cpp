@@ -17,7 +17,7 @@ void Charactor::Update()
 	m_Position = m_Position + m_Velocity;
 }
 
-void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait)
+void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait, HBITMAP & bitmap)
 {
 
 	static int totalFrame = 0;
@@ -34,7 +34,7 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWai
 		}
 
 		if (curFrame < totalFrame)
-			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f);
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight,bitmap);
 
 		if (curFrame == totalFrame - 1)
 		{
@@ -56,7 +56,7 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWai
 		}
 
 		if (curFrame < totalFrame)
-			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f);
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight,bitmap);
 	}
 	
 
@@ -93,8 +93,8 @@ BOOL Ryno::Idle()
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
-	RECT collderPos = {Charactor::m_Position.m_X, Charactor::m_Position.m_Y, 
-		Charactor::m_Position.m_X + 20, Charactor::m_Position.m_Y + 20};
+	RECT collderPos = {Charactor::m_Position.m_X+25, Charactor::m_Position.m_Y, 
+		Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Y + 100};
 	m_BodyColliders.SetArea(collderPos);
 	return 0;
 }
@@ -144,7 +144,6 @@ BOOL Ryno::Jump(bool & keydown, bool & jumping)
 		m_Position.m_Y = m_Position.m_Z;
 		keydown = false;
 		jumping = false;
-		//return 0;
 	}
 
 	if (!jumping && keydown)
@@ -153,14 +152,15 @@ BOOL Ryno::Jump(bool & keydown, bool & jumping)
 		jumping = true;
 	}
 
-	cout << m_Velocity.m_Y << endl;
-	cout << m_Position.m_Y << ", " << m_Position.m_Z << endl;
-
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
 			m_Position.m_Y - m_CurAni->GetHeights()[i] });
 	}
+
+	RECT collderPos = { Charactor::m_Position.m_X , Charactor::m_Position.m_Y,
+		Charactor::m_Position.m_X + 80, Charactor::m_Position.m_Y + 100 };
+	m_BodyColliders.SetArea(collderPos);
 
 	return 0;
 }
@@ -210,6 +210,11 @@ BOOL Ryno::NormalAttack()
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
+
+	RECT collderPos = { Charactor::m_Position.m_X + 50, Charactor::m_Position.m_Y,
+		Charactor::m_Position.m_X + 200, Charactor::m_Position.m_Y + 100 };
+	m_AttackColliders.SetArea(collderPos);
+
 	return 0;
 }
 

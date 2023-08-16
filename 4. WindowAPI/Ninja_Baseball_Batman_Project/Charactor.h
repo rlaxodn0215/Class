@@ -88,7 +88,7 @@ public:
 	void SetLookRight(bool way) { m_isLookRight = way; }
 
 	void Update();
-	void ShowCharactor(HDC hdc, int frameTime, int Timer, bool & aniWait);
+	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, bool& aniWait, HBITMAP& bitmap);
 };
 
 class Player : public Charactor // 상태 패턴
@@ -142,6 +142,9 @@ public:
 	Ryno(Vector3 pos, int hp, int moveSpeed, 
 		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
 		: Player(pos, hp, moveSpeed, anis, sounds) { Born();};
+
+	BoxCollider GetBodyCollider() { return m_BodyColliders; }
+	BoxCollider GetAttackCollider() { return m_AttackColliders; }
 
 	BOOL Born() override;
 	BOOL Idle() override;

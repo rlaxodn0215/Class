@@ -188,7 +188,7 @@ bool showAni = false;
 bool recUpdate = false;
 
 TCHAR fileName[100];
-TCHAR ImageName[100] = _T("Bitmap/Ryno.bmp");
+TCHAR ImageName[100] = _T("Bitmap/Ryno_reverse.bmp");
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -740,7 +740,7 @@ void ShowProc(HDC hdc)
     DrawRectInstant(hdc, rec2);
 
     DrawPivot(hdc);
-    ShowPosInfo(hdc);
+    //ShowPosInfo(hdc);
 }
 
 void CalcAns()

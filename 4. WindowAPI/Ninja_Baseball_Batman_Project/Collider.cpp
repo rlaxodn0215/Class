@@ -114,11 +114,18 @@ BOOL CircleCollider::OnCollision(Collider& other, int zOffsetDelta)
 void CircleCollider::ShowCollider(HDC hdc)
 {
 	HPEN hPen, oldPen;
-	hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+	HBRUSH hBrush, hOldBrush;
+	hPen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
 	oldPen = (HPEN)SelectObject(hdc, hPen);
+	hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+	hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+
 	Ellipse(hdc, m_Center.x - m_Radius, m_Center.y - m_Radius, m_Center.x + m_Radius, m_Center.y + m_Radius);
+
 	SelectObject(hdc, oldPen);
 	DeleteObject(hPen);
+	SelectObject(hdc, hOldBrush);
+	DeleteObject(hBrush);
 }
 
 BoxCollider::BoxCollider()
@@ -310,9 +317,16 @@ BOOL BoxCollider::OnCollision(Collider& other, int zOffsetDelta)
 void BoxCollider::ShowCollider(HDC hdc)
 {
 	HPEN hPen, oldPen;
-	hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+	HBRUSH hBrush, hOldBrush;
+	hPen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
 	oldPen = (HPEN)SelectObject(hdc, hPen);
+	hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+	hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+
 	Rectangle(hdc, m_Area.left, m_Area.top, m_Area.right, m_Area.bottom);
+
 	SelectObject(hdc, oldPen);
 	DeleteObject(hPen);
+	SelectObject(hdc, hOldBrush);
+	DeleteObject(hBrush);
 }

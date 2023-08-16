@@ -151,7 +151,7 @@ void GameManager::TitleScene(HDC hdc, HBITMAP & screen) // SceneNum = 0
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f);
+    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f, true, screen);
     //cout << curFrame << endl;
 }
 
@@ -180,7 +180,7 @@ void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
     {
         for (int j = 0; j <= 630; j += 35)
         {
-            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f);
+            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f, true, screen);
         }
     }
 
@@ -194,70 +194,70 @@ void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f);
+        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f, true, screen);
 
-        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
+        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
+        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
+        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
 
-        ShowTimer(hdc, Timer_ani);
+        ShowTimer(hdc, Timer_ani,screen);
     }
 
     else
     {
         if (m_Cursor.x == m_SelectPosX[0])
         {
-            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f, true, screen);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
         }
 
         else if (m_Cursor.x == m_SelectPosX[1])
         {
-            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f, true, screen);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
         }
 
 
         else if (m_Cursor.x == m_SelectPosX[2])
         {
-            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f);
+            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f, true, screen);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
         }
 
         else
         {
-            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f);
+            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f, true, screen);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
 
         }
     }
 
 
-    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f);
-    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f);
-    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f);
-    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f);
+    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f, true, screen);
+    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f, true, screen);
+    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f, true, screen);
+    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f, true, screen);
 
-    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f);
-    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f);
-    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f);
-    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f, true, screen);
+    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f, true, screen);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f, true, screen);
+    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f, true, screen);
 
 
 }
 
 void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
 {
-    screen = NULL;
+    //screen = NULL;
 
     if (Sprites.empty() || Animations.empty())
     {
@@ -271,10 +271,14 @@ void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
         m_Player = new Ryno(Vector3(100, 500, 500), 100, 5, temp, temp1);
     }
 
-    Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
-    Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
+   Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f,true, screen);
+   Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, screen);
 
-    m_Player->ShowCharactor(hdc,m_Player->GetAniSpeed(), m_TimerFrame,m_AniWait);
+    m_Player->ShowCharactor(hdc,m_Player->GetAniSpeed(), m_TimerFrame,m_AniWait,screen);
+    Ryno* temp = (Ryno*)m_Player;
+    temp->GetBodyCollider().ShowCollider(hdc);
+    temp->GetAttackCollider().ShowCollider(hdc);
+
 }
 
 void GameManager::EndingScene(HDC hdc, HBITMAP & screen) // SceneNum = 3
@@ -284,7 +288,7 @@ void GameManager::EndingScene(HDC hdc, HBITMAP & screen) // SceneNum = 3
 
 }
 
-void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
+void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni,HBITMAP & bitmap)
 {
     int temp = m_SelectTimer / 10;
 
@@ -293,13 +297,13 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
 
     if (tens > 0)
     {
-        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f);
-        timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f);
+        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f, true, bitmap);
+        timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f, true, bitmap);
     }
 
     else
     {
-        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f);
+        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f, true, bitmap);
     }
     
 }
@@ -489,21 +493,18 @@ void GameManager::CheckKeyRelease(WPARAM wParam)
 
     if (wParam == VK_UP)
     {
-        cout << "UP_release" << endl;
         m_ComboFlag[0] = true;
         m_KeyFlag[0] = false;
     }
 
     if (wParam == VK_DOWN)
     {
-        cout << "DOWN_release" << endl;
         m_ComboFlag[1] = true;
         m_KeyFlag[1] = false;
     }
 
     if (wParam == VK_LEFT)
     {
-        cout << "LEFT_release" << endl;
         m_ComboFlag[2] = true;
         m_KeyFlag[2] = false;
 
@@ -511,23 +512,19 @@ void GameManager::CheckKeyRelease(WPARAM wParam)
 
     if (wParam == VK_RIGHT)
     {
-        cout << "RIGHT_release" << endl;
         m_ComboFlag[3] = true;
         m_KeyFlag[3] = false;
     }
 
     if (wParam == 0x41)
     {
-        cout << "ATTACK_release" << endl;
         m_ComboFlag[4] = true;
         m_KeyFlag[4] = false;
     }
 
     if (wParam == 0x53)
     {
-        cout << "JUMP_release" << endl;
         m_ComboFlag[5] = true;
-        //m_KeyFlag[5] = false;
     }
     
 }

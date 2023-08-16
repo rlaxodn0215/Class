@@ -213,10 +213,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              if (Screen == NULL)
                  Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
 
-             hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
+             hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);           
              /////////////////////////////////////////////////////////////////////
 
-             (gameManager->*(gameManager->GetInstance()->m_Scene))(hMemDC,Screen);
+             (gameManager->*(gameManager->GetInstance()->m_Scene))(hMemDC, Screen);
 
              ////////////////////////////////////////////////////////////////////
              BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);

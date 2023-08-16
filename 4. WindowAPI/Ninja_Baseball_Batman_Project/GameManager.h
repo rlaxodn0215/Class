@@ -51,7 +51,7 @@ public:
 	void EndingScene(HDC hdc, HBITMAP & screen);
 
 	void Gravity(int g);
-	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
+	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, HBITMAP& bitmap);
 	void CheckKeyInput();
 	void CheckKeyRelease(WPARAM wParam);
 	void ShowPlayerLife(const Charactor & player);

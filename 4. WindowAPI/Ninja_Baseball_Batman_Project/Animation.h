@@ -23,6 +23,6 @@ public:
 	Animation();
 	Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100]);
 	~Animation();
-	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio);
+	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio, bool lookRight, HBITMAP & bitmap);
 };
 
