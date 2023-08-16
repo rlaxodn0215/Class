@@ -110,7 +110,7 @@ public:
 	virtual BOOL Idle()=0;
 	virtual BOOL Move() = 0;
 	virtual BOOL Run() = 0;
-	virtual BOOL Jump(bool & keydown)=0;
+	virtual BOOL Jump(bool& keydown, bool& jumping)=0;
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
 	virtual BOOL NormalAttack()=0;
@@ -145,7 +145,7 @@ public:
 	BOOL Idle() override;
 	BOOL Move() override;
 	BOOL Run() override;
-	BOOL Jump(bool & keydown) override;
+	BOOL Jump(bool& keydown, bool& jumping) override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
 	BOOL NormalAttack() override;

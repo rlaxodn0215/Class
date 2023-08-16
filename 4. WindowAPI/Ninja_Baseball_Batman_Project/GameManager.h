@@ -32,6 +32,7 @@ public:
 	bool m_SelectFlag = false;
 
 	bool m_KeyFlag[6] = {}; //0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: ATTACK, 5: JUMP
+	bool m_Jumping;
 	bool m_ComboFlag[6] = {}; 
 	bool m_AniWait;
 

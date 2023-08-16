@@ -306,7 +306,7 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
 
 void GameManager::Gravity(int g)
 {
-   if (m_Player->GetPos().m_Y < m_Player->GetPos().m_Z)
+   if (m_Player->GetVel().m_Y <= 40 && m_Player->GetPos().m_Y <= m_Player->GetPos().m_Z)
    {
        m_Player->SetVel(m_Player->GetVel() + Vector3(0,g,0));
        m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
@@ -490,10 +490,10 @@ void GameManager::CheckKeyInput()
             cout << "ATTACK" << endl;
         }
 
-        if (GetAsyncKeyState(0x53) & 0x8000 || m_KeyFlag[5]) // s
+        if (GetAsyncKeyState(0x53) & 0x8000 || m_Jumping) // s
         {   
-            m_Player->Jump(m_KeyFlag[5]);
             m_KeyFlag[5] = true;
+            m_Player->Jump(m_KeyFlag[5],m_Jumping);
             cout << "JUMP" << endl;
         }
 

@@ -126,23 +126,34 @@ BOOL Ryno::Run()
 	return 0;
 }
 
-BOOL Ryno::Jump(bool & keydown)
+BOOL Ryno::Jump(bool & keydown, bool & jumping)
 {
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
 	m_CurAni = m_Animations["Ryno_jump"];
 	m_CurAniSpeed = 4;
 
-	if(!keydown)
-		m_Velocity.m_Y = -100;
+	if (!jumping)
+	{
+		m_Velocity.m_Y = -40;
+		jumping = true;
+	}
+
+	if (m_Velocity.m_Y >= 40)
+	{
+		m_Velocity.m_Y = 0;
+		keydown = false;
+		jumping = false;
+		//return 0;
+	}
+
+	cout << m_Velocity.m_Y << endl;
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
 			m_Position.m_Y - m_CurAni->GetHeights()[i] });
 	}
-
-	if (m_Velocity.m_Y == 100) keydown = false;
 
 	return 0;
 }
