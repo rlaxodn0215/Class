@@ -56,14 +56,18 @@ class Charactor
 {
 protected:
 	Vector3 m_Position;
+	Vector3 m_Velocity = {0,0,0};
 	int m_Hp;
 	int m_MoveSpeed;
 	bool m_isLookRight = true;// false == left
 	bool m_isAlive = true;
+
 	map<string, shared_ptr<Animation>> m_Animations;
-	map<string, shared_ptr<Sound>> m_Sounds;
 	shared_ptr<Animation> m_CurAni;
 	vector<POINT> m_CurAniShowOffset;
+	int m_CurAniSpeed = 0;
+
+	map<string, shared_ptr<Sound>> m_Sounds;
 	shared_ptr<Sound> m_CurSound;
 
 public:
@@ -74,9 +78,12 @@ public:
 
 	Vector3 GetPos() { return m_Position; }
 	void SetPos(Vector3 vec) { m_Position = vec; }
+	Vector3 GetVel() { return m_Velocity; }
+	void SetVel(Vector3 vec) { m_Velocity = vec; }
 	int GetHP() { return m_Hp; }
 	void SetHP(int hp) { m_Hp = hp; }
 	int GetMoveSpeed() { return m_MoveSpeed; }
+	int GetAniSpeed() { return m_CurAniSpeed; }
 
 	void ShowCharactor(HDC hdc, int frameTime, int Timer);
 };
@@ -101,12 +108,12 @@ public:
 	virtual BOOL Born() = 0;
 	virtual BOOL Idle()=0;
 	virtual BOOL Move() = 0;
+	virtual BOOL Run() = 0;
 	virtual BOOL Jump()=0;
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
 	virtual BOOL NormalAttack()=0;
 	virtual BOOL JumpAttack()=0;
-	virtual BOOL Sliding()=0;
 	virtual BOOL SlidingAttack()=0;
 	virtual BOOL HomeRun()=0;
 	virtual BOOL Catch()=0;
@@ -139,12 +146,12 @@ public:
 	BOOL Born() override;
 	BOOL Idle() override;
 	BOOL Move() override;
+	BOOL Run() override;
 	BOOL Jump() override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
 	BOOL NormalAttack() override;
 	BOOL JumpAttack() override;
-	BOOL Sliding() override;
 	BOOL SlidingAttack() override;
 	BOOL HomeRun() override;
 	BOOL Catch() override;

@@ -3,8 +3,8 @@
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 0;
-    m_Scene = &GameManager::TitleScene;
+	m_SceneNum = 2;
+    m_Scene = &GameManager::PlayScene;
     ///
 	m_Stage = NULL;
 	m_Player = NULL;
@@ -38,7 +38,7 @@ void GameManager::GetSentence(int& i, char* buff, char* sentence)
     return;
 }
 
-void GameManager::LoadSprites(const TCHAR dataFileName[100])
+void GameManager::LoadSprites(const TCHAR dataFileName[100], map<string, shared_ptr<Sprite>> & temp)
 {
 
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
@@ -77,13 +77,13 @@ void GameManager::LoadSprites(const TCHAR dataFileName[100])
         GetSentence(index, chbuff, address);
         TCHAR uniAddress[200] = {};
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-        Sprites[name] = shared_ptr<Sprite>(new Sprite(uniAddress));
+        temp[name] = shared_ptr<Sprite>(new Sprite(uniAddress));
         index++;
     }
 
 }
 
-void GameManager::LoadAnimations(const TCHAR dataFileName[100])
+void GameManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>> & temp)
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -93,8 +93,8 @@ void GameManager::LoadAnimations(const TCHAR dataFileName[100])
     }
 
     DWORD rbytes;
-    TCHAR buff[10000] = {};
-    char chbuff[10000] = {};
+    TCHAR buff[3000] = {};
+    char chbuff[3000] = {};
     size_t convertedChars = 0;
 
     ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
@@ -122,7 +122,7 @@ void GameManager::LoadAnimations(const TCHAR dataFileName[100])
         GetSentence(index, chbuff, address);
         TCHAR uniAddress[200] = {};
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-        Animations[aniName]= shared_ptr<Animation>(new Animation(Sprites[originSprite], uniAddress));
+        temp[aniName]= shared_ptr<Animation>(new Animation(Sprites[originSprite], uniAddress));
         index++;
     }
 
@@ -140,8 +140,8 @@ void GameManager::TitleScene(HDC hdc, HBITMAP & screen) // SceneNum = 0
     //Animations.clear();
     //Sounds.clear();
 
-    LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
-    LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"));
+    LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"),Sprites);
+    LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"),Animations);
     //모든 소리 로드
 
     static int totalFrame = 0;
@@ -161,8 +161,8 @@ void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
 
     if (Sprites.empty() || Animations.empty())
     {
-        LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"));
+        LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"), Sprites);
+        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"), Animations);
 
         // 타이머 애니 로드
         Timer_ani.push_back(Animations["Num_zero"]);
@@ -261,29 +261,20 @@ void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
 
     if (Sprites.empty() || Animations.empty())
     {
-        LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/PlayScene_Animations.txt"));
-
         map<string, shared_ptr<Animation>> temp;
-        temp["Ryno_born"] = Animations["Ryno_born"];
-        temp["Ryno_idle"] = Animations["Ryno_idle"];
-        temp["Ryno_walk"] = Animations["Ryno_walk"];
-        temp["Ryno_slide"] = Animations["Ryno_slide"];
-        temp["Ryno_jump"] = Animations["Ryno_jump"];
-        temp["Ryno_damaged"] = Animations["Ryno_damaged"];
-        temp["Ryno_damaged1"] = Animations["Ryno_damaged1"];
-        temp["Ryno_dead"] = Animations["Ryno_dead"];
-        temp["Ryno_attack"] = Animations["Ryno_attack"];
+        LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"),Sprites);
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),Animations);
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp);
 
         map<string, shared_ptr<Sound>> temp1;
 
-        m_Player = new Ryno(Vector3(100, 500, -1), 100, 5, temp, temp1);
+        m_Player = new Ryno(Vector3(100, 0, 500), 100, 5, temp, temp1);
     }
 
     Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
     Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f);
 
-    m_Player->ShowCharactor(hdc,4, m_TimerFrame);
+    m_Player->ShowCharactor(hdc,m_Player->GetAniSpeed(), m_TimerFrame);
 
 
 
@@ -388,16 +379,22 @@ void GameManager::CheckKeyInput()
 
         }
 
+        m_Player->Idle();
+        m_Player->SetVel(Vector3(0, 0, 0));
+        m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+
         if (GetAsyncKeyState(VK_UP) & 0x8000)
         {
-            m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X, m_Player->GetPos().m_Pos_Y - m_Player->GetMoveSpeed()/2, -1));
+            m_Player->SetVel(Vector3(m_Player->GetVel().m_Pos_X, 0, -m_Player->GetMoveSpeed() / 1.5f));
+            m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
             m_Player->Move();
             cout << "UP" << endl;
         }
 
         if (GetAsyncKeyState(VK_DOWN) & 0x8000)
         {
-            m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X, m_Player->GetPos().m_Pos_Y + m_Player->GetMoveSpeed()/2, -1));
+            m_Player->SetVel(Vector3(m_Player->GetVel().m_Pos_X, 0, m_Player->GetMoveSpeed() / 1.5f));
+            m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
             m_Player->Move();
             cout << "DOWN" << endl;
         }
@@ -406,15 +403,17 @@ void GameManager::CheckKeyInput()
         {
             if (m_ComboFlag[2] == false)
             {
-                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X - m_Player->GetMoveSpeed(), m_Player->GetPos().m_Pos_Y, -1));
+                m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed(), m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
                 m_Player->Move();
                 cout << "LEFT" << endl;
             }
             else
             {
                 m_ComboTimerCount = 0;
-                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X - (m_Player->GetMoveSpeed()) * 2, m_Player->GetPos().m_Pos_Y, -1));
-                m_Player->Sliding();
+                m_Player->SetVel(Vector3(- m_Player->GetMoveSpeed()*2, m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+                m_Player->Run();
                 cout << "LEFT RUN" << endl;
 
             }
@@ -424,32 +423,39 @@ void GameManager::CheckKeyInput()
         {
             if (m_ComboFlag[3] == false)
             {
-                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X + m_Player->GetMoveSpeed(), m_Player->GetPos().m_Pos_Y, -1));
+                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed(), m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
                 m_Player->Move();
                 cout << "RIGHT" << endl;
+               // cout << m_Player->GetVel() << endl;
             }
             else
             {
                 m_ComboTimerCount = 0;
-                m_Player->SetPos(Vector3(m_Player->GetPos().m_Pos_X + (m_Player->GetMoveSpeed())*2, m_Player->GetPos().m_Pos_Y, -1));
-                m_Player->Move(); //sliding이 문제...
+                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed()*2, m_Player->GetVel().m_Pos_Y, 0));
+                m_Player->SetPos(m_Player->GetPos() + m_Player->GetVel());
+                m_Player->Run();
                 cout << "RIGHT RUN" << endl;
+                //cout << m_Player->GetVel()<< endl;
 
             }
         }
 
         if (GetAsyncKeyState(0x41) & 0x8000) // a
         {
+            m_Player->NormalAttack();
             cout << "ATTACK" << endl;
         }
 
         if (GetAsyncKeyState(0x53) & 0x8000) // s
-        {
+        {   
+            m_Player->Jump();
             cout << "JUMP" << endl;
         }
 
         if (m_ComboFlag[4] && m_ComboFlag[5])
         {
+            m_Player->HomeRun();
             cout << "HOME_RUN" << endl;
         }
     }
