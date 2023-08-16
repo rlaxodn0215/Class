@@ -115,15 +115,11 @@ public:
 	virtual BOOL Jump(bool& keydown, bool& jumping)=0;
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
-	virtual BOOL NormalAttack()=0;
-	virtual BOOL JumpAttack()=0;
-	virtual BOOL SlidingAttack()=0;
+	virtual BOOL NormalAttack(bool isright)=0;
 	virtual BOOL HomeRun()=0;
 	virtual BOOL Catch()=0;
 	virtual BOOL CatchAttack()=0;
 	virtual BOOL CatchThrow()=0;
-	virtual BOOL LayDownAttack()=0;
-	virtual BOOL SpecialCatchAttack()=0;
 	virtual BOOL CatchDynamite()=0;
 
 };
@@ -153,15 +149,11 @@ public:
 	BOOL Jump(bool& keydown, bool& jumping) override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
-	BOOL NormalAttack() override;
-	BOOL JumpAttack() override;
-	BOOL SlidingAttack() override;
+	BOOL NormalAttack(bool isright) override;
 	BOOL HomeRun() override;
 	BOOL Catch() override;
 	BOOL CatchAttack() override;
 	BOOL CatchThrow() override;
-	BOOL LayDownAttack() override;
-	BOOL SpecialCatchAttack() override;
 	BOOL CatchDynamite() override;
 };
 

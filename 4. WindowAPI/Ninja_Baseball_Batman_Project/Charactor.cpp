@@ -93,8 +93,8 @@ BOOL Ryno::Idle()
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
-	RECT collderPos = {Charactor::m_Position.m_X+25, Charactor::m_Position.m_Y, 
-		Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Y + 100};
+	RECT collderPos = {Charactor::m_Position.m_X+25, Charactor::m_Position.m_Z, 
+		Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Z + 100};
 	m_BodyColliders.SetArea(collderPos);
 	return 0;
 }
@@ -198,7 +198,7 @@ BOOL Ryno::Dead()
 	return 0;
 }
 
-BOOL Ryno::NormalAttack()
+BOOL Ryno::NormalAttack(bool isright)
 {
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
@@ -211,34 +211,41 @@ BOOL Ryno::NormalAttack()
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
-	RECT collderPos = { Charactor::m_Position.m_X + 50, Charactor::m_Position.m_Y,
-		Charactor::m_Position.m_X + 200, Charactor::m_Position.m_Y + 100 };
-	m_AttackColliders.SetArea(collderPos);
 
-	return 0;
-}
-
-BOOL Ryno::JumpAttack()
-{
-	return 0;
-}
-
-
-BOOL Ryno::SlidingAttack()
-{
-	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
-
-	m_CurAni = m_Animations["Ryno_slide"];
-	m_CurAniSpeed = 4;
-
-	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	if (isright)
 	{
-		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+		RECT collderPos = { Charactor::m_Position.m_X + 50, Charactor::m_Position.m_Y,
+		Charactor::m_Position.m_X + 200, Charactor::m_Position.m_Y + 100 };
+		m_AttackColliders.SetArea(collderPos);
+	}
+
+	else
+	{
+		RECT collderPos = { Charactor::m_Position.m_X - 40, Charactor::m_Position.m_Y,
+		Charactor::m_Position.m_X + 90 , Charactor::m_Position.m_Y + 100 };
+		m_AttackColliders.SetArea(collderPos);
 	}
 
 	return 0;
 }
+
+
+
+//BOOL Ryno::SlidingAttack()
+//{
+//	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+//
+//	m_CurAni = m_Animations["Ryno_slide"];
+//	m_CurAniSpeed = 4;
+//
+//	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+//	{
+//		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+//			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+//	}
+//
+//	return 0;
+//}
 
 BOOL Ryno::HomeRun()
 {
@@ -252,6 +259,14 @@ BOOL Ryno::HomeRun()
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
+
+	RECT collderPos = { Charactor::m_Position.m_X - 100, Charactor::m_Position.m_Z,
+		Charactor::m_Position.m_X + 300, Charactor::m_Position.m_Z + 100 };
+	m_AttackColliders.SetArea(collderPos);
+
+	RECT collderPos1 = { Charactor::m_Position.m_X + 25, Charactor::m_Position.m_Z,
+		Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Z + 100 };
+	m_BodyColliders.SetArea(collderPos1);
 
 	return 0;
 }
@@ -267,16 +282,6 @@ BOOL Ryno::CatchAttack()
 }
 
 BOOL Ryno::CatchThrow()
-{
-	return 0;
-}
-
-BOOL Ryno::LayDownAttack()
-{
-	return 0;
-}
-
-BOOL Ryno::SpecialCatchAttack()
 {
 	return 0;
 }

@@ -481,7 +481,8 @@ void GameManager::CheckKeyInput()
         if (GetAsyncKeyState(0x41) & 0x8000) // a
         {
             m_KeyFlag[4] = true;
-            m_Player->NormalAttack();
+            m_AniWait = true;
+            m_Player->NormalAttack(m_Player->GetLookRight());
         }
 
        
