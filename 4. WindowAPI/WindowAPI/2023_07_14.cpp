@@ -800,9 +800,10 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         static int posX = 150;
         posX += 3;
         //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
-        TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        //TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
         StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
-        TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        //StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
+        //TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
         DeleteDC(hMenDC2);  
@@ -836,7 +837,7 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
 
     //hdc에 그려주기
-    BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
+    //BitBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0, SRCCOPY);
     TransparentBlt(hdc, 0, 0, recView.right, recView.bottom, hMenDC, 0, 0,
         recView.right, recView.bottom, RGB(255, 0, 255));
 

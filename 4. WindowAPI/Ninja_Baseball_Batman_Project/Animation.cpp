@@ -101,33 +101,11 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 
 	if (lookRight)
 	{
-		//HDC hMemDC, hMemDC1;
-		//HBITMAP holdBitmap, holdBitmap1;
-
-		//hMemDC = CreateCompatibleDC(hdc);
-		//holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
-
-		//hMemDC1 = CreateCompatibleDC(hdc);
-		//holdBitmap1 = (HBITMAP)SelectObject(hMemDC1, m_ResourceSprite->GetSpriteImage());
-
-		//StretchBlt(hMemDC, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
-
-		//BitBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, SRCCOPY);
-
-		//TransparentBlt(hdc, posX , posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
-		//	bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
-		//		m_ResourceSprite->GetTransparentColor().m_Z));
-
-		//SelectObject(hMemDC1, holdBitmap1);
-		//DeleteDC(hMemDC1);
-
-		//SelectObject(hMemDC, holdBitmap);
-		//DeleteDC(hMemDC);
 
 		HDC hMemDC;
 		HBITMAP holdBitmap;
 
-		hMemDC = CreateCompatibleDC(NULL);
+		hMemDC = CreateCompatibleDC(hdc);
 		holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());	
 
 		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
@@ -144,19 +122,17 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 		HDC hMemDC, hMemDC1;
 		HBITMAP holdBitmap, holdBitmap1;
 
-		hMemDC = CreateCompatibleDC(NULL);
-		holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
+		hMemDC = CreateCompatibleDC(hdc);
+		holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, (int)(bx * imageRatio), (int)(by * imageRatio)));
 
-		hMemDC1 = CreateCompatibleDC(NULL);
+		hMemDC1 = CreateCompatibleDC(hMemDC);
 		holdBitmap1 = (HBITMAP)SelectObject(hMemDC1, m_ResourceSprite->GetSpriteImage());
 
-		StretchBlt(hdc, posX + (int)(bx * imageRatio), posY, -(int)(bx * imageRatio), (int)(by * imageRatio), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
+		StretchBlt(hMemDC, (int)(bx * imageRatio)-1, 0, -(int)(bx*imageRatio) , (int)(by * imageRatio), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
 
-		//BitBlt(hdc, posX, posY, bx, by, hMemDC, xStart, yStart, SRCCOPY);
-
-		//TransparentBlt(hdc, posX + (int)(bx * imageRatio), posY, -(int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
-		//	bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
-		//		m_ResourceSprite->GetTransparentColor().m_Z));
+		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, 0, 0, (int)(bx * imageRatio), (int)(by * imageRatio),
+			RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
+				m_ResourceSprite->GetTransparentColor().m_Z));
 
 		SelectObject(hMemDC1, holdBitmap1);
 		DeleteDC(hMemDC1);

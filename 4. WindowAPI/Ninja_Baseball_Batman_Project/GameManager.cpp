@@ -271,35 +271,17 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
         LoadStage(1,winRect);
     }
 
-    m_Player->m_Bitmap = (HBITMAP)SelectObject(hdc, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
+    m_Player->m_Bitmap = screen;
 
     Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
     Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
+
     m_Player->ShowCharactor(hdc, m_Player->GetAniSpeed(), m_TimerFrame, m_StopMove, winRect);
+    //m_Stage->ShowMonsters(hdc, m_TimerFrame, winRect);
 
     Ryno* temp = (Ryno*)m_Player;
     temp->GetBodyCollider().ShowCollider(hdc);
     temp->GetAttackCollider().ShowCollider(hdc);
-
-    HDC hMemDC;
-    HBITMAP hOldBitmap;
-
-    //HDC tempDC = GetDC(hWnd);
-    hMemDC = CreateCompatibleDC(hdc);
-    hOldBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
-
-    /////////////////////////////////////////////////////////////////////
-
-    m_Stage->ShowMonsters(hMemDC, m_TimerFrame, winRect);
-
-    ////////////////////////////////////////////////////////////////////
-
-    BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
-
-    SelectObject(hMemDC, hOldBitmap);
-    DeleteDC(hMemDC);
-
-
 }
 
 void GameManager::LoadStage(int stageNum, RECT winRect)
@@ -318,8 +300,17 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
 
         map<string, shared_ptr<Sound>> temp1;
 
-        stageMonsters.push_back(Baseball(Vector3(900, 500, 400),50,2,temp,temp1));
-        stageMonsters.push_back(Baseball(Vector3(900, 500, 600),50,2,temp,temp1));
+        stageMonsters.push_back(Baseball(Vector3(800, 400, 400),50,2,temp,temp1));
+        stageMonsters.push_back(Baseball(Vector3(800, 600, 600),50,2,temp,temp1));
+
+        //stageMonsters.push_back(Baseball(Vector3(700, 400, 400), 50, 2, temp, temp1));
+        //stageMonsters.push_back(Baseball(Vector3(700, 600, 600), 50, 2, temp, temp1));
+
+        //stageMonsters.push_back(Baseball(Vector3(500, 400, 400), 50, 2, temp, temp1));
+        //stageMonsters.push_back(Baseball(Vector3(500, 600, 600), 50, 2, temp, temp1));
+
+        //stageMonsters.push_back(Baseball(Vector3(400, 400, 400), 50, 2, temp, temp1));
+        //stageMonsters.push_back(Baseball(Vector3(400, 600, 600), 50, 2, temp, temp1));
 
         m_Stage = new Stage(playArea, limitAreas, stageMonsters);
     }
