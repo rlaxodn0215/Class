@@ -17,7 +17,7 @@ void Charactor::Update()
 	m_Position = m_Position + m_Velocity;
 }
 
-void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait, HBITMAP & bitmap)
+void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait, RECT winRect)
 {
 
 	static int totalFrame = 0;
@@ -34,7 +34,7 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWai
 		}
 
 		if (curFrame < totalFrame)
-			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight,bitmap);
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight, winRect);
 
 		if (curFrame == totalFrame - 1)
 		{
@@ -56,7 +56,7 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWai
 		}
 
 		if (curFrame < totalFrame)
-			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight,bitmap);
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight, winRect);
 	}
 	
 
@@ -94,8 +94,11 @@ BOOL Ryno::Idle()
 	}
 
 	RECT collderPos = {Charactor::m_Position.m_X+25, Charactor::m_Position.m_Z, 
-		Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Z + 100};
+		Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Z + 125};
 	m_BodyColliders.SetArea(collderPos);
+
+	m_AttackColliders.SetArea({0,0,0,0});
+
 	return 0;
 }
 
@@ -226,26 +229,10 @@ BOOL Ryno::NormalAttack(bool isright)
 		m_AttackColliders.SetArea(collderPos);
 	}
 
+	
+
 	return 0;
 }
-
-
-
-//BOOL Ryno::SlidingAttack()
-//{
-//	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
-//
-//	m_CurAni = m_Animations["Ryno_slide"];
-//	m_CurAniSpeed = 4;
-//
-//	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
-//	{
-//		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
-//			m_Position.m_Z - m_CurAni->GetHeights()[i] });
-//	}
-//
-//	return 0;
-//}
 
 BOOL Ryno::HomeRun()
 {
@@ -286,19 +273,165 @@ BOOL Ryno::CatchThrow()
 	return 0;
 }
 
-BOOL Ryno::CatchDynamite()
+BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 {
+	RECT collderPos = { 0,0,0,0 };
+	m_BodyColliders.SetArea(collderPos);
+
+	if (m_PlayingDynamite == 0) //flying
+	{
+		static int time = 0;
+		static int temp = 0;
+		static int temp1 = 0;
+
+		temp1 = timer;
+		if (temp<temp1)
+		{
+			temp = temp1;
+			time++;
+		}
+
+		if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+		m_CurAni = m_Animations["Ryno_fly"];
+		m_CurAniSpeed = 4;
+
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[0] / 2),
+			m_Position.m_Y - m_CurAni->GetHeights()[0] });
+
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[1] / 2) - 44, // 42
+			m_Position.m_Y - m_CurAni->GetHeights()[1] - 16 }); //14
+		
+
+		m_Velocity.m_Y = 0;
+		m_Position.m_Y = m_Position.m_Z - 300;
+
+		if (time > 50)
+		{
+			m_PlayingDynamite = 1;
+			time = temp = temp1 = 0;
+		}
+	}
+
+	else if (m_PlayingDynamite == 1) //shooting balls
+	{
+		static int time = 0;
+		static int temp = 0;
+		static int temp1 = 0;
+
+		temp1 = timer;
+		if (temp < temp1)
+		{
+			temp = temp1;
+			time++;
+		}
+
+		if (m_isLookRight)
+		{
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55, m_Position.m_Y+30 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55+20, m_Position.m_Y+30+35 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 40,m_Position.m_Y + 30 + 70}, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 60,m_Position.m_Y + 30 + 105}, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 80,m_Position.m_Y + 30 + 140 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 100,m_Position.m_Y + 30 + 175 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 120, m_Position.m_Y + 30 +210}, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 140,m_Position.m_Y + 30 + 245 }, 0, 2.0f, m_isLookRight, winRect);
+
+			collderPos = { Charactor::m_Position.m_X + 150, Charactor::m_Position.m_Z,
+							Charactor::m_Position.m_X + 350, Charactor::m_Position.m_Z + 100 };
+			m_AttackColliders.SetArea(collderPos);
+		}
+
+		else
+		{
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y + 30}, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 20, m_Position.m_Y + 30 + 35 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 40,m_Position.m_Y + 30 + 70 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 60,m_Position.m_Y + 30 + 105 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 80,m_Position.m_Y + 30 + 140 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 100,m_Position.m_Y + 30 + 175 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 120, m_Position.m_Y + 30 + 210 }, 0, 2.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 140,m_Position.m_Y + 30 + 245 }, 0, 2.0f, m_isLookRight, winRect);
+
+			collderPos = { Charactor::m_Position.m_X - 50, Charactor::m_Position.m_Z,
+							Charactor::m_Position.m_X - 250, Charactor::m_Position.m_Z + 100 };
+			m_AttackColliders.SetArea(collderPos);
+		}
+
+		if (time > 100)
+		{
+			m_PlayingDynamite = 3;
+			time = temp = temp1 = 0;
+		}
+	}
+
+	else if (m_PlayingDynamite == 3) //squish...
+	{
+
+		static int time = 0;
+		static int temp = 0;
+		static int temp1 = 0;
+
+		temp1 = timer;
+		if (temp < temp1)
+		{
+			temp = temp1;
+			time++;
+		}
+
+		if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+		m_CurAni = m_Animations["Ryno_dynamite"];
+		m_CurAniSpeed = 4;
+		m_Velocity = { 0,0,0 };
+
+		if (m_isLookRight)
+		{
+			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left+40, m_AttackColliders.GetArea().top - 40 });
+			m_Position.m_X = m_AttackColliders.GetArea().left + 40;
+			m_Position.m_Y = m_AttackColliders.GetArea().top;
+		}
+
+		else
+		{
+			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left-170, m_AttackColliders.GetArea().top - 40 });
+			m_Position.m_X = m_AttackColliders.GetArea().left-170;
+			m_Position.m_Y = m_AttackColliders.GetArea().top;
+		}
+
+		m_Position.m_Z = m_Position.m_Y;
+
+		if (time > 50)
+		{
+			m_PlayingDynamite = 0;
+			time = temp = temp1 = 0;
+			playerDynamite = false;
+			SetTakeGravity(true);
+		}
+
+	}
+
 	return 0;
-}
-
-
-
-void Monster::MoveUpdate()
-{
 }
 
 void Baseball::Idle()
 {
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Baseball_readyforfight"];
+	m_CurAniSpeed = 10;
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+	}
+
+	//RECT collderPos = { Charactor::m_Position.m_X + 25, Charactor::m_Position.m_Z,
+	//	Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Z + 125 };
+	//m_BodyColliders.SetArea(collderPos);
+
+	//m_AttackColliders.SetArea({ 0,0,0,0 });
 }
 
 void Baseball::Damaged()

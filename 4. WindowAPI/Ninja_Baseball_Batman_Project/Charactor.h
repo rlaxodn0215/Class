@@ -9,24 +9,16 @@
 
 using namespace std;
 
-enum PlayerCharactor
-{
-	JOSE,
-	RYNO,
-	ROGER,
-	STRAW
-};
-
-enum MonsterCharactor
-{
-	BASEBALL,
-	BAT,
-	CARD_RED,
-	CARD_YELLW,
-	CARD_GREEN,
-	CARD_BLUE,
-	WINDYPLANE
-};
+//enum MonsterCharactor
+//{
+//	BASEBALL,
+//	BAT,
+//	CARD_RED,
+//	CARD_YELLW,
+//	CARD_GREEN,
+//	CARD_BLUE,
+//	WINDYPLANE
+//};
 
 enum PlayerStatus
 {
@@ -61,6 +53,7 @@ protected:
 	int m_MoveSpeed;
 	bool m_isLookRight = true;// false == left
 	bool m_isAlive = true;
+	bool m_takeGravity = true;
 
 	map<string, shared_ptr<Animation>> m_Animations;
 	shared_ptr<Animation> m_CurAni;
@@ -71,6 +64,8 @@ protected:
 	shared_ptr<Sound> m_CurSound;
 
 public:
+	HBITMAP m_Bitmap;
+
 	Charactor() = default;
 	Charactor(Vector3 pos, int hp, int moveSpeed,
 		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
@@ -86,15 +81,20 @@ public:
 	int GetAniSpeed() { return m_CurAniSpeed; }
 	bool GetLookRight() { return m_isLookRight; }
 	void SetLookRight(bool way) { m_isLookRight = way; }
+	bool GetAlive() { return m_isAlive; }
+	void SetAlive(bool live) { m_isAlive = live; }
+	bool GetTakeGravity() { return m_takeGravity; }
+	void SetTakeGravity(bool takeG) { m_takeGravity = takeG; }
 
 	void Update();
-	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, bool& aniWait, HBITMAP& bitmap);
+	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, bool& aniWait,RECT winRect);
 };
 
 class Player : public Charactor // 상태 패턴
 {
 protected:
 	PlayerStatus m_PlayerStatus = BORN;
+	int m_PlayingDynamite = 0;
 
 public:
 	Player() = default;
@@ -104,34 +104,36 @@ public:
 	virtual ~Player() = default;
 	PlayerStatus GetPlayerStatus() { return m_PlayerStatus; }
 	void SetPlayerStatus(int i) { m_PlayerStatus = (PlayerStatus)i; }
+	int GetPlayDynamite() { return m_PlayingDynamite; }
+	void SetPlayDynamite(int num) { m_PlayingDynamite=num; }
 
 	//BOOL (Player::* PlayerPlaying)();
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
-	virtual BOOL Born() = 0;
-	virtual BOOL Idle()=0;
-	virtual BOOL Move() = 0;
-	virtual BOOL Run() = 0;
-	virtual BOOL Jump(bool& keydown, bool& jumping)=0;
+	virtual BOOL Born() = 0;//
+	virtual BOOL Idle()=0;//
+	virtual BOOL Move() = 0;//
+	virtual BOOL Run() = 0;//
+	virtual BOOL Jump(bool& keydown, bool& jumping)=0;//
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
-	virtual BOOL NormalAttack(bool isright)=0;
-	virtual BOOL HomeRun()=0;
+	virtual BOOL NormalAttack(bool isright)=0;//
+	virtual BOOL HomeRun()=0;//
 	virtual BOOL Catch()=0;
 	virtual BOOL CatchAttack()=0;
 	virtual BOOL CatchThrow()=0;
-	virtual BOOL CatchDynamite()=0;
+	virtual BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
 
 };
 
 class Ryno :public Player
 {
 private:
-	PlayerCharactor m_Charactor = RYNO;
 	BoxCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
 	int m_PlayerLife = 3;
 	int m_Points = 0;
+	
 
 public:
 	Ryno() = default;
@@ -154,15 +156,16 @@ public:
 	BOOL Catch() override;
 	BOOL CatchAttack() override;
 	BOOL CatchThrow() override;
-	BOOL CatchDynamite() override;
+	BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
 };
 
 class Monster : public Charactor
 {
 public:
 	Monster() = default;
+	Monster(Vector3 position, int Hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds) :Charactor(position,Hp,moveSpeed,anis,sounds) {};
 	virtual ~Monster() = default;
-	void MoveUpdate();
 	virtual void Idle()=0;
 	virtual void Damaged()=0;
 	virtual void Dead()=0;
@@ -172,11 +175,19 @@ public:
 class Baseball :public Monster
 {
 private:
-	MonsterCharactor m_Charactor;
 	CircleCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
 
 public:
+
+
+
+	Baseball()=default;
+	Baseball(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds) : Monster(pos, hp, moveSpeed, anis, sounds) {
+		Idle();
+	};
+	~Baseball()=default;
 	void Idle();
 	void Damaged();
 	void Dead();

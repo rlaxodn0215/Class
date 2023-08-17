@@ -6,7 +6,7 @@ GameManager::GameManager()
 	m_SceneNum = 2;
     m_Scene = &GameManager::PlayScene;
     ///
-	m_Stage = NULL;
+    m_Stage=NULL;
 	m_Player = NULL;
 	m_Cam = NULL;
 }
@@ -14,14 +14,14 @@ GameManager::GameManager()
 
 GameManager::~GameManager()
 {
-	if(m_Stage !=NULL)
-	delete m_Stage;
+    if (m_Stage != NULL)
+        delete m_Stage;
 
 	if (m_Player != NULL)
-	delete m_Player;
+	    delete m_Player;
 
 	if (m_Cam != NULL)
-	delete m_Cam;
+	    delete m_Cam;
 }
 
 void GameManager::GetSentence(int& i, char* buff, char* sentence)
@@ -132,7 +132,7 @@ void GameManager::LoadSounds(const TCHAR dataFileName[100])
 {
 }
 
-void GameManager::TitleScene(HDC hdc, HBITMAP & screen) // SceneNum = 0
+void GameManager::TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 0
 {
     screen = NULL;
 
@@ -151,11 +151,11 @@ void GameManager::TitleScene(HDC hdc, HBITMAP & screen) // SceneNum = 0
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f, true, screen);
+    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f, true, winRect);
     //cout << curFrame << endl;
 }
 
-void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
+void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 1
 {
     screen = NULL;
 
@@ -180,7 +180,7 @@ void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
     {
         for (int j = 0; j <= 630; j += 35)
         {
-            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f, true, screen);
+            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f, true, winRect);
         }
     }
 
@@ -194,71 +194,69 @@ void GameManager::SelectScene(HDC hdc, HBITMAP & screen) // SceneNum = 1
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f, true, screen);
+        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f, true, winRect);
 
-        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
-        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
-        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
-        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
+        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
+        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
+        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
+        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
 
-        ShowTimer(hdc, Timer_ani,screen);
+        ShowTimer(hdc, Timer_ani,winRect);
     }
 
     else
     {
         if (m_Cursor.x == m_SelectPosX[0])
         {
-            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f, true, screen);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
+            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
         }
 
         else if (m_Cursor.x == m_SelectPosX[1])
         {
-            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f, true, screen);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
+            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
         }
 
 
         else if (m_Cursor.x == m_SelectPosX[2])
         {
-            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f, true, screen);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, screen);
+            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
         }
 
         else
         {
-            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f, true, screen);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, screen);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, screen);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, screen);
+            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
 
         }
     }
 
 
-    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f, true, screen);
-    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f, true, screen);
-    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f, true, screen);
-    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f, true, screen);
+    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f, true, winRect);
+    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f, true, winRect);
+    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f, true, winRect);
+    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f, true, winRect);
 
-    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f, true, screen);
-    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f, true, screen);
-    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f, true, screen);
-    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f, true, screen);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f, true, winRect);
+    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f, true, winRect);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f, true, winRect);
+    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f, true, winRect);
 
 
 }
 
-void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
+void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 2
 {
-    //screen = NULL;
-
     if (Sprites.empty() || Animations.empty())
     {
         map<string, shared_ptr<Animation>> temp;
@@ -269,26 +267,72 @@ void GameManager::PlayScene(HDC hdc, HBITMAP & screen) // SceneNum = 2
         map<string, shared_ptr<Sound>> temp1;
 
         m_Player = new Ryno(Vector3(100, 500, 500), 100, 5, temp, temp1);
+
+        LoadStage(1,winRect);
     }
 
-   Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f,true, screen);
-   Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, screen);
+    m_Player->m_Bitmap = (HBITMAP)SelectObject(hdc, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
 
-    m_Player->ShowCharactor(hdc,m_Player->GetAniSpeed(), m_TimerFrame,m_AniWait,screen);
+    Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
+    Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
+    m_Player->ShowCharactor(hdc, m_Player->GetAniSpeed(), m_TimerFrame, m_StopMove, winRect);
+
     Ryno* temp = (Ryno*)m_Player;
     temp->GetBodyCollider().ShowCollider(hdc);
     temp->GetAttackCollider().ShowCollider(hdc);
 
+    HDC hMemDC;
+    HBITMAP hOldBitmap;
+
+    //HDC tempDC = GetDC(hWnd);
+    hMemDC = CreateCompatibleDC(hdc);
+    hOldBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
+
+    /////////////////////////////////////////////////////////////////////
+
+    m_Stage->ShowMonsters(hMemDC, m_TimerFrame, winRect);
+
+    ////////////////////////////////////////////////////////////////////
+
+    BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
+
+    SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
+
+
 }
 
-void GameManager::EndingScene(HDC hdc, HBITMAP & screen) // SceneNum = 3
+void GameManager::LoadStage(int stageNum, RECT winRect)
+{
+    if (stageNum == 1)
+    {
+        RECT playArea = { 0,0,326,233 };
+        vector<RECT> limitAreas;
+        limitAreas.push_back({ 0,0,winRect.right,410 });
+        limitAreas.push_back({ 0,0,420,505 });
+
+        list<Charactor> stageMonsters;
+
+        map<string, shared_ptr<Animation>> temp;
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp);
+
+        map<string, shared_ptr<Sound>> temp1;
+
+        stageMonsters.push_back(Baseball(Vector3(900, 500, 400),50,2,temp,temp1));
+        stageMonsters.push_back(Baseball(Vector3(900, 500, 600),50,2,temp,temp1));
+
+        m_Stage = new Stage(playArea, limitAreas, stageMonsters);
+    }
+}
+
+void GameManager::EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 3
 {
 
 
 
 }
 
-void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni,HBITMAP & bitmap)
+void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni,RECT winRect)
 {
     int temp = m_SelectTimer / 10;
 
@@ -297,27 +341,29 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni,HB
 
     if (tens > 0)
     {
-        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f, true, bitmap);
-        timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f, true, bitmap);
+        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f, true, winRect);
+        timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f, true, winRect);
     }
 
     else
     {
-        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f, true, bitmap);
+        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f, true, winRect);
     }
     
 }
 
 void GameManager::Gravity(int g)
 {
+    
    if (m_Player->GetVel().m_Y <= 30 && m_Player->GetPos().m_Y <= m_Player->GetPos().m_Z)
    {
-       m_Player->SetVel(m_Player->GetVel() + Vector3(0,g,0));
+       if(m_Player->GetTakeGravity())
+            m_Player->SetVel(m_Player->GetVel() + Vector3(0,g,0));
    }
     
 }
 
-void GameManager::CheckKeyInput()
+void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
 {
     if (m_SceneNum == 0)
     {
@@ -369,6 +415,13 @@ void GameManager::CheckKeyInput()
     {
         m_Player->Update();
 
+        TCHAR temp[20];
+        _stprintf_s(temp, L"[%d, %d, %d]", m_Player->GetPos().m_X, m_Player->GetPos().m_Y+125, m_Player->GetPos().m_Z+125);
+        TextOut(hdc, m_Player->GetPos().m_X, m_Player->GetPos().m_Y + 125, temp, _tcslen(temp)); //Sprite는 해당 값에서 확대 비율을 나눈다
+
+        //cout << m_Player->GetPos() << endl;
+        //cout << m_Player->GetVel() << endl;
+
         if (m_ComboFlag[0] || m_ComboFlag[1] || m_ComboFlag[2] ||
             m_ComboFlag[3] || m_ComboFlag[4] || m_ComboFlag[5])
         {
@@ -384,81 +437,96 @@ void GameManager::CheckKeyInput()
             }
 
         }
-        if (!m_AniWait && !m_Jumping)
-        {
-            m_Player->Idle();
-            m_Player->SetVel(Vector3(0, 0, 0));
-        }
 
-        if (GetAsyncKeyState(VK_UP) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
+        if (!m_StopMove)
         {
-            m_KeyFlag[0] = true;
-
-            if (!m_Jumping)
+            if (!m_Jumping && !m_PlayerDynamite)
             {
-                m_Player->SetVel(Vector3(0, -m_Player->GetMoveSpeed() / 1.5f, -m_Player->GetMoveSpeed() / 1.5f));
-                m_Player->Move();
+                m_Player->Idle();
+                m_Player->SetVel(Vector3(0, 0, 0));
             }
-        }
 
-        if (GetAsyncKeyState(VK_DOWN) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
-        {
-            m_KeyFlag[1] = true;
-
-            if (!m_Jumping)
+            if (GetAsyncKeyState(VK_UP) & 0x8000 && !m_KeyFlag[4] && !m_PlayerDynamite)
             {
-                m_Player->SetVel(Vector3(0, m_Player->GetMoveSpeed() / 1.5f, m_Player->GetMoveSpeed() / 1.5f));
-                m_Player->Move();
-            }
-        }
-
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
-        {
-            m_KeyFlag[2] = true;
-            m_Player->SetLookRight(false);
-
-            if (m_ComboFlag[2] == false)
-            {
-                m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed(), m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+                m_KeyFlag[0] = true;
 
                 if (!m_Jumping)
-                m_Player->Move();
+                {
+                    m_Player->SetVel(Vector3(0, -m_Player->GetMoveSpeed() / 1.5f, -m_Player->GetMoveSpeed() / 1.5f));
+                    m_Player->Move();
+                }
             }
-            else
+
+            if (GetAsyncKeyState(VK_DOWN) & 0x8000 && !m_KeyFlag[4] && !m_PlayerDynamite)
             {
-                m_ComboTimerCount = 0;
-                m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+                m_KeyFlag[1] = true;
 
                 if (!m_Jumping)
-                m_Player->Run();
+                {
+                    m_Player->SetVel(Vector3(0, m_Player->GetMoveSpeed() / 1.5f, m_Player->GetMoveSpeed() / 1.5f));
+                    m_Player->Move();
+                }
+            }
 
+            if (GetAsyncKeyState(VK_LEFT) & 0x8000 && !m_KeyFlag[4])
+            {
+                m_KeyFlag[2] = true;
+                m_Player->SetLookRight(false);
+
+                if (m_ComboFlag[2] == false)
+                {
+                    if (!m_PlayerDynamite)
+                    {
+                        m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed(), m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+
+                        if (!m_Jumping)
+                            m_Player->Move();
+                    }
+                }
+                else
+                {
+                    m_ComboTimerCount = 0;
+
+                    if (!m_PlayerDynamite)
+                    {
+                        m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+
+                        if (!m_Jumping)
+                            m_Player->Run();
+                    }
+                }
+            }
+
+            if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && !m_KeyFlag[4])
+            {
+                m_KeyFlag[3] = true;
+                m_Player->SetLookRight(true);
+
+                if (m_ComboFlag[3] == false)
+                {
+                    if (!m_PlayerDynamite)
+                    {
+                        m_Player->SetVel(Vector3(m_Player->GetMoveSpeed(), m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+
+                        if (!m_Jumping)
+                            m_Player->Move();
+                    }
+                }
+                else
+                {
+                    m_ComboTimerCount = 0;
+                    if (!m_PlayerDynamite)
+                    {
+                        m_Player->SetVel(Vector3(m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+
+                        if (!m_Jumping)
+                            m_Player->Run();
+                    }
+                }
             }
         }
 
-        if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && !m_AniWait && !m_KeyFlag[4])
-        {
-            m_KeyFlag[3] = true;
-            m_Player->SetLookRight(true);
-
-            if (m_ComboFlag[3] == false)
-            {
-                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed(), m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
-
-                if (!m_Jumping)
-                m_Player->Move();
-            }
-            else
-            {
-                m_ComboTimerCount = 0;
-                m_Player->SetVel(Vector3(m_Player->GetMoveSpeed()*2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
-
-                if (!m_Jumping)
-                m_Player->Run();
-
-            }
-        }   
-
-        if (m_ComboFlag[4] && m_ComboFlag[5])
+        if (m_ComboFlag[4] && m_ComboFlag[5]&& !m_PlayerDynamite)
         {
             m_Player->HomeRun();
 
@@ -467,24 +535,32 @@ void GameManager::CheckKeyInput()
             else
                 m_Player->SetPos(m_Player->GetPos() + Vector3(-10, 0, 0));
 
-            m_AniWait = true;
+            m_StopMove = true;
             m_KeyFlag[5] = false;
             m_Jumping = false;
         }
 
-        else if (GetAsyncKeyState(0x53) & 0x8000 || (m_Jumping && !m_KeyFlag[4])) // s
+        else if (GetAsyncKeyState(0x53) & 0x8000 || (m_Jumping && !m_KeyFlag[4]) && !m_PlayerDynamite) // s
         {
             m_KeyFlag[5] = true;
             m_Player->Jump(m_KeyFlag[5], m_Jumping);
         }
 
-        if (GetAsyncKeyState(0x41) & 0x8000) // a
+        if (GetAsyncKeyState(0x41) & 0x8000 && !m_PlayerDynamite) // a
         {
             m_KeyFlag[4] = true;
-            m_AniWait = true;
+            m_StopMove = true;
             m_Player->NormalAttack(m_Player->GetLookRight());
         }
 
+        if (m_ComboFlag[0] && m_ComboFlag[1] && m_ComboFlag[5] || m_PlayerDynamite)
+        {
+            cout << "Dynamite" << endl;
+            m_PlayerDynamite = true;
+            m_Player->SetTakeGravity(false);
+            //m_StopMove = true;
+            m_Player->Dynamite(hdc,m_TimerFrame, winRect,m_PlayerDynamite);
+        }
        
     }
 }

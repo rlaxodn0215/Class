@@ -140,7 +140,6 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +152,6 @@
     <ClCompile Include="Ninja_Baseball_Batman_Project.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Stage.cpp" />
-    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>

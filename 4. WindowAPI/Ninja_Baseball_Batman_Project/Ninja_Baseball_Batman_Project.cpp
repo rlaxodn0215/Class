@@ -47,7 +47,6 @@ void Initalize(HWND hWnd);
 void EndGame(HWND hWnd);
 
 
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -152,11 +151,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+PAINTSTRUCT ps;
+HDC hdc;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc;;
 
     switch (message)
     {
@@ -216,7 +215,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
              hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);           
              /////////////////////////////////////////////////////////////////////
 
-             (gameManager->*(gameManager->GetInstance()->m_Scene))(hMemDC, Screen);
+             (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, Screen,winRect);
 
              ////////////////////////////////////////////////////////////////////
              BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
@@ -261,7 +260,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 void Initalize(HWND hWnd)
 {
     GetClientRect(hWnd, &winRect);
-    gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 됮 않는다.
+    gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 되지 않는다.
 }
 
 void EndGame(HWND hWnd)
@@ -272,8 +271,11 @@ void EndGame(HWND hWnd)
 
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
-    gameManager->GetInstance()->CheckKeyInput();
-    gameManager->GetInstance()->Gravity(2);
+    HDC temp = GetDC(hWnd);
+    gameManager->GetInstance()->CheckKeyInput(temp, winRect);
+        
+    if(gameManager->GetInstance()->m_Player !=NULL)
+        gameManager->GetInstance()->Gravity(2);
 
     if (gameManager->GetInstance()->m_TimerFrame >= 1000)
         gameManager->GetInstance()->m_TimerFrame = 0;

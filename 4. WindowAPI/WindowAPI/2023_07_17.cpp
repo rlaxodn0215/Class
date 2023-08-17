@@ -547,8 +547,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         hdc = BeginPaint(hWnd, &ps);
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...  
 
-        DrawBitmap(hWnd, hdc);
-        //DrwaBitmapDoubleBuffering(hWnd, hdc);
+        //DrawBitmap(hWnd, hdc);
+        DrwaBitmapDoubleBuffering(hWnd, hdc);
         DrawRectText(hdc);
 
         EndPaint(hWnd, &ps);
@@ -787,9 +787,6 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     }
 
     hodBitmap = (HBITMAP)SelectObject(hMenDC, hDoubleBufferImage);
-
-
-
 
     {//수지
         hMenDC2 = CreateCompatibleDC(hMenDC);

@@ -760,20 +760,18 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
     hodBitmap = (HBITMAP)SelectObject(hMenDC, hDoubleBufferImage);
 
+    //{//수지
 
+    //    hMenDC2 = CreateCompatibleDC(hMenDC);
+    //    hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hBackImage);
+    //    bx = bitBack.bmWidth;
+    //    by = bitBack.bmHeight;
 
+    //    BitBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
 
-    {//수지
-        hMenDC2 = CreateCompatibleDC(hMenDC);
-        hodBitmap2 = (HBITMAP)SelectObject(hMenDC2, hBackImage);
-        bx = bitBack.bmWidth;
-        by = bitBack.bmHeight;
-
-        BitBlt(hMenDC, 0, 0, bx, by, hMenDC2, 0, 0, SRCCOPY);
-
-        SelectObject(hMenDC2, hodBitmap2);
-        DeleteDC(hMenDC2);
-    }
+    //    SelectObject(hMenDC2, hodBitmap2);
+    //    DeleteDC(hMenDC2);
+    //}
 
     {//시공
 
@@ -803,7 +801,7 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         posX += 3;
         //BitBlt(hdc, 150, 150, bx, by, hMenDC, 0, 0, SRCCOPY);
         TransparentBlt(hMenDC, posX, 150, bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
-        //StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
+        StretchBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, SRCCOPY);
         TransparentBlt(hMenDC, posX, 150, -bx, by, hMenDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
 
         SelectObject(hMenDC2, hodBitmap2);
@@ -834,6 +832,7 @@ void DrwaBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
        DeleteDC(hMenDC2);
     }
+
 
 
     //hdc에 그려주기

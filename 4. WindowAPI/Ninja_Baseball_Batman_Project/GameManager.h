@@ -22,8 +22,8 @@ public:
 	vector<shared_ptr<Animation>> Timer_ani;
 	int m_SceneNum = 0;
 
-	void(GameManager:: * m_Scene)(HDC,HBITMAP&);
-	Stage* m_Stage;
+	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);
+	Stage * m_Stage;
 	Player* m_Player;
 	Camera* m_Cam;
 
@@ -34,7 +34,8 @@ public:
 	bool m_KeyFlag[6] = {}; //0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: ATTACK, 5: JUMP
 	bool m_Jumping;
 	bool m_ComboFlag[6] = {}; 
-	bool m_AniWait;
+	bool m_StopMove;
+	bool m_PlayerDynamite;
 
 	int m_TimerFrame = 0;
 	int m_SelectTimer = 20*10;
@@ -45,14 +46,15 @@ public:
 	void LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp);
 	void LoadSounds(const TCHAR dataFileName[100]);
 	
-	void TitleScene(HDC hdc, HBITMAP & screen);
-	void SelectScene(HDC hdc, HBITMAP & screen);
-	void PlayScene(HDC hdc, HBITMAP & screen);
-	void EndingScene(HDC hdc, HBITMAP & screen);
+	void TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
+	void SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
+	void PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
+	void LoadStage(int stageNum, RECT winRect);
+	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
 	void Gravity(int g);
-	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, HBITMAP& bitmap);
-	void CheckKeyInput();
+	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
+	void CheckKeyInput(HDC hdc, RECT winRect);
 	void CheckKeyRelease(WPARAM wParam);
 	void ShowPlayerLife(const Charactor & player);
 	void ShowPlayerHPbar(const Charactor & player);
