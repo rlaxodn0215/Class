@@ -66,22 +66,29 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWai
 
 BOOL Ryno::Born()
 {
-	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+	cout << "Ryno_Born" << endl;
+
+	if (!m_CurAniShowOffset.empty())
+	{
+		m_CurAniShowOffset.clear();
+
+		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+		{
+			m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+				m_Position.m_Z - m_CurAni->GetHeights()[i] });
+		}
+	}
 
 	m_CurAni = m_Animations["Ryno_born"];
 	m_CurAniSpeed = 4;
-
-	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
-	{
-		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i]/2),
-			m_Position.m_Z - m_CurAni->GetHeights()[i] });
-	}
 
 	return 0;
 }
 
 BOOL Ryno::Idle()
 {
+	cout << "Ryno_Idle" << endl;
+
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
 	m_CurAni = m_Animations["Ryno_idle"];
@@ -104,6 +111,8 @@ BOOL Ryno::Idle()
 
 BOOL Ryno::Move()
 {
+	cout << "Ryno_Move" << endl;
+
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
 	m_CurAni = m_Animations["Ryno_walk"];
@@ -418,7 +427,11 @@ void Baseball::Idle()
 {
 	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
 
-	m_CurAni = m_Animations["Baseball_readyforfight"];
+	if(rand()%2)
+		m_CurAni = m_Animations["Baseball_readyforfight"];
+	else
+		m_CurAni = m_Animations["Baseball_walk"];
+
 	m_CurAniSpeed = 10;
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -427,23 +440,70 @@ void Baseball::Idle()
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
-	//RECT collderPos = { Charactor::m_Position.m_X + 25, Charactor::m_Position.m_Z,
-	//	Charactor::m_Position.m_X + 100, Charactor::m_Position.m_Z + 125 };
-	//m_BodyColliders.SetArea(collderPos);
-
-	//m_AttackColliders.SetArea({ 0,0,0,0 });
+	m_BodyColliders.SetCenter({ m_Position.m_X, m_Position.m_Z });
+	m_BodyColliders.SetRadius(50);
+	m_AttackColliders.SetArea({ 0,0,0,0 });
 }
 
 void Baseball::Damaged()
 {
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	if (rand() % 4 == 0)
+		m_CurAni = m_Animations["Baseball_hit1"];
+	else if(rand() % 4 == 1)
+		m_CurAni = m_Animations["Baseball_hit2"];
+	else if (rand() % 4 == 2)
+		m_CurAni = m_Animations["Baseball_hit3"];
+	else 
+		m_CurAni = m_Animations["Baseball_hit4"];
+
+	m_CurAniSpeed = 10;
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+	}
 }
 
 void Baseball::Dead()
 {
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	m_CurAni = m_Animations["Baseball_dead"];
+
+	m_CurAniSpeed = 10;
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+	}
 }
 
 void Baseball::NormalAttack()
 {
+	if (!m_CurAniShowOffset.empty()) m_CurAniShowOffset.clear();
+
+	if (rand() % 2)
+		m_CurAni = m_Animations["Baseball_kick"];
+	else
+		m_CurAni = m_Animations["Baseball_punch"];
+
+	m_CurAniSpeed = 10;
+
+	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+	{
+		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+	}
+}
+
+void Baseball::FollowPlayer()
+{
+
+
 }
 
 

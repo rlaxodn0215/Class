@@ -170,6 +170,7 @@ public:
 	virtual void Damaged()=0;
 	virtual void Dead()=0;
 	virtual void NormalAttack()=0;
+	virtual void FollowPlayer() = 0;
 };
 
 class Baseball :public Monster
@@ -179,9 +180,6 @@ private:
 	BoxCollider m_AttackColliders;
 
 public:
-
-
-
 	Baseball()=default;
 	Baseball(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
 		map<string, shared_ptr<Sound>>& sounds) : Monster(pos, hp, moveSpeed, anis, sounds) {
@@ -192,4 +190,5 @@ public:
 	void Damaged();
 	void Dead();
 	void NormalAttack();
+	void FollowPlayer();
 };
