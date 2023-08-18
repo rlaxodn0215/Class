@@ -28,12 +28,9 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         if (iter->get()->GetAttackCollider().OnTrigger(temp1, 3)) //몬스터의 공격이 플레이어에게 들어 갔다.
         {
             player->SetHP(player->GetHP() - iter->get()->GetAttack());
-            //cout << "몬스터의 공격이 플레이어에게 들어 갔다." << endl;
+            cout << "몬스터의 공격이 플레이어에게 들어 갔다." << endl;
         }
     }
-
-
-
 
 
     for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();) //몬스터 및 플래이어 이동 처리

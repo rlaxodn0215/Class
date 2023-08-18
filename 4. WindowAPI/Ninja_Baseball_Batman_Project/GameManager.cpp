@@ -287,8 +287,8 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
 
         map<string, shared_ptr<Sound>> temp1;
 
-        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 400, 400),50,1,temp,temp1)));
         stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(600, 450, 450),50,1,temp,temp1)));
