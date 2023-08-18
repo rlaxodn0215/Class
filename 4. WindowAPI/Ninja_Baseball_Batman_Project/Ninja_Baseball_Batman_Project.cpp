@@ -163,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         {
             Initalize(hWnd);
-            SetTimer(hWnd, TIMER, 10, Timer);
+            SetTimer(hWnd, TIMER, 20, Timer);
         }
         break;
     case WM_CHAR:

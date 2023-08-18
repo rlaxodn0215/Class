@@ -115,7 +115,7 @@ void CircleCollider::ShowCollider(HDC hdc)
 {
 	HPEN hPen, oldPen;
 	HBRUSH hBrush, hOldBrush;
-	hPen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+	hPen = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
 	oldPen = (HPEN)SelectObject(hdc, hPen);
 	hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
 	hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);

@@ -20,28 +20,37 @@ using namespace std;
 //	WINDYPLANE
 //};
 
-enum PlayerStatus
+//enum PlayerStatus
+//{
+//	BORN,
+//	IDLE,
+//	MOVE,
+//	NORMAL_ATTACK,
+//	JUMP,
+//	JUMP_ATTACK,
+//	DAMAGED,
+//	LAY_DOWN,
+//	DEAD,
+//	SLIDE,
+//	SLIDE_ATTACK,
+//	HOME_RUN,
+//	CATCH,
+//	CATCH_ATTACK,
+//	SPECIAL_CATCH_ATTACK,
+//	CATCH_THROW,
+//	LAYDOWN_ATTACK,
+//	BEARHAND_MODE,
+//	BEARHAND_ATTACK,
+//	CATCH_DYNAMITE
+//};
+
+enum MonsterStatus
 {
-	BORN,
-	IDLE,
+	NOTHING,
 	MOVE,
 	NORMAL_ATTACK,
-	JUMP,
-	JUMP_ATTACK,
 	DAMAGED,
-	LAY_DOWN,
-	DEAD,
-	SLIDE,
-	SLIDE_ATTACK,
-	HOME_RUN,
-	CATCH,
-	CATCH_ATTACK,
-	SPECIAL_CATCH_ATTACK,
-	CATCH_THROW,
-	LAYDOWN_ATTACK,
-	BEARHAND_MODE,
-	BEARHAND_ATTACK,
-	CATCH_DYNAMITE
+	DEAD
 };
 
 class Charactor
@@ -88,12 +97,12 @@ public:
 
 	void Update();
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, bool& aniWait,RECT winRect);
+	virtual void ShowColliders(HDC hdc) = 0;
 };
 
 class Player : public Charactor // 상태 패턴
 {
 protected:
-	PlayerStatus m_PlayerStatus = BORN;
 	int m_PlayingDynamite = 0;
 
 public:
@@ -102,12 +111,8 @@ public:
 		: Charactor(pos, hp, moveSpeed, anis, sounds) {};
 
 	virtual ~Player() = default;
-	PlayerStatus GetPlayerStatus() { return m_PlayerStatus; }
-	void SetPlayerStatus(int i) { m_PlayerStatus = (PlayerStatus)i; }
 	int GetPlayDynamite() { return m_PlayingDynamite; }
 	void SetPlayDynamite(int num) { m_PlayingDynamite=num; }
-
-	//BOOL (Player::* PlayerPlaying)();
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
 	virtual BOOL Born() = 0;//
@@ -124,6 +129,9 @@ public:
 	virtual BOOL CatchThrow()=0;
 	virtual BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
 
+	//virtual void ShowColliders(HDC hdc) = 0;
+	void ShowColliders(HDC hdc) override;
+
 };
 
 class Ryno :public Player
@@ -134,7 +142,6 @@ private:
 	int m_PlayerLife = 3;
 	int m_Points = 0;
 	
-
 public:
 	Ryno() = default;
 	Ryno(Vector3 pos, int hp, int moveSpeed, 
@@ -164,18 +171,22 @@ class Monster : public Charactor
 public:
 	Monster() = default;
 	Monster(Vector3 position, int Hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds) :Charactor(position,Hp,moveSpeed,anis,sounds) {};
+		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, Hp, moveSpeed, anis, sounds) {
+		m_isLookRight = false;
+	};
 	virtual ~Monster() = default;
-	virtual void Idle()=0;
+	virtual void Move()=0;
 	virtual void Damaged()=0;
 	virtual void Dead()=0;
 	virtual void NormalAttack()=0;
-	virtual void FollowPlayer() = 0;
+	virtual void ShowColliders(HDC hdc) = 0;
+	virtual void MonsterAI(Player* player, int z_offest) = 0;
 };
 
 class Baseball :public Monster
 {
 private:
+	MonsterStatus m_Status;
 	CircleCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
 
@@ -183,12 +194,18 @@ public:
 	Baseball()=default;
 	Baseball(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
 		map<string, shared_ptr<Sound>>& sounds) : Monster(pos, hp, moveSpeed, anis, sounds) {
-		Idle();
+		m_Status = NOTHING; Move();
 	};
 	~Baseball()=default;
-	void Idle();
+
+	CircleCollider GetBodyCollider() { return m_BodyColliders; }
+	BoxCollider GetAttackCollider() { return m_AttackColliders; }
+
+	void Move();
 	void Damaged();
 	void Dead();
 	void NormalAttack();
-	void FollowPlayer();
+	void MonsterAI(Player* player, int z_offest)override;
+
+	void ShowColliders(HDC hdc)override;
 };

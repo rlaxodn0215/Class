@@ -266,22 +266,39 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
         map<string, shared_ptr<Sound>> temp1;
 
-        m_Player = new Ryno(Vector3(100, 500, 500), 100, 5, temp, temp1);
+        m_Player = new Ryno(Vector3(100, 500, 500), 100, 10, temp, temp1);
 
         LoadStage(1,winRect);
     }
-
     m_Player->m_Bitmap = screen;
+
+    //HDC hMemDC, hMemDC1;
+    //HBITMAP hOldBitmap, hOldBitmap1;
+
+    //hMemDC1 = CreateCompatibleDC(hdc);
+    //hOldBitmap1 = (HBITMAP)SelectObject(hMemDC1, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
+
+    //Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
+    //Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
+
+
+    //hMemDC = CreateCompatibleDC(hdc);
+    //hOldBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
+    ///////////////////////////////////////////////////////////////////////
+    //m_Player->ShowCharactor(hMemDC, m_Player->GetAniSpeed(), m_TimerFrame, m_StopMove, winRect);
+    //m_Player->ShowColliders(hMemDC);
+    //m_Stage->ShowStage(hMemDC, m_TimerFrame, winRect);
+    //////////////////////////////////////////////////////////////////////
+    //BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
+
+    //SelectObject(hMemDC, hOldBitmap);
+    //DeleteDC(hMemDC);
 
     Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
     Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
-
     m_Player->ShowCharactor(hdc, m_Player->GetAniSpeed(), m_TimerFrame, m_StopMove, winRect);
-    //m_Stage->ShowMonsters(hdc, m_TimerFrame, winRect);
-
-    Ryno* temp = (Ryno*)m_Player;
-    temp->GetBodyCollider().ShowCollider(hdc);
-    temp->GetAttackCollider().ShowCollider(hdc);
+    m_Player->ShowColliders(hdc);
+    m_Stage->ShowStage(hdc,m_TimerFrame,winRect);
 }
 
 void GameManager::LoadStage(int stageNum, RECT winRect)
@@ -293,24 +310,15 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
         limitAreas.push_back({ 0,0,winRect.right,410 });
         limitAreas.push_back({ 0,0,420,505 });
 
-        list<Charactor> stageMonsters;
+        list<shared_ptr<Monster>> stageMonsters;
 
         map<string, shared_ptr<Animation>> temp;
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp);
 
         map<string, shared_ptr<Sound>> temp1;
 
-        stageMonsters.push_back(Baseball(Vector3(800, 400, 400),50,2,temp,temp1));
-        stageMonsters.push_back(Baseball(Vector3(800, 600, 600),50,2,temp,temp1));
-
-        //stageMonsters.push_back(Baseball(Vector3(700, 400, 400), 50, 2, temp, temp1));
-        //stageMonsters.push_back(Baseball(Vector3(700, 600, 600), 50, 2, temp, temp1));
-
-        //stageMonsters.push_back(Baseball(Vector3(500, 400, 400), 50, 2, temp, temp1));
-        //stageMonsters.push_back(Baseball(Vector3(500, 600, 600), 50, 2, temp, temp1));
-
-        //stageMonsters.push_back(Baseball(Vector3(400, 400, 400), 50, 2, temp, temp1));
-        //stageMonsters.push_back(Baseball(Vector3(400, 600, 600), 50, 2, temp, temp1));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 400, 500),50,1,temp,temp1)));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 650),50,1,temp,temp1)));
 
         m_Stage = new Stage(playArea, limitAreas, stageMonsters);
     }
@@ -405,6 +413,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
     else if (m_SceneNum == 2)
     {
         m_Player->Update();
+        m_Stage->StageUpdate(winRect, m_Player);
 
         TCHAR temp[20];
         _stprintf_s(temp, L"[%d, %d, %d]", m_Player->GetPos().m_X, m_Player->GetPos().m_Y+125, m_Player->GetPos().m_Z+125);
@@ -429,15 +438,15 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
 
         }
 
-        if (!m_StopMove)
+        if (!m_StopMove) // 움직일 수 없는 애니 작동 여부
         {
-            if (!m_Jumping && !m_PlayerDynamite)
+            if (!m_Jumping && !m_PlayerDynamite) // 점프와 필살기 사용 안 할때
             {
                 m_Player->Idle();
                 m_Player->SetVel(Vector3(0, 0, 0));
             }
 
-            if (GetAsyncKeyState(VK_UP) & 0x8000 && !m_KeyFlag[4] && !m_PlayerDynamite)
+            if (GetAsyncKeyState(VK_UP) & 0x8000 && !m_KeyFlag[4] && !m_PlayerDynamite) //공격 X, 필살기 X
             {
                 m_KeyFlag[0] = true;
 
