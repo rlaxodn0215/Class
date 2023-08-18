@@ -52,7 +52,7 @@ BOOL CircleCollider::OnTrigger(Collider& other, int zOffsetDelta)
 		return FALSE;
 }
 
-BOOL CircleCollider::OnCollision(Collider& other, int zOffsetDelta)
+BOOL CircleCollider::OnCollision(Collider & other, int zOffsetDelta)
 {
 	Collider* base = &other;
 

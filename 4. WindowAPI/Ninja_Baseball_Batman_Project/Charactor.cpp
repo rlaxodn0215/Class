@@ -72,7 +72,7 @@ BOOL Ryno::Born()
 
 		m_CurAniSpeed = 4;
 
-		cout << "Ryno_Born" << endl;
+		//cout << "Ryno_Born" << endl;
 	}
 
 	return 0;
@@ -99,7 +99,7 @@ BOOL Ryno::Idle()
 
 		m_AttackColliders.SetArea({ 0,0,0,0 });
 
-		cout << "Ryno_Idle" << endl;
+		//cout << "Ryno_Idle" << endl;
 	}
 
 	return 0;
@@ -120,7 +120,7 @@ BOOL Ryno::Move()
 				m_Position.m_Z - m_CurAni->GetHeights()[i] });
 		}
 
-		cout << "Ryno_Move" << endl;
+		//cout << "Ryno_Move" << endl;
 	}
 	return 0;
 }
@@ -177,7 +177,7 @@ BOOL Ryno::Jump(bool & keydown, bool jumping)
 			m_Position.m_Y - m_CurAni->GetHeights()[i] });
 	}
 
-	cout << "Ryno_Jump" << endl;
+	//cout << "Ryno_Jump" << endl;
 
 	return 0;
 }
@@ -281,7 +281,7 @@ BOOL Ryno::HomeRun()
 	
 	m_BodyColliders.SetArea({0,0,0,0});
 	
-	cout << "Ryno_Homerun" << endl;
+	//cout << "Ryno_Homerun" << endl;
 
 	return 0;
 }
@@ -481,14 +481,14 @@ void Baseball::Move()
 	}
 	
 	if(m_isLookRight)
-		m_BodyColliders.SetCenter({ m_Position.m_X + 60, m_Position.m_Z -100 });
+		m_BodyCircleColliders.SetCenter({ m_Position.m_X + 60, m_Position.m_Z -100 });
 	else
-		m_BodyColliders.SetCenter({ m_Position.m_X + 90, m_Position.m_Z -100 });
+		m_BodyCircleColliders.SetCenter({ m_Position.m_X + 90, m_Position.m_Z -100 });
 
-	m_BodyColliders.SetRadius(70);
+	m_BodyCircleColliders.SetRadius(70);
 	m_AttackColliders.SetArea({ 0,0,0,0 });
 
-	cout << "Baseball Idle" << endl;
+	//cout << "Baseball Idle" << endl;
 }
 
 void Baseball::Damaged()
@@ -573,10 +573,10 @@ void Baseball::NormalAttack()
 
 	m_AttackColliders.SetArea(collderPos);
 
-	cout << "Baseball Attack!!" << endl;
+	//cout << "Baseball Attack!!" << endl;
 }
 
-void Baseball::MonsterAI(Player * player, int z_offest)
+void Baseball::MonsterAI(shared_ptr<Player> player, int z_offest)
 {
 	//시선 처리
 	if (m_Position.m_X - player->GetPos().m_X > 0)m_isLookRight = true;

@@ -14,14 +14,7 @@ GameManager::GameManager()
 
 GameManager::~GameManager()
 {
-    if (m_Stage != NULL)
-        delete m_Stage;
 
-	if (m_Player != NULL)
-	    delete m_Player;
-
-	if (m_Cam != NULL)
-	    delete m_Cam;
 }
 
 void GameManager::GetSentence(int& i, char* buff, char* sentence)
@@ -266,7 +259,7 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
         map<string, shared_ptr<Sound>> temp1;
 
-        m_Player = new Ryno(Vector3(100, 500, 500), 100, 10, temp, temp1);
+        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100, 10, temp, temp1));
 
         LoadStage(1,winRect);
     }
@@ -312,14 +305,14 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(550, 450, 450), 50, 1, temp, temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(550, 550, 550), 50, 1, temp, temp1)));
 
-        m_Stage = new Stage(playArea, limitAreas, stageMonsters);
+        m_Stage =shared_ptr<Stage>(new Stage(playArea, limitAreas, stageMonsters));
     }
 }
 
 void GameManager::EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 3
 {
 
-
+    
 
 }
 
@@ -354,19 +347,46 @@ void GameManager::Gravity(int g)
     
 }
 
-void GameManager::CheckTrigger()
-{
-    vector<shared_ptr<Charactor>> SameZ;
-    
 
+//시간 되면 푸세요 ~ ^^
+//vector<vector<shared_ptr<Charactor>>> GameManager::SameZ(shared_ptr<Stage> & stage, shared_ptr<Player> & player, int z_offset)
+//{
+//    vector<shared_ptr<Charactor>> charactor;
+//    vector<vector<shared_ptr<Charactor>>> ans;
+//    vector<shared_ptr<Charactor>> temp;
+//
+//    for (auto iter : stage.get()->GetStageMonsters())
+//    {
+//        charactor.push_back(iter);
+//    }
+//
+//    charactor.push_back(player);
+//
+//    sort(charactor.begin(), charactor.end(), Compare);
+//
+//    temp.push_back(charactor[0]);
+//
+//    int interval[2] = { temp.back()->GetPos().m_Z - z_offset, temp.back()->GetPos().m_Z + z_offset };
+//
+//    for (int i = 1; i < charactor.size(); i++)
+//    {
+//        if (interval[1] >= charactor[i]->GetPos().m_Z - z_offset) // z가 범위 안에 있다
+//        {
+//            interval[0] =  min(interval[0],charactor[i]->GetPos().m_Z - z_offset);
+//            temp.push_back(charactor[i]);
+//        }
+//
+//        else
+//        {
+//
+//        }
+//
+//
+//    }
+//
+//    return ans;
+//}
 
-
-}
-
-void GameManager::CheckCollider()
-{
-
-}
 
 void GameManager::Rendering()
 {

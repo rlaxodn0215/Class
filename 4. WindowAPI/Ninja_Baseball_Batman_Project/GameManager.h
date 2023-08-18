@@ -2,6 +2,7 @@
 #include<map>
 #include<string>
 #include<iostream>
+#include<algorithm>
 #include"Camera.h"
 #include"Charactor.h"
 #include"Stage.h"
@@ -23,9 +24,9 @@ public:
 	int m_SceneNum = 0;
 
 	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);
-	Stage * m_Stage;
-	Player* m_Player;
-	Camera* m_Cam;
+	shared_ptr<Stage>  m_Stage;
+	shared_ptr< Player> m_Player;
+	shared_ptr<Camera> m_Cam;
 
 	POINT m_Cursor = { 50,150 }; //(50,150), +220
 	int m_SelectPosX[4] = {50,290,530,765};
@@ -50,9 +51,14 @@ public:
 	void LoadStage(int stageNum, RECT winRect);
 	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
+	//시간 되면 푸세요 ~ ^^
+	//vector<vector<shared_ptr<Charactor>>> SameZ(shared_ptr<Stage> & stage, shared_ptr<Player> & player, int z_offset);
+	//bool Compare(const shared_ptr<Charactor> & other1, const shared_ptr<Charactor>& other2) const
+	//{
+	//	return (other1.get()->GetPos().m_Z < other2.get()->GetPos().m_Z);
+	//}
+
 	void Gravity(int g);
-	void CheckTrigger();
-	void CheckCollider();
 	void Rendering();
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
 	void CheckKeyInput(HDC hdc, RECT winRect);

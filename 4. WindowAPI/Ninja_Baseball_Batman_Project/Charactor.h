@@ -10,9 +10,10 @@
 
 using namespace std;
 
-enum MonsterStatus
+enum Status
 {
 	NOTHING,
+	IDLE,
 	MOVE,
 	NORMAL_ATTACK,
 	DAMAGED,
@@ -33,6 +34,7 @@ protected:
 	bool m_StopMove = false;
 	int m_CurAniFrameNum = 0;
 	int m_tempTimer = 0;
+	int m_Attack = 0;
 
 	map<string, shared_ptr<Animation>> m_Animations;
 	shared_ptr<Animation> m_CurAni;
@@ -68,7 +70,10 @@ public:
 	void SetJumping(bool j) { m_Jumping = j; }
 	bool GetStopMove() { return m_StopMove; }
 	void SetStopMove(bool s) { m_StopMove = s; }
+	int GetAttack() { return m_Attack; }
+	void SetAttack(int num) { m_Attack = num; }
 
+	void Dead() { if (m_Hp <= 0)m_isAlive = false; }
 	void Update(bool moveOK);
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
 	virtual void ShowColliders(HDC hdc) = 0;
@@ -79,6 +84,9 @@ class Player : public Charactor // 상태 패턴
 protected:
 	int m_PlayingDynamite = 0;
 
+	int m_PlayerLife = 3;
+	int m_Points = 0;
+
 public:
 	Player() = default;
 	Player(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
@@ -87,6 +95,14 @@ public:
 	virtual ~Player() = default;
 	int GetPlayDynamite() { return m_PlayingDynamite; }
 	void SetPlayDynamite(int num) { m_PlayingDynamite=num; }
+
+	int GetPlayerLife() { return m_PlayerLife; }
+	void SetPlayerLife(int num) { m_PlayerLife = num; }
+	int GetPoints() { return m_Points; }
+	void SetPoints(int num) { m_Points = num; }
+
+	virtual BoxCollider GetBodyCollider() = 0;
+	virtual BoxCollider GetAttackCollider() = 0;
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
 	virtual BOOL Born() = 0;//
@@ -113,8 +129,6 @@ class Ryno :public Player
 private:
 	BoxCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
-	int m_PlayerLife = 3;
-	int m_Points = 0;
 	
 public:
 	Ryno() = default;
@@ -148,20 +162,25 @@ public:
 		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, Hp, moveSpeed, anis, sounds) {
 		m_isLookRight = false;
 	};
+
+	virtual CircleCollider GetBodyCircleCollider() = 0;
+	virtual BoxCollider GetBodyCollider() = 0;
+	virtual BoxCollider GetAttackCollider() = 0;
+
 	virtual ~Monster() = default;
 	virtual void Move()=0;
 	virtual void Damaged()=0;
 	virtual void Dead()=0;
 	virtual void NormalAttack()=0;
 	virtual void ShowColliders(HDC hdc) = 0;
-	virtual void MonsterAI(Player* player, int z_offest) = 0;
+	virtual void MonsterAI(shared_ptr<Player> player, int z_offest) = 0;
 };
 
 class Baseball :public Monster
 {
 private:
-	MonsterStatus m_Status;
-	CircleCollider m_BodyColliders;
+	Status m_Status;
+	CircleCollider m_BodyCircleColliders;
 	BoxCollider m_AttackColliders;
 
 public:
@@ -172,14 +191,15 @@ public:
 	};
 	~Baseball()=default;
 
-	CircleCollider GetBodyCollider() { return m_BodyColliders; }
+	CircleCollider GetBodyCircleCollider() { return m_BodyCircleColliders; }
+	BoxCollider GetBodyCollider() { return m_AttackColliders; }
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
 
 	void Move();
 	void Damaged();
 	void Dead();
 	void NormalAttack();
-	void MonsterAI(Player* player, int z_offest)override;
+	void MonsterAI(shared_ptr<Player> player, int z_offest)override;
 
 	void ShowColliders(HDC hdc)override;
 };
