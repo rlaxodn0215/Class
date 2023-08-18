@@ -32,10 +32,8 @@ public:
 	bool m_SelectFlag = false;
 
 	bool m_KeyFlag[6] = {}; //0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: ATTACK, 5: JUMP
-	bool m_Jumping;
 	bool m_ComboFlag[6] = {}; 
-	bool m_StopMove;
-	bool m_PlayerDynamite;
+	bool m_PlayerDynamite = false;
 
 	int m_TimerFrame = 0;
 	int m_SelectTimer = 20*10;
@@ -53,6 +51,9 @@ public:
 	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
 	void Gravity(int g);
+	void CheckTrigger();
+	void CheckCollider();
+	void Rendering();
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
 	void CheckKeyInput(HDC hdc, RECT winRect);
 	void CheckKeyRelease(WPARAM wParam);

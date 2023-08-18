@@ -204,25 +204,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-             HDC hMemDC;
-             HBITMAP hOldBitmap;
+            HDC hMemDC;
+            HBITMAP hOldBitmap;
 
-             hMemDC = CreateCompatibleDC(hdc);
+            hMemDC = CreateCompatibleDC(hdc);
 
-             if (Screen == NULL)
-                 Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
+            if (Screen == NULL)
+                Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
 
-             hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);           
-             /////////////////////////////////////////////////////////////////////
+            hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
+            /////////////////////////////////////////////////////////////////////
 
-             (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, Screen,winRect);
+            (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, Screen, winRect);
 
-             ////////////////////////////////////////////////////////////////////
-             BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
+            ////////////////////////////////////////////////////////////////////
+            BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
 
-             SelectObject(hMemDC, hOldBitmap);
-             DeleteDC(hMemDC);
-            
+            SelectObject(hMemDC, hOldBitmap);
+            DeleteDC(hMemDC);
+
+
             EndPaint(hWnd, &ps);
         }
         break;

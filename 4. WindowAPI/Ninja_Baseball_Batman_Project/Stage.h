@@ -16,7 +16,10 @@ public:
 	Stage(RECT & playArea, vector<RECT> & limitAreas, list<shared_ptr<Monster>> & stageMonsters);
 	~Stage() = default;
 
-	void StageUpdate(RECT winRect, Player* player);
-	void ShowStage(HDC hdc, int Timer, RECT winRect);
+	RECT GetPlayArea() { return m_PlayArea; }
+	vector<RECT> GetLimitAreas(){ return m_LimitAreas; }
+	list<shared_ptr<Monster>> GetStageMonsters() { return m_StageMonsters; }
+
+	void StageUpdate(HDC hdc, int Timer, RECT winRect, Player* player, bool aniWait);
 };
 

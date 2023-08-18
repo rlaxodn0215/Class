@@ -270,35 +270,12 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
         LoadStage(1,winRect);
     }
+
     m_Player->m_Bitmap = screen;
-
-    //HDC hMemDC, hMemDC1;
-    //HBITMAP hOldBitmap, hOldBitmap1;
-
-    //hMemDC1 = CreateCompatibleDC(hdc);
-    //hOldBitmap1 = (HBITMAP)SelectObject(hMemDC1, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
-
-    //Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
-    //Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
-
-
-    //hMemDC = CreateCompatibleDC(hdc);
-    //hOldBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom));
-    ///////////////////////////////////////////////////////////////////////
-    //m_Player->ShowCharactor(hMemDC, m_Player->GetAniSpeed(), m_TimerFrame, m_StopMove, winRect);
-    //m_Player->ShowColliders(hMemDC);
-    //m_Stage->ShowStage(hMemDC, m_TimerFrame, winRect);
-    //////////////////////////////////////////////////////////////////////
-    //BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
-
-    //SelectObject(hMemDC, hOldBitmap);
-    //DeleteDC(hMemDC);
 
     Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
     Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
-    m_Player->ShowCharactor(hdc, m_Player->GetAniSpeed(), m_TimerFrame, m_StopMove, winRect);
-    m_Player->ShowColliders(hdc);
-    m_Stage->ShowStage(hdc,m_TimerFrame,winRect);
+    m_Stage->StageUpdate(hdc, m_TimerFrame, winRect, m_Player, m_Player->GetStopMove());
 }
 
 void GameManager::LoadStage(int stageNum, RECT winRect)
@@ -317,8 +294,23 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
 
         map<string, shared_ptr<Sound>> temp1;
 
-        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 400, 500),50,1,temp,temp1)));
-        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 650),50,1,temp,temp1)));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 400, 400),50,1,temp,temp1)));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(600, 450, 450),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(600, 550, 550),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(500, 450, 450),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(500, 550, 550),50,1,temp,temp1)));
+
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(850, 400, 400), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(850, 550, 550), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(750, 450, 450), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(750, 550, 550), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(650, 450, 450), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(650, 550, 550), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(550, 450, 450), 50, 1, temp, temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(550, 550, 550), 50, 1, temp, temp1)));
 
         m_Stage = new Stage(playArea, limitAreas, stageMonsters);
     }
@@ -360,6 +352,24 @@ void GameManager::Gravity(int g)
             m_Player->SetVel(m_Player->GetVel() + Vector3(0,g,0));
    }
     
+}
+
+void GameManager::CheckTrigger()
+{
+    vector<shared_ptr<Charactor>> SameZ;
+    
+
+
+
+}
+
+void GameManager::CheckCollider()
+{
+
+}
+
+void GameManager::Rendering()
+{
 }
 
 void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
@@ -412,8 +422,6 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
 
     else if (m_SceneNum == 2)
     {
-        m_Player->Update();
-        m_Stage->StageUpdate(winRect, m_Player);
 
         TCHAR temp[20];
         _stprintf_s(temp, L"[%d, %d, %d]", m_Player->GetPos().m_X, m_Player->GetPos().m_Y+125, m_Player->GetPos().m_Z+125);
@@ -438,9 +446,9 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
 
         }
 
-        if (!m_StopMove) // 움직일 수 없는 애니 작동 여부
+        if (!m_Player->GetStopMove()) // 움직일 수 없는 애니 작동 여부
         {
-            if (!m_Jumping && !m_PlayerDynamite) // 점프와 필살기 사용 안 할때
+            if (!m_Player->GetJumping() && !m_PlayerDynamite) // 점프와 필살기 사용 안 할때
             {
                 m_Player->Idle();
                 m_Player->SetVel(Vector3(0, 0, 0));
@@ -450,7 +458,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             {
                 m_KeyFlag[0] = true;
 
-                if (!m_Jumping)
+                if (!m_Player->GetJumping())
                 {
                     m_Player->SetVel(Vector3(0, -m_Player->GetMoveSpeed() / 1.5f, -m_Player->GetMoveSpeed() / 1.5f));
                     m_Player->Move();
@@ -461,7 +469,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             {
                 m_KeyFlag[1] = true;
 
-                if (!m_Jumping)
+                if (!m_Player->GetJumping())
                 {
                     m_Player->SetVel(Vector3(0, m_Player->GetMoveSpeed() / 1.5f, m_Player->GetMoveSpeed() / 1.5f));
                     m_Player->Move();
@@ -479,7 +487,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
                     {
                         m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed(), m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
 
-                        if (!m_Jumping)
+                        if (!m_Player->GetJumping())
                             m_Player->Move();
                     }
                 }
@@ -491,7 +499,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
                     {
                         m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
 
-                        if (!m_Jumping)
+                        if (!m_Player->GetJumping())
                             m_Player->Run();
                     }
                 }
@@ -508,7 +516,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
                     {
                         m_Player->SetVel(Vector3(m_Player->GetMoveSpeed(), m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
 
-                        if (!m_Jumping)
+                        if (!m_Player->GetJumping())
                             m_Player->Move();
                     }
                 }
@@ -519,7 +527,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
                     {
                         m_Player->SetVel(Vector3(m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
 
-                        if (!m_Jumping)
+                        if (!m_Player->GetJumping())
                             m_Player->Run();
                     }
                 }
@@ -535,22 +543,27 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             else
                 m_Player->SetPos(m_Player->GetPos() + Vector3(-10, 0, 0));
 
-            m_StopMove = true;
+            m_Player->SetStopMove(true);
             m_KeyFlag[5] = false;
-            m_Jumping = false;
+            m_Player->SetJumping(false);
         }
 
-        else if (GetAsyncKeyState(0x53) & 0x8000 || (m_Jumping && !m_KeyFlag[4]) && !m_PlayerDynamite) // s
+        else if (GetAsyncKeyState(0x53) & 0x8000 || (m_Player->GetJumping() && !m_KeyFlag[4]) && !m_PlayerDynamite) // s
         {
             m_KeyFlag[5] = true;
-            m_Player->Jump(m_KeyFlag[5], m_Jumping);
+            m_Player->Jump(m_KeyFlag[5], m_Player->GetJumping());
         }
 
-        if (GetAsyncKeyState(0x41) & 0x8000 && !m_PlayerDynamite) // a
+        if (!m_Player->GetJumping())
         {
-            m_KeyFlag[4] = true;
-            m_StopMove = true;
-            m_Player->NormalAttack(m_Player->GetLookRight());
+            if (GetAsyncKeyState(0x41) & 0x8000 && !m_PlayerDynamite) // a
+            {
+                m_KeyFlag[4] = true;
+                m_Player->SetStopMove(true);
+                m_Player->SetVel(Vector3(0, 0, 0));
+                m_Player->NormalAttack(m_Player->GetLookRight());
+
+            }
         }
 
         if (m_ComboFlag[0] && m_ComboFlag[1] && m_ComboFlag[5] || m_PlayerDynamite)

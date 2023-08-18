@@ -12,37 +12,33 @@ Charactor::Charactor(Vector3 pos, int hp, int moveSpeed,
 	m_CurSound = NULL;
 }
 
-void Charactor::Update()
+void Charactor::Update(bool moveOK)
 {
-	m_Position = m_Position + m_Velocity;
+	if (moveOK)
+		m_Position = m_Position + m_Velocity;
 }
 
-void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWait, RECT winRect)
+void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, RECT winRect)
 {
-
-	static int totalFrame = 0;
-	static int curFrame = 0;
-	totalFrame = m_CurAni->GetFrameTotalCount();
-
-	if (aniWait)
+	if (m_StopMove)
 	{
-		static int tempTimer = 0;
 
-		if (!(Timer % TimeDivRatio) && curFrame < totalFrame - 1)
+		if (!(Timer % TimeDivRatio) && m_CurAniFrameNum < m_CurAni->GetFrameTotalCount() - 1)
 		{
-			curFrame++;
+			m_CurAniFrameNum++;
 		}
 
-		if (curFrame < totalFrame)
-			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight, winRect);
+		if (m_CurAniFrameNum < m_CurAni->GetFrameTotalCount())
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[m_CurAniFrameNum], m_CurAniFrameNum, 3.0f, m_isLookRight, winRect);
 
-		if (curFrame == totalFrame - 1)
+		if (m_CurAniFrameNum == m_CurAni->GetFrameTotalCount() - 1)
 		{
-			tempTimer++;
-			if (tempTimer> TimeDivRatio * 2.5f)
+			m_tempTimer++;
+			if (m_tempTimer> TimeDivRatio * 2.5f)
 			{
-				aniWait = false;
-				tempTimer = 0;
+				m_StopMove = false;
+				m_tempTimer = 0;
+				m_CurAniFrameNum = 0;
 			}
 		}
 	}
@@ -51,12 +47,12 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, bool & aniWai
 	{
 		if (!(Timer % TimeDivRatio))
 		{
-			if (curFrame < totalFrame - 1) curFrame++;
-			else curFrame = 0;
+			if (m_CurAniFrameNum < m_CurAni->GetFrameTotalCount() - 1) m_CurAniFrameNum++;
+			else m_CurAniFrameNum = 0;
 		}
 
-		if (curFrame < totalFrame)
-			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[curFrame], curFrame, 3.0f, m_isLookRight, winRect);
+		if (m_CurAniFrameNum < m_CurAni->GetFrameTotalCount())
+			m_CurAni->AniPlay(hdc, m_CurAniShowOffset[m_CurAniFrameNum], m_CurAniFrameNum, 3.0f, m_isLookRight, winRect);
 	}
 
 }
@@ -89,7 +85,7 @@ BOOL Ryno::Idle()
 		m_CurAniShowOffset.clear();
 
 		m_CurAni = m_Animations["Ryno_idle"];
-		m_CurAniSpeed = 4;
+		m_CurAniSpeed = 2;
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 		{
@@ -116,7 +112,7 @@ BOOL Ryno::Move()
 		m_CurAniShowOffset.clear();
 
 		m_CurAni = m_Animations["Ryno_walk"];
-		m_CurAniSpeed = 4;
+		m_CurAniSpeed = 2;
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 		{
@@ -136,7 +132,7 @@ BOOL Ryno::Run()//1
 		m_CurAniShowOffset.clear();
 
 		m_CurAni = m_Animations["Ryno_run"];
-		m_CurAniSpeed = 4;
+		m_CurAniSpeed = 2;
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 		{
@@ -147,7 +143,7 @@ BOOL Ryno::Run()//1
 	return 0;
 }
 
-BOOL Ryno::Jump(bool & keydown, bool & jumping)
+BOOL Ryno::Jump(bool & keydown, bool jumping)
 {
 
 	if (m_CurAni != m_Animations["Ryno_jump"])
@@ -161,13 +157,13 @@ BOOL Ryno::Jump(bool & keydown, bool & jumping)
 		m_Velocity.m_Y = 0;
 		m_Position.m_Y = m_Position.m_Z;
 		keydown = false;
-		jumping = false;
+		m_Jumping = false;
 	}
 
 	if (!jumping && keydown)
 	{
 		m_Velocity.m_Y = -30; //점프 속도
-		jumping = true;
+		m_Jumping = true;
 	}
 
 	RECT collderPos = { Charactor::m_Position.m_X , Charactor::m_Position.m_Y - 50,
@@ -233,7 +229,7 @@ BOOL Ryno::NormalAttack(bool isright)
 		m_CurAniShowOffset.clear();
 
 		m_CurAni = m_Animations["Ryno_attack"];
-		m_CurAniSpeed = 4;
+		m_CurAniSpeed = 2;
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 		{
@@ -265,7 +261,7 @@ BOOL Ryno::HomeRun()
 	if (m_CurAni != m_Animations["Ryno_homerun"])
 	{
 		m_CurAni = m_Animations["Ryno_homerun"];
-		m_CurAniSpeed = 10;
+		m_CurAniSpeed = 3;
 	}
 		
 	
@@ -326,7 +322,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		if (m_CurAni != m_Animations["Ryno_fly"])
 		{
 			m_CurAni = m_Animations["Ryno_fly"];
-			m_CurAniSpeed = 4;
+			m_CurAniSpeed = 2;
 		}
 
 		m_CurAniShowOffset.clear();
@@ -342,7 +338,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		m_Position.m_Y = m_Position.m_Z - 300;
 		
 
-		if (time > 50)
+		if (time > 20)
 		{
 			m_PlayingDynamite = 1;
 			time = temp = temp1 = 0;
@@ -394,7 +390,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_AttackColliders.SetArea(collderPos);
 		}
 
-		if (time > 100)
+		if (time > 50)
 		{
 			m_PlayingDynamite = 3;
 			time = temp = temp1 = 0;
@@ -440,7 +436,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 		m_Position.m_Z = m_Position.m_Y;
 
-		if (time > 50)
+		if (time > 20)
 		{
 			m_PlayingDynamite = 0;
 			time = temp = temp1 = 0;

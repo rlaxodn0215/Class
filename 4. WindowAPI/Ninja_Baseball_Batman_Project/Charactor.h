@@ -6,43 +6,9 @@
 #include"Sound.h"
 #include"Collider.h"
 #include"Vector3.h"
+#include<list>
 
 using namespace std;
-
-//enum MonsterCharactor
-//{
-//	BASEBALL,
-//	BAT,
-//	CARD_RED,
-//	CARD_YELLW,
-//	CARD_GREEN,
-//	CARD_BLUE,
-//	WINDYPLANE
-//};
-
-//enum PlayerStatus
-//{
-//	BORN,
-//	IDLE,
-//	MOVE,
-//	NORMAL_ATTACK,
-//	JUMP,
-//	JUMP_ATTACK,
-//	DAMAGED,
-//	LAY_DOWN,
-//	DEAD,
-//	SLIDE,
-//	SLIDE_ATTACK,
-//	HOME_RUN,
-//	CATCH,
-//	CATCH_ATTACK,
-//	SPECIAL_CATCH_ATTACK,
-//	CATCH_THROW,
-//	LAYDOWN_ATTACK,
-//	BEARHAND_MODE,
-//	BEARHAND_ATTACK,
-//	CATCH_DYNAMITE
-//};
 
 enum MonsterStatus
 {
@@ -56,13 +22,17 @@ enum MonsterStatus
 class Charactor
 {
 protected:
-	Vector3 m_Position;
+	Vector3 m_Position = {0,0,0};
 	Vector3 m_Velocity = {0,0,0};
 	int m_Hp;
 	int m_MoveSpeed;
 	bool m_isLookRight = true;// false == left
 	bool m_isAlive = true;
 	bool m_takeGravity = true;
+	bool m_Jumping = false;
+	bool m_StopMove = false;
+	int m_CurAniFrameNum = 0;
+	int m_tempTimer = 0;
 
 	map<string, shared_ptr<Animation>> m_Animations;
 	shared_ptr<Animation> m_CurAni;
@@ -94,9 +64,13 @@ public:
 	void SetAlive(bool live) { m_isAlive = live; }
 	bool GetTakeGravity() { return m_takeGravity; }
 	void SetTakeGravity(bool takeG) { m_takeGravity = takeG; }
+	bool GetJumping() { return m_Jumping; }
+	void SetJumping(bool j) { m_Jumping = j; }
+	bool GetStopMove() { return m_StopMove; }
+	void SetStopMove(bool s) { m_StopMove = s; }
 
-	void Update();
-	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, bool& aniWait,RECT winRect);
+	void Update(bool moveOK);
+	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
 	virtual void ShowColliders(HDC hdc) = 0;
 };
 
@@ -119,7 +93,7 @@ public:
 	virtual BOOL Idle()=0;//
 	virtual BOOL Move() = 0;//
 	virtual BOOL Run() = 0;//
-	virtual BOOL Jump(bool& keydown, bool& jumping)=0;//
+	virtual BOOL Jump(bool& keydown, bool jumping)=0;//
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
 	virtual BOOL NormalAttack(bool isright)=0;//
@@ -155,7 +129,7 @@ public:
 	BOOL Idle() override;
 	BOOL Move() override;
 	BOOL Run() override;
-	BOOL Jump(bool& keydown, bool& jumping) override;
+	BOOL Jump(bool& keydown, bool jumping) override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
 	BOOL NormalAttack(bool isright) override;
