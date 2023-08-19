@@ -130,6 +130,8 @@
     <ClCompile Include="2주차 1번.cpp" />
     <ClCompile Include="2주차 3번.cpp" />
     <ClCompile Include="2주차 4번.cpp" />
+    <ClCompile Include="4주차 3번.cpp" />
+    <ClCompile Include="4주차 4번.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
