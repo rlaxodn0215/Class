@@ -21,5 +21,6 @@ public:
 	list<shared_ptr<Monster>> GetStageMonsters() { return m_StageMonsters; }
 
 	void StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> player, bool aniWait);
+	void RenderingCharactor();
 };
 

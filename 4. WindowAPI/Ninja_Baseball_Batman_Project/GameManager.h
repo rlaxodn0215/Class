@@ -50,14 +50,11 @@ public:
 	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
 	void Gravity(int g);
-	void Rendering();
 	void ShowBackStage(HDC hdc, RECT winRect);
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
 	void CheckKeyInput(HDC hdc, RECT winRect);
 	void CheckKeyRelease(WPARAM wParam);
-	void ShowPlayerHPbar(const Charactor & player);
-	void ShowPlayerStateUI(const Charactor & player);
-	void ShowPlayerPoints(const Charactor & player);
+	void ShowUI(HDC hdc, RECT winRect);
 	void GameOver();
 };
 

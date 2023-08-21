@@ -12,7 +12,6 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
 {
 	if (m_StageMonsters.empty()) m_StageFinish = true;
 
-
     for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
     {
         CircleCollider temp = iter->get()->GetBodyCircleCollider();
@@ -27,6 +26,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
                 player->SetPoints(player->GetPoints() + player->GetAttack());
                 iter->get()->SetHP(iter->get()->GetHP() - player->GetAttack());
                 iter->get()->Damaged();
+                //cout << iter->get()->GetHP() << endl;
                 //cout << "Player Attack" << endl;
             }
         }
@@ -38,7 +38,18 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             {
                 player->SetHP(player->GetHP() - iter->get()->GetAttack());
                 player->Damaged();
-                cout << "Monster Attack" << endl;
+                if (player->GetAlive())
+                {
+                    player->Damaged();
+                }
+
+                else
+                {
+                    
+                }
+
+                cout << player->GetHP() << endl;
+                //cout << "Monster Attack" << endl;
             }
         }
 

@@ -87,6 +87,8 @@ public:
 	void SetAttackTimer(int num) { m_AttackTimer = num; }
 	int GetAttackTiming() { return m_AttackTiming; }
 	void SetAttackTiming(int num) { m_AttackTiming = num; }
+	int GetTempTimer() { return m_tempTimer; }
+	void SetTempTimer(int num) { m_tempTimer = num; }
 
 
 	void Dead() { if (m_Hp <= 0)m_isAlive = false; }

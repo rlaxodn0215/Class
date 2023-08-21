@@ -213,14 +213,22 @@ BOOL Ryno::Dead()
 		m_CurAni = m_Animations["Ryno_dead"];
 		m_CurAniSpeed = 4;
 		m_CurAniFrameNum = 0;
+		m_tempTimer = 0;
 
-		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+		for (int t = 0; t < 4; t++)
 		{
-			m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
-				m_Position.m_Z - m_CurAni->GetHeights()[i] });
+			for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+			{
+				m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+					m_Position.m_Z - m_CurAni->GetHeights()[i] + 20});
+				m_CurAniShowOffset.push_back({ 0,0 });
+			}
 		}
+		m_BodyColliders.SetArea({0,0,0,0});
 	}
+
 	return 0;
+	
 }
 
 BOOL Ryno::Attack(bool isright)
@@ -408,6 +416,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		{
 			m_PlayingDynamite = 3;
 			time = temp = temp1 = 0;
+			m_AttackTimer = 0;
 		}
 	}
 
@@ -416,6 +425,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		static int time = 0;
 		static int temp = 0;
 		static int temp1 = 0;
+		m_AttackTiming = 3;
 		m_Attack = 50;
 
 		temp1 = timer;
@@ -533,17 +543,21 @@ void Baseball::Dead()
 	if (m_Status != DEAD)
 	{
 		m_CurAni = m_Animations["Baseball_dead"];
-		m_CurAniSpeed = 10;
+		m_CurAniSpeed = 2;
 		m_CurAniFrameNum = 0;
 		m_Status = DEAD;
-	}
+		m_tempTimer = 0;
+		m_CurAniShowOffset.clear();
 
-	m_CurAniShowOffset.clear();
-
-	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
-	{
-		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
-			m_Position.m_Z - m_CurAni->GetHeights()[i] });
+		for (int t = 0; t < 4; t++)
+		{
+			for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
+			{
+				m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
+					m_Position.m_Z - m_CurAni->GetHeights()[i] - 100 });
+				m_CurAniShowOffset.push_back({ -1000,0 });
+			}
+		}
 	}
 }
 
@@ -560,6 +574,7 @@ void Baseball::Attack()
 		m_CurAniFrameNum = 0;
 		m_AttackTiming = 8;
 		m_AttackTimer = 0;
+		m_Attack = 0;
 
 		m_Status = ATTACK;
 	}
@@ -595,66 +610,80 @@ void Baseball::Attack()
 
 void Baseball::MonsterAI(shared_ptr<Player> player, int z_offest)
 {
-	//시선 처리
-	if (m_Position.m_X - player->GetPos().m_X > 0)m_isLookRight = true;
-	else m_isLookRight = false;
 
-	if (m_Status == DAMAGED) //공격을 받으면 잠시 일시 정지
+	if (m_Hp > 0)
 	{
-		m_Velocity = { 0,0,0 };
-		m_DamagedTime++;
-		Damaged();
-		if (m_DamagedTime >= 20)
+		//시선 처리
+		if (m_Position.m_X - player->GetPos().m_X > 0)m_isLookRight = true;
+		else m_isLookRight = false;
+
+		if (m_Status == DAMAGED) //공격을 받으면 잠시 일시 정지
 		{
-			m_Status = NOTHING;
-			m_DamagedTime = 0;
+			m_Velocity = { 0,0,0 };
+			m_DamagedTime++;
+			Damaged();
+			if (m_DamagedTime >= 20)
+			{
+				m_Status = NOTHING;
+				m_DamagedTime = 0;
+			}
+		}
+
+		else
+		{
+			if (m_Position.m_Z - 120 < player->GetPos().m_Z - z_offest) //같은 z축을 만든다
+			{
+				m_Velocity.m_Y = m_MoveSpeed;
+				m_Velocity.m_Z = m_MoveSpeed;
+				Move();
+			}
+
+			else if (m_Position.m_Z - 120 > player->GetPos().m_Z + z_offest)
+			{
+				m_Velocity.m_Y = -m_MoveSpeed;
+				m_Velocity.m_Z = -m_MoveSpeed;
+				Move();
+			}
+
+			else //z 축이 동일 하면
+			{
+				m_Velocity.m_Y = 0;
+				m_Velocity.m_Z = 0;
+
+				if (m_Position.m_X - player->GetPos().m_X > 140) //공격 사정거리보다 크면
+				{
+					m_Velocity.m_X = -2 * m_MoveSpeed;
+					Move();
+				}
+
+				else if (m_Position.m_X - player->GetPos().m_X < -140)
+				{
+					m_Velocity.m_X = 2 * m_MoveSpeed;
+					Move();
+				}
+
+				else //사정거리 안에 있다
+				{
+					m_Velocity.m_X = 0;
+					//공격!
+					Attack();
+
+				}
+
+			}
 		}
 	}
 
 	else
 	{
-		if (m_Position.m_Z - 120 < player->GetPos().m_Z - z_offest) //같은 z축을 만든다
+		m_Velocity = { 0,0,0 };
+		Dead();
+		m_tempTimer++;
+		if (m_tempTimer == m_CurAniShowOffset.size() - 1)
 		{
-			m_Velocity.m_Y = m_MoveSpeed;
-			m_Velocity.m_Z = m_MoveSpeed;
-			Move();
-		}
-
-		else if (m_Position.m_Z - 120 > player->GetPos().m_Z + z_offest)
-		{
-			m_Velocity.m_Y = -m_MoveSpeed;
-			m_Velocity.m_Z = -m_MoveSpeed;
-			Move();
-		}
-
-		else //z 축이 동일 하면
-		{
-			m_Velocity.m_Y = 0;
-			m_Velocity.m_Z = 0;
-
-			if (m_Position.m_X - player->GetPos().m_X > 140) //공격 사정거리보다 크면
-			{
-				m_Velocity.m_X = -2 * m_MoveSpeed;
-				Move();
-			}
-
-			else if (m_Position.m_X - player->GetPos().m_X < -140)
-			{
-				m_Velocity.m_X = 2 * m_MoveSpeed;
-				Move();
-			}
-
-			else //사정거리 안에 있다
-			{
-				m_Velocity.m_X = 0;
-				//공격!
-				Attack();
-				
-			}
-
+			m_isAlive = false;
 		}
 	}
-	
 
 }
 
