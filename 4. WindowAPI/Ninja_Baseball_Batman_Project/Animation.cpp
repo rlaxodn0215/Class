@@ -96,8 +96,8 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 	int by = m_Height[spriteIndex];
 	int xStart = m_Offset[spriteIndex].x;
 	int yStart = m_Offset[spriteIndex].y;
-	int posX = offset_location.x;
-	int posY = offset_location.y;
+	int posX = offset_location.x - m_Pivot[spriteIndex].x;
+	int posY = offset_location.y - m_Pivot[spriteIndex].y;
 
 	if (lookRight)
 	{

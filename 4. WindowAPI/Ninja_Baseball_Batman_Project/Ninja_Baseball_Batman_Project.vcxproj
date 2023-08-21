@@ -131,7 +131,6 @@
     <ClInclude Include="SingletonTemplate.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Collider.h" />
-    <ClInclude Include="Camera.h" />
     <ClInclude Include="Charactor.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameManager.h" />
@@ -146,7 +145,6 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Charactor.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Ninja_Baseball_Batman_Project.cpp" />

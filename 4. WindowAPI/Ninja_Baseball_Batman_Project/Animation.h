@@ -1,6 +1,5 @@
 #pragma once
 #include"Sprite.h"
-#include"Camera.h"
 #include<vector>
 
 using namespace std;
@@ -19,12 +18,12 @@ public:
 	int GetFrameTotalCount() { return m_FrameTotalCount; }
 	vector<int> GetWidths() { return m_Width; }
 	vector<int> GetHeights() { return m_Height; }
+	vector<POINT> GetPivots() { return m_Pivot; }
 	shared_ptr<Sprite> GetResourceSprite() { return m_ResourceSprite; }
 	
 	Animation();
 	Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100]);
 	~Animation();
-	POINT SpriteToAni();
 	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio, bool lookRight, RECT winRect);
 };
 

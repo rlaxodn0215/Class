@@ -30,10 +30,22 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             player->SetHP(player->GetHP() - iter->get()->GetAttack());
             //cout << "몬스터의 공격이 플레이어에게 들어 갔다." << endl;
         }
+
+
+        if (iter->get()->GetPos().m_Z <= 413) //이동 영역 (몬스터)
+        {
+            iter->get()->SetPos({ iter->get()->GetPos().m_X, 413, 413 });
+        }
+
+        else if (iter->get()->GetPos().m_Z >= winRect.bottom)
+        {
+            iter->get()->SetPos({ iter->get()->GetPos().m_X, winRect.bottom, winRect.bottom });
+        }
     }
 
 
-    for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();) //몬스터 및 플래이어 이동 처리
+
+    for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();) //몬스터 이동 처리
     {
         iter->get()->ShowCharactor(hdc, iter->get()->GetAniSpeed(), Timer, winRect);
         iter->get()->ShowColliders(hdc);
@@ -47,6 +59,26 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
 
         if (iter->get()->GetAlive() == false) iter = m_StageMonsters.erase(iter);
         else ++iter;
+    }
+
+    if (player->GetPos().m_X < 25) //이동 영역 (플레이어)
+    {
+        player->SetPos({ 25,player->GetPos().m_Y, player->GetPos().m_Z });
+    }
+
+    else if (player->GetPos().m_X > winRect.right-110)
+    {
+        player->SetPos({ winRect.right-110,player->GetPos().m_Y, player->GetPos().m_Z });
+    }
+
+    if (player->GetPos().m_Z < 415 - 80)
+    {
+        player->SetPos({ player->GetPos().m_X, 415 - 80, 415 - 80 });
+    }
+
+    else if (player->GetPos().m_Z > winRect.bottom - 100)
+    {
+        player->SetPos({ player->GetPos().m_X, winRect.bottom - 100, winRect.bottom - 100});
     }
 
 	player->ShowCharactor(hdc, player->GetAniSpeed(), Timer, winRect);

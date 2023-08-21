@@ -8,7 +8,6 @@ GameManager::GameManager()
     ///
     m_Stage=NULL;
 	m_Player = NULL;
-	m_Cam = NULL;
 }
 
 
@@ -259,7 +258,7 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
         map<string, shared_ptr<Sound>> temp1;
 
-        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(50, 100, 100), 100, 10, temp, temp1));
+        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100, 10, temp, temp1));
 
         LoadStage(1,winRect);
     }
@@ -267,9 +266,10 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
     m_Player->m_Bitmap = screen;
     ShowBackStage(hdc, winRect);
 
-    Animations["Stage_6_boss"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
-    m_Stage->StageUpdate(hdc, m_TimerFrame, winRect, m_Player, m_Player->GetStopMove());
+    Animations["Stage_6_boss"]->AniPlay(hdc, { Animations["Stage_6_boss"]->GetPivots()[0].x,
+        Animations["Stage_6_boss"]->GetPivots()[0].y - 3 },0, 3.0f, true, winRect);
 
+    m_Stage->StageUpdate(hdc, m_TimerFrame, winRect, m_Player, m_Player->GetStopMove());
 
 }
 
@@ -279,8 +279,7 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
     {
         RECT playArea = { 0,0,326,233 };
         vector<RECT> limitAreas;
-        limitAreas.push_back({ 0,0,winRect.right,410 });
-        limitAreas.push_back({ 0,0,420,505 });
+        limitAreas.push_back({ 0,0,winRect.right,415 });
 
         list<shared_ptr<Monster>> stageMonsters;
 
@@ -289,7 +288,7 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
 
         map<string, shared_ptr<Sound>> temp1;
 
-        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
@@ -585,8 +584,11 @@ void GameManager::ShowBackStage(HDC hdc, RECT winRect)
             down = true;
     }
 
-    Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X, pos_Y }, 0, 3.0f, true, winRect);
-    Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X + 3 * Animations["Background1_BackStage"]->GetWidths()[0], pos_Y }, 0, 3.0f, true, winRect);
+    Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X + Animations["Background1_BackStage"]->GetPivots()[0].x, pos_Y +
+        Animations["Background1_BackStage"]->GetPivots()[0].y}, 0, 3.0f, true, winRect);
+    Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X + Animations["Background1_BackStage"]->GetPivots()[0].x +
+        3 * Animations["Background1_BackStage"]->GetWidths()[0], pos_Y
+        + Animations["Background1_BackStage"]->GetPivots()[0].y }, 0, 3.0f, true, winRect);
 
 }
 
@@ -631,17 +633,11 @@ void GameManager::CheckKeyRelease(WPARAM wParam)
     
 }
 
-void GameManager::ShowPlayerLife(const Charactor& player)
-{
-}
 
 void GameManager::ShowPlayerHPbar(const Charactor& player)
 {
 }
 
-void GameManager::ShowBossHPbar(const Charactor& Boss)
-{
-}
 
 void GameManager::ShowPlayerStateUI(const Charactor& player)
 {
@@ -651,13 +647,6 @@ void GameManager::ShowPlayerPoints(const Charactor& player)
 {
 }
 
-void GameManager::MoveNextStage()
-{
-}
-
-void GameManager::SlowMotion()
-{
-}
 
 void GameManager::GameOver()
 {

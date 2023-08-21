@@ -6,7 +6,6 @@
 #include"Sprite.h"
 #include"Animation.h"
 #include"Collider.h"
-#include"Camera.h"
 #include"Charactor.h"
 #include"GameManager.h"
 #include"Sound.h"

@@ -114,9 +114,6 @@ public:
 	virtual BOOL Dead()=0;
 	virtual BOOL NormalAttack(bool isright)=0;//
 	virtual BOOL HomeRun()=0;//
-	virtual BOOL Catch()=0;
-	virtual BOOL CatchAttack()=0;
-	virtual BOOL CatchThrow()=0;
 	virtual BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
 
 	//virtual void ShowColliders(HDC hdc) = 0;
@@ -148,9 +145,6 @@ public:
 	BOOL Dead() override;
 	BOOL NormalAttack(bool isright) override;
 	BOOL HomeRun() override;
-	BOOL Catch() override;
-	BOOL CatchAttack() override;
-	BOOL CatchThrow() override;
 	BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
 };
 

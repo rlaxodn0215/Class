@@ -3,7 +3,6 @@
 #include<string>
 #include<iostream>
 #include<algorithm>
-#include"Camera.h"
 #include"Charactor.h"
 #include"Stage.h"
 #include"SingletonTemplate.h"
@@ -26,7 +25,6 @@ public:
 	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);
 	shared_ptr<Stage>  m_Stage;
 	shared_ptr< Player> m_Player;
-	shared_ptr<Camera> m_Cam;
 
 	POINT m_Cursor = { 50,150 }; //(50,150), +220
 	int m_SelectPosX[4] = {50,290,530,765};
