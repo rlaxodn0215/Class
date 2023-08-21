@@ -18,17 +18,28 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         CircleCollider temp = iter->get()->GetBodyCircleCollider();
         BoxCollider temp1 = player->GetBodyCollider();
 
-        if (player->GetAttackCollider().OnTrigger(temp, 3))
-        {
-            player->SetPoints(player->GetPoints()+ player->GetAttack());
-            iter->get()->SetHP(iter->get()->GetHP() - player->GetAttack());
-            //cout << "플레이어 공격이 몬스터에 들어갔다." << endl;
+        if (player->GetAttackCollider().OnTrigger(temp, 10)) //플레이어 공격
+        {   
+            player->SetAttackTimer(player->GetAttackTimer() + 1);
+            //cout << player->GetAttackTimer() << endl;
+            if (player->GetAttackTimer() == player->GetAttackTiming())
+            {
+                player->SetPoints(player->GetPoints() + player->GetAttack());
+                iter->get()->SetHP(iter->get()->GetHP() - player->GetAttack());
+                iter->get()->Damaged();
+                //cout << "Player Attack" << endl;
+            }
         }
 
-        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 3)) 
+        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 500)) //몬스터 공격
         {
-            player->SetHP(player->GetHP() - iter->get()->GetAttack());
-            //cout << "몬스터의 공격이 플레이어에게 들어 갔다." << endl;
+            iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1);
+            if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming())
+            {
+                player->SetHP(player->GetHP() - iter->get()->GetAttack());
+                player->Damaged();
+                cout << "Monster Attack" << endl;
+            }
         }
 
 
@@ -42,8 +53,6 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             iter->get()->SetPos({ iter->get()->GetPos().m_X, winRect.bottom, winRect.bottom });
         }
     }
-
-
 
     for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();) //몬스터 이동 처리
     {

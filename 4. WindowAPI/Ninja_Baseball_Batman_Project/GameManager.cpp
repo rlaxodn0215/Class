@@ -432,6 +432,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             {
                 m_Player->Idle();
                 m_Player->SetVel(Vector3(0, 0, 0));
+                //cout << "Player Idle" << endl;
             }
 
             if (GetAsyncKeyState(VK_UP) & 0x8000 && !m_KeyFlag[4] && !m_PlayerDynamite) //공격 X, 필살기 X
@@ -514,45 +515,48 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             }
         }
 
-        if (m_ComboFlag[4] && m_ComboFlag[5]&& !m_PlayerDynamite)
+        if (m_Player->GetStatus() != DAMAGED)
         {
-            m_Player->HomeRun();
-
-            if (m_Player->GetLookRight())
-                m_Player->SetPos(m_Player->GetPos() + Vector3(10, 0, 0));
-            else
-                m_Player->SetPos(m_Player->GetPos() + Vector3(-10, 0, 0));
-
-            m_Player->SetStopMove(true);
-            m_KeyFlag[5] = false;
-            m_Player->SetJumping(false);
-        }
-
-        else if (GetAsyncKeyState(0x53) & 0x8000 || (m_Player->GetJumping() && !m_KeyFlag[4]) && !m_PlayerDynamite) // s
-        {
-            m_KeyFlag[5] = true;
-            m_Player->Jump(m_KeyFlag[5], m_Player->GetJumping());
-        }
-
-        if (!m_Player->GetJumping())
-        {
-            if (GetAsyncKeyState(0x41) & 0x8000 && !m_PlayerDynamite) // a
+            if (m_ComboFlag[4] && m_ComboFlag[5] && !m_PlayerDynamite)
             {
-                m_KeyFlag[4] = true;
+                m_Player->HomeRun();
+                m_Player->SetAttack(10);
+
+                if (m_Player->GetLookRight())
+                    m_Player->SetPos(m_Player->GetPos() + Vector3(10, 0, 0));
+                else
+                    m_Player->SetPos(m_Player->GetPos() + Vector3(-10, 0, 0));
+
                 m_Player->SetStopMove(true);
-                m_Player->SetVel(Vector3(0, 0, 0));
-                m_Player->NormalAttack(m_Player->GetLookRight());
-
+                m_KeyFlag[5] = false;
+                m_Player->SetJumping(false);
             }
-        }
 
-        if (m_ComboFlag[0] && m_ComboFlag[1] && m_ComboFlag[5] || m_PlayerDynamite)
-        {
-            cout << "Dynamite" << endl;
-            m_PlayerDynamite = true;
-            m_Player->SetTakeGravity(false);
-            //m_StopMove = true;
-            m_Player->Dynamite(hdc,m_TimerFrame, winRect,m_PlayerDynamite);
+            else if (GetAsyncKeyState(0x53) & 0x8000 || (m_Player->GetJumping() && !m_KeyFlag[4]) && !m_PlayerDynamite) // s
+            {
+                m_KeyFlag[5] = true;
+                m_Player->Jump(m_KeyFlag[5], m_Player->GetJumping());
+            }
+
+            if (!m_Player->GetJumping())
+            {
+                if (GetAsyncKeyState(0x41) & 0x8000 && !m_PlayerDynamite) // a
+                {
+                    m_KeyFlag[4] = true;
+                    m_Player->SetAttack(10);
+                    m_Player->SetStopMove(true);
+                    m_Player->SetVel(Vector3(0, 0, 0));
+                    m_Player->Attack(m_Player->GetLookRight());
+
+                }
+            }
+
+            if (m_ComboFlag[0] && m_ComboFlag[1] && m_ComboFlag[5] || m_PlayerDynamite)
+            {
+                m_PlayerDynamite = true;
+                m_Player->SetTakeGravity(false);
+                m_Player->Dynamite(hdc, m_TimerFrame, winRect, m_PlayerDynamite);
+            }
         }
        
     }

@@ -15,7 +15,11 @@ enum Status
 	NOTHING,
 	IDLE,
 	MOVE,
-	NORMAL_ATTACK,
+	RUN,
+	JUMP,
+	ATTACK,
+	HOME_RUN,
+	DYNAMITE,
 	DAMAGED,
 	DEAD
 };
@@ -23,6 +27,7 @@ enum Status
 class Charactor
 {
 protected:
+	Status m_Status;
 	Vector3 m_Position = {0,0,0};
 	Vector3 m_Velocity = {0,0,0};
 	int m_Hp;
@@ -35,6 +40,8 @@ protected:
 	int m_CurAniFrameNum = 0;
 	int m_tempTimer = 0;
 	int m_Attack = 0;
+	int m_AttackTiming = 0;
+	int m_AttackTimer = 0;
 
 	map<string, shared_ptr<Animation>> m_Animations;
 	shared_ptr<Animation> m_CurAni;
@@ -52,6 +59,9 @@ public:
 		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
 	~Charactor() = default;
 
+
+	Status GetStatus() { return m_Status; }
+	void SetStatus(Status st) { m_Status = st; }
 	Vector3 GetPos() { return m_Position; }
 	void SetPos(Vector3 vec) { m_Position = vec; }
 	Vector3 GetVel() { return m_Velocity; }
@@ -72,6 +82,12 @@ public:
 	void SetStopMove(bool s) { m_StopMove = s; }
 	int GetAttack() { return m_Attack; }
 	void SetAttack(int num) { m_Attack = num; }
+	shared_ptr<Animation> GetCurAni() { return m_CurAni; }
+	int GetAttackTimer() { return m_AttackTimer; }
+	void SetAttackTimer(int num) { m_AttackTimer = num; }
+	int GetAttackTiming() { return m_AttackTiming; }
+	void SetAttackTiming(int num) { m_AttackTiming = num; }
+
 
 	void Dead() { if (m_Hp <= 0)m_isAlive = false; }
 	void Update(bool moveOK);
@@ -83,14 +99,15 @@ class Player : public Charactor // 상태 패턴
 {
 protected:
 	int m_PlayingDynamite = 0;
-
 	int m_PlayerLife = 3;
 	int m_Points = 0;
 
 public:
 	Player() = default;
 	Player(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
-		: Charactor(pos, hp, moveSpeed, anis, sounds) {};
+		: Charactor(pos, hp, moveSpeed, anis, sounds) {
+		m_Status = NOTHING;
+	};
 
 	virtual ~Player() = default;
 	int GetPlayDynamite() { return m_PlayingDynamite; }
@@ -105,18 +122,16 @@ public:
 	virtual BoxCollider GetAttackCollider() = 0;
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
-	virtual BOOL Born() = 0;//
-	virtual BOOL Idle()=0;//
-	virtual BOOL Move() = 0;//
-	virtual BOOL Run() = 0;//
-	virtual BOOL Jump(bool& keydown, bool jumping)=0;//
+	virtual BOOL Idle()=0;
+	virtual BOOL Move() = 0;
+	virtual BOOL Run() = 0;
+	virtual BOOL Jump(bool& keydown, bool jumping)=0;
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
-	virtual BOOL NormalAttack(bool isright)=0;//
-	virtual BOOL HomeRun()=0;//
+	virtual BOOL Attack(bool isright)=0;
+	virtual BOOL HomeRun()=0;
 	virtual BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
 
-	//virtual void ShowColliders(HDC hdc) = 0;
 	void ShowColliders(HDC hdc) override;
 
 };
@@ -131,25 +146,26 @@ public:
 	Ryno() = default;
 	Ryno(Vector3 pos, int hp, int moveSpeed, 
 		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
-		: Player(pos, hp, moveSpeed, anis, sounds) { Born();};
+		: Player(pos, hp, moveSpeed, anis, sounds) { Idle();};
 
 	BoxCollider GetBodyCollider() { return m_BodyColliders; }
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
 
-	BOOL Born() override;
 	BOOL Idle() override;
 	BOOL Move() override;
 	BOOL Run() override;
 	BOOL Jump(bool& keydown, bool jumping) override;
 	BOOL Damaged() override;
 	BOOL Dead() override;
-	BOOL NormalAttack(bool isright) override;
+	BOOL Attack(bool isright) override;
 	BOOL HomeRun() override;
 	BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
 };
 
 class Monster : public Charactor
 {
+protected:
+	int m_DamagedTime = 0;
 public:
 	Monster() = default;
 	Monster(Vector3 position, int Hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
@@ -165,7 +181,7 @@ public:
 	virtual void Move()=0;
 	virtual void Damaged()=0;
 	virtual void Dead()=0;
-	virtual void NormalAttack()=0;
+	virtual void Attack()=0;
 	virtual void ShowColliders(HDC hdc) = 0;
 	virtual void MonsterAI(shared_ptr<Player> player, int z_offest) = 0;
 };
@@ -173,7 +189,6 @@ public:
 class Baseball :public Monster
 {
 private:
-	Status m_Status;
 	CircleCollider m_BodyCircleColliders;
 	BoxCollider m_AttackColliders;
 
@@ -181,7 +196,7 @@ public:
 	Baseball()=default;
 	Baseball(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
 		map<string, shared_ptr<Sound>>& sounds) : Monster(pos, hp, moveSpeed, anis, sounds) {
-		m_Status = NOTHING; Move();
+		 Move();
 	};
 	~Baseball()=default;
 
@@ -192,7 +207,7 @@ public:
 	void Move();
 	void Damaged();
 	void Dead();
-	void NormalAttack();
+	void Attack();
 	void MonsterAI(shared_ptr<Player> player, int z_offest)override;
 
 	void ShowColliders(HDC hdc)override;

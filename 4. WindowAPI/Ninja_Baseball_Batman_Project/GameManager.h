@@ -55,13 +55,9 @@ public:
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
 	void CheckKeyInput(HDC hdc, RECT winRect);
 	void CheckKeyRelease(WPARAM wParam);
-	void ShowPlayerLife(const Charactor & player);
 	void ShowPlayerHPbar(const Charactor & player);
-	void ShowBossHPbar(const Charactor & Boss);
 	void ShowPlayerStateUI(const Charactor & player);
 	void ShowPlayerPoints(const Charactor & player);
-	void MoveNextStage();
-	void SlowMotion();
-	void GameOver(); // Rank Æ÷ÇÔ
+	void GameOver();
 };
 
