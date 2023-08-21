@@ -1,5 +1,6 @@
 #pragma once
 #include"Sprite.h"
+#include"Camera.h"
 #include<vector>
 
 using namespace std;
@@ -23,6 +24,7 @@ public:
 	Animation();
 	Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100]);
 	~Animation();
+	POINT SpriteToAni();
 	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio, bool lookRight, RECT winRect);
 };
 

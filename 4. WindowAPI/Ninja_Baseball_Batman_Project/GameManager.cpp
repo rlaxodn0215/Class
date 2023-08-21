@@ -259,16 +259,18 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
         map<string, shared_ptr<Sound>> temp1;
 
-        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100, 10, temp, temp1));
+        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(50, 100, 100), 100, 10, temp, temp1));
 
         LoadStage(1,winRect);
     }
 
     m_Player->m_Bitmap = screen;
+    ShowBackStage(hdc, winRect);
 
-    Animations["Background1_stage1"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
-    Animations["Stage_1_2_3"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
+    Animations["Stage_6_boss"]->AniPlay(hdc, { 0,0 }, 0, 3.0f, true, winRect);
     m_Stage->StageUpdate(hdc, m_TimerFrame, winRect, m_Player, m_Player->GetStopMove());
+
+
 }
 
 void GameManager::LoadStage(int stageNum, RECT winRect)
@@ -287,7 +289,7 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
 
         map<string, shared_ptr<Sound>> temp1;
 
-        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
@@ -346,47 +348,6 @@ void GameManager::Gravity(int g)
    }
     
 }
-
-
-//시간 되면 푸세요 ~ ^^
-//vector<vector<shared_ptr<Charactor>>> GameManager::SameZ(shared_ptr<Stage> & stage, shared_ptr<Player> & player, int z_offset)
-//{
-//    vector<shared_ptr<Charactor>> charactor;
-//    vector<vector<shared_ptr<Charactor>>> ans;
-//    vector<shared_ptr<Charactor>> temp;
-//
-//    for (auto iter : stage.get()->GetStageMonsters())
-//    {
-//        charactor.push_back(iter);
-//    }
-//
-//    charactor.push_back(player);
-//
-//    sort(charactor.begin(), charactor.end(), Compare);
-//
-//    temp.push_back(charactor[0]);
-//
-//    int interval[2] = { temp.back()->GetPos().m_Z - z_offset, temp.back()->GetPos().m_Z + z_offset };
-//
-//    for (int i = 1; i < charactor.size(); i++)
-//    {
-//        if (interval[1] >= charactor[i]->GetPos().m_Z - z_offset) // z가 범위 안에 있다
-//        {
-//            interval[0] =  min(interval[0],charactor[i]->GetPos().m_Z - z_offset);
-//            temp.push_back(charactor[i]);
-//        }
-//
-//        else
-//        {
-//
-//        }
-//
-//
-//    }
-//
-//    return ans;
-//}
-
 
 void GameManager::Rendering()
 {
@@ -596,6 +557,37 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
         }
        
     }
+}
+
+void GameManager::ShowBackStage(HDC hdc, RECT winRect)
+{
+    static int pos_X = 0; // startOffset 설정
+    static int pos_Y = 0;
+    static bool down = true;
+
+    if (pos_X > -3 * Animations["Background1_BackStage"]->GetWidths()[0]) pos_X -= 40;
+    else pos_X = 0;
+
+    if (down)
+    {
+        if (pos_Y >= -(3 * Animations["Background1_BackStage"]->GetHeights()[0] - winRect.bottom / 2))
+            pos_Y -= 2;
+        else
+            down = false;
+
+    }
+
+    else
+    {
+        if (pos_Y <= 0)
+            pos_Y += 2;
+        else
+            down = true;
+    }
+
+    Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X, pos_Y }, 0, 3.0f, true, winRect);
+    Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X + 3 * Animations["Background1_BackStage"]->GetWidths()[0], pos_Y }, 0, 3.0f, true, winRect);
+
 }
 
 void GameManager::CheckKeyRelease(WPARAM wParam)

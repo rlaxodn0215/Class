@@ -18,17 +18,17 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         CircleCollider temp = iter->get()->GetBodyCircleCollider();
         BoxCollider temp1 = player->GetBodyCollider();
 
-        if (player->GetAttackCollider().OnTrigger(temp, 3)) //플레이어 공격이 몬스터에 들어갔다.
+        if (player->GetAttackCollider().OnTrigger(temp, 3))
         {
             player->SetPoints(player->GetPoints()+ player->GetAttack());
             iter->get()->SetHP(iter->get()->GetHP() - player->GetAttack());
             //cout << "플레이어 공격이 몬스터에 들어갔다." << endl;
         }
 
-        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 3)) //몬스터의 공격이 플레이어에게 들어 갔다.
+        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 3)) 
         {
             player->SetHP(player->GetHP() - iter->get()->GetAttack());
-            cout << "몬스터의 공격이 플레이어에게 들어 갔다." << endl;
+            //cout << "몬스터의 공격이 플레이어에게 들어 갔다." << endl;
         }
     }
 

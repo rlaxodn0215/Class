@@ -22,7 +22,6 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, RECT winRect)
 {
 	if (m_StopMove)
 	{
-
 		if (!(Timer % TimeDivRatio) && m_CurAniFrameNum < m_CurAni->GetFrameTotalCount() - 1)
 		{
 			m_CurAniFrameNum++;

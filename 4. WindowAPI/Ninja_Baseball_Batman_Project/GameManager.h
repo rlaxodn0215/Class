@@ -51,15 +51,9 @@ public:
 	void LoadStage(int stageNum, RECT winRect);
 	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
-	//시간 되면 푸세요 ~ ^^
-	//vector<vector<shared_ptr<Charactor>>> SameZ(shared_ptr<Stage> & stage, shared_ptr<Player> & player, int z_offset);
-	//bool Compare(const shared_ptr<Charactor> & other1, const shared_ptr<Charactor>& other2) const
-	//{
-	//	return (other1.get()->GetPos().m_Z < other2.get()->GetPos().m_Z);
-	//}
-
 	void Gravity(int g);
 	void Rendering();
+	void ShowBackStage(HDC hdc, RECT winRect);
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
 	void CheckKeyInput(HDC hdc, RECT winRect);
 	void CheckKeyRelease(WPARAM wParam);

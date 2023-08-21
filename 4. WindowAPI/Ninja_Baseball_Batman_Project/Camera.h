@@ -1,17 +1,15 @@
 #pragma once
 #include"framework.h"
+#include"Charactor.h"
 
 class Camera
 {
 private:
-	RECT m_SceneArea; //sprite ±‚¡ÿ
-	POINT m_CamCenter;
-	int m_CamMoveOffset;
-
+	POINT m_CamOffset; //Sprite 
+	RECT m_winRect;
 public:
 	Camera();
-	Camera(RECT sceneArea, int camOffset);
-	//~Camera();
+	Camera(shared_ptr<Player> player, RECT winRect);
 
 	void CameraMove(POINT endpoint);
 	void ShowCameraCenter();
