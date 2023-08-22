@@ -10,7 +10,6 @@ Charactor::Charactor(Vector3 pos, int maxhp,int curhp, int moveSpeed,
 	m_Animations = anis;
 	m_Sounds = sounds;
 	m_CurAni = NULL;
-	m_CurSound = NULL;
 }
 
 void Charactor::Update(bool moveOK)
@@ -245,6 +244,8 @@ BOOL Ryno::Attack(bool isright)
 		m_AttackTimer = 0;
 	}
 
+	//m_Sounds["Ryno_attack"]->PlayAudio();
+
 	m_CurAniShowOffset.clear();
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -283,6 +284,7 @@ BOOL Ryno::HomeRun()
 		m_CurAniFrameNum = 0;
 		m_AttackTiming = 6;
 		m_AttackTimer = 0;
+		//m_CurSound = m_Sounds["Ryno_homerun"];
 	}
 		
 	m_CurAniShowOffset.clear();

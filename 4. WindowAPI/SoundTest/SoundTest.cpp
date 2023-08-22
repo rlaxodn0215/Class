@@ -3,8 +3,9 @@
 
 #include "framework.h"
 #include "SoundTest.h"
-#include"windows.h"
-#include"mmsystem.h"
+#include<Windows.h>
+#include<mmsystem.h>
+#include<Digitalv.h>
 
 #define MAX_LOADSTRING 100
 
@@ -20,6 +21,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -126,56 +128,90 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-MCIDEVICEID MusicID = 0;
-MCI_PLAY_PARMS Play = {};
+MCI_OPEN_PARMS      mciOpenParms; //파일을 로드
+MCI_PLAY_PARMS       mciPlayParms; //파일을 재생
+MCI_STATUS_PARMS   mciStatus; //파일의 상태
+UINT wDeviceID = 0;
 
+DWORD Sound1, Sound2;
+
+MCIDEVICEID MusicID = 0;
+MCI_PLAY_PARMS Play;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-    
-    
     switch (message)
     {
     case WM_CREATE:
     {
-        MCIERROR        Error;
-        MCI_OPEN_PARMS Data = {};
+        Sound1 = LoadWAV(hWnd, L"test.wav");
+        Sound2 = LoadWAV(hWnd, L"Sound2.wav");
 
-        Data.lpstrDeviceType = _T("mp3");
-        Data.lpstrElementName = _T("test.mp3");
+        //MCIERROR        Error;
+        //MCI_OPEN_PARMS Data = {};
 
-        Error = mciSendCommandA(
-            0,
-            MCI_OPEN,
-            MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
-            (DWORD_PTR)&Data
-        );
+        //Data.lpstrDeviceType = L"WaveAudio";
+        //Data.lpstrElementName = _T("test.wav");
 
-        if (Error == 0)
-        {
-            MusicID = Data.wDeviceID;
-        }
+        //Error = mciSendCommandA(
+        //    0,
+        //    MCI_OPEN,
+        //    MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
+        //    (DWORD_PTR)&Data
+        //);
+
+        //if (Error == 0)
+        //{
+        //    MusicID = Data.wDeviceID;
+        //}
     }
         break;
     case WM_KEYDOWN:
     {
         switch (wParam)
         {
-        case VK_F3:
-            Play = {};
-
-            mciSendCommandA(MusicID, MCI_PLAY, MCI_NOTIFY, (DWORD_PTR)&Play);
-             break;
-        // 정지
-        case VK_F4:
-            mciSendCommandA(MusicID, MCI_PAUSE, 0, 0);
+        case VK_F1:
+           Sound1 = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
+           // Sound1 = mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
+            break;
+        case VK_F2:
+            Sound1 = mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
             break;
 
-        // 처음으로
-        case VK_F5:
-            mciSendCommandA(MusicID, MCI_SEEK, MCI_SEEK_TO_START, 0);
-            break;
+        //case VK_F1:
+        //    PlaySoundA("test.wav", nullptr, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+        //    break;
+
+        //case VK_F2:
+        //    PlaySoundA(nullptr, nullptr, 0);
+        //    break;
+
+        //case VK_F3:
+        //   Play = {};
+
+        //    mciSendCommandA(MusicID, MCI_PLAY, MCI_NOTIFY, (DWORD_PTR)&Play);
+        //     break;
+        //// 정지
+        //case VK_F4:
+        //    mciSendCommandA(MusicID, MCI_PAUSE, 0, 0);
+        //    break;
+
+        //// 처음으로
+        //case VK_F5:
+        //    mciSendCommandA(MusicID, MCI_SEEK, MCI_SEEK_TO_START, 0);
+        //    break;
         default:
+            break;
+        }
+    }
+
+    case WM_KEYUP:
+    {
+        switch (wParam)
+        {
+        case VK_F1:
+            //Sound1 = mciSendCommand(1, MCI_RESUME, 0, (DWORD)(LPVOID)NULL);
+            //Sound1 = mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
             break;
         }
     }
@@ -207,12 +243,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_DESTROY:
         //사운드 파일 제거
-        mciSendCommandA(MusicID, MCI_CLOSE, 0, 0);
+        //mciSendCommandA(MusicID, MCI_CLOSE, 0, 0);
+        if (wDeviceID > 0)
+        {
+            mciSendCommand(1, MCI_CLOSE, 0, (DWORD)(LPVOID)NULL);
+            mciSendCommand(2, MCI_CLOSE, 0, (DWORD)(LPVOID)NULL);
+        }
         PostQuitMessage(0);
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
+    return 0;
+}
+
+DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave)
+{
+    DWORD Result;
+    //WaveAudio 대신 MPEGVideo를 사용하면 mp3 형식을 재생합니다.
+    mciOpenParms.lpstrDeviceType = L"WaveAudio";
+    mciOpenParms.lpstrElementName = lpszWave;
+    Result = mciSendCommand(wDeviceID, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPVOID)&mciOpenParms);
+    if (Result)
+        return Result;
+    wDeviceID = mciOpenParms.wDeviceID;
+    mciPlayParms.dwCallback = (DWORD)hWnd;
+    if (Result)
+        return Result;
     return 0;
 }
 

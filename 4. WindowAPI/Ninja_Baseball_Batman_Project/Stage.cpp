@@ -10,7 +10,8 @@ Stage::Stage(RECT& playArea, vector<RECT>& limitAreas, list<shared_ptr<Monster>>
 
 void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> player, bool aniWait)
 {
-	if (m_StageMonsters.empty()) m_StageFinish = true;
+	if (m_StageMonsters.empty()) 
+        m_StageFinish = true;
 
     for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
     {
@@ -24,6 +25,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             if (player->GetAttackTimer() == player->GetAttackTiming())
             {
                 iter->get()->SetCurHP(iter->get()->GetCurHP() - player->GetAttack());
+                player->GetSounds()->PlayAudio();
                 iter->get()->Damaged();
                 //cout << "Player Attack" << endl;
             }
@@ -35,10 +37,10 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming())
             {
                 player->SetCurHP(player->GetCurHP() - iter->get()->GetAttack());
-                player->Damaged();
 
                 if (player->GetAlive())
                 {
+                   // player->GetSounds()["Ryno_hit"]->PlayAudio();
                     player->Damaged();
                 }
 

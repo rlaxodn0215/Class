@@ -2,6 +2,7 @@
 //
 
 #include "framework.h"
+#include<Windows.h>
 #include "Ninja_Baseball_Batman_Project.h"
 #include"Sprite.h"
 #include"Animation.h"
@@ -16,7 +17,6 @@
 #define TIMER 1
 
 #pragma comment(lib, "msimg32.lib")
-#pragma comment(lib,"winmm.lib")
 
 using namespace std;
 
@@ -34,6 +34,11 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 GameManager* gameManager;
 HBITMAP Screen;
 RECT winRect;
+MCIDEVICEID MusicID = 0;
+
+MCI_OPEN_PARMS      mciOpen; //파일을 로드
+MCI_PLAY_PARMS       mciPlay; //파일을 재생
+MCI_STATUS_PARMS   mciStatus; //파일의 상태
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);

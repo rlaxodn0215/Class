@@ -120,41 +120,88 @@ void GameManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
 
 }
 
-void GameManager::LoadSounds(const TCHAR dataFileName[100])
+void GameManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd)
 {
+    HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+
+    if (hFile == NULL)
+    {
+        MessageBox(NULL, _T("Sprite 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+    }
+
+    DWORD rbytes;
+    TCHAR buff[2000] = {};
+    char chbuff[2000] = {};
+    size_t convertedChars = 0;
+
+    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+
+    if (buff[0] == 65279)
+    {
+        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
+        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+    }
+
+#ifdef UNICODE
+    wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
+#else
+    strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
+#endif
+
+    static int channel = 1;
+    int index = 0;
+    while (chbuff[index++] != '\n');
+    while (1)
+    {
+        char name[100], address[200];
+        GetSentence(index, chbuff, name);
+        if (buff[index] == '\0') break;
+        GetSentence(index, chbuff, address);
+        TCHAR uniAddress[200] = {};
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
+        temp[name] = shared_ptr<Sound>(new Sound(hWnd,uniAddress, channel));
+        channel++;
+        index++;
+    }
+
+    channel = 1;
 }
 
 void GameManager::TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 0
 {
     screen = NULL;
 
-    //Sprites.clear();
-    //Animations.clear();
-    //Sounds.clear();
+    if (Sprites.empty() || Animations.empty() || Sounds.empty())
+    {
+        LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"), Sprites);
+        LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"), Animations);
+        LoadSounds(_T("AniData/Datas/TitleScene_Sounds.txt"), Sounds, hWnd);
+        Sounds["Title_sound"]->PlayAudio();
+    }
 
-    LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"),Sprites);
-    LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"),Animations);
-    //모든 소리 로드
 
     static int totalFrame = 0;
     static int curFrame = 0;
     if (totalFrame == 0) totalFrame = Animations["Title_screen"]->GetFrameTotalCount();
-    if (!(m_TimerFrame % 50))
+    if (!(m_TimerFrame % 40))
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f,1.55f, true, winRect);
-    //cout << curFrame << endl;
+    Animations["Title_screen"]->AniPlay(hdc, { Animations["Title_screen"]->GetPivots()[0].x + 35,
+        Animations["Title_screen"]->GetPivots()[0].y}, curFrame, 1.55f, 1.55f, true, winRect);
+
 }
 
 void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 1
 {
     screen = NULL;
 
-    if (Sprites.empty() || Animations.empty())
+    if (Sprites.empty() || Animations.empty() || Sounds.empty())
     {
         LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"), Sprites);
         LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"), Animations);
+        LoadSounds(_T("AniData/Datas/SelectScene_Sounds.txt"), Sounds, hWnd);
+        Sounds["Select_BGM"]->PlayAudio();
 
         // 타이머 애니 로드
         Number_ani.push_back(Animations["Num_zero"]);
@@ -168,11 +215,13 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect
         Number_ani.push_back(Animations["Num_eight"]);
         Number_ani.push_back(Animations["Num_nine"]);
     }
+
     for (int i = 20; i <= 900; i += 30)
     {
         for (int j = 0; j <= 630; j += 35)
         {
-            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f,1.55f, true, winRect);
+            Animations["Select_background"]->AniPlay(hdc, { Animations["Select_background"]->GetPivots()[0].x + i,
+                Animations["Select_background"]->GetPivots()[0].y + j}, 0, 1.55f, 1.55f, true, winRect);
         }
     }
 
@@ -188,10 +237,14 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect
 
         Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f, 3.0f, true, winRect);
 
-        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
-        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
-        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
-        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Jose_select"]->AniPlay(hdc, { Animations["Jose_select"]->GetPivots()[0].x + 20,
+            Animations["Jose_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Ryno_select"]->AniPlay(hdc, { Animations["Ryno_select"]->GetPivots()[0].x + 262,
+            Animations["Ryno_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Roger_select"]->AniPlay(hdc, { Animations["Roger_select"]->GetPivots()[0].x + 507,
+            Animations["Roger_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Straw_select"]->AniPlay(hdc, { Animations["Straw_select"]->GetPivots()[0].x + 750,
+           Animations["Straw_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
 
         ShowTimer(hdc, Number_ani,winRect);
     }
@@ -200,64 +253,80 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect
     {
         if (m_Cursor.x == m_SelectPosX[0])
         {
-            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_selected"]->AniPlay(hdc, { Animations["Jose_selected"]->GetPivots()[0].x + 20,
+                Animations["Jose_selected"]->GetPivots()[0].y + 150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { Animations["Ryno_select"]->GetPivots()[0].x + 262,
+           Animations["Ryno_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { Animations["Roger_select"]->GetPivots()[0].x + 507,
+                Animations["Roger_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { Animations["Straw_select"]->GetPivots()[0].x + 750,
+               Animations["Straw_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
         }
 
         else if (m_Cursor.x == m_SelectPosX[1])
         {
-            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_selected"]->AniPlay(hdc, { Animations["Ryno_selected"]->GetPivots()[0].x + 262,
+                Animations["Ryno_selected"]->GetPivots()[0].y + 150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { Animations["Jose_select"]->GetPivots()[0].x + 20,
+            Animations["Jose_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { Animations["Roger_select"]->GetPivots()[0].x + 507,
+            Animations["Roger_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { Animations["Straw_select"]->GetPivots()[0].x + 750,
+               Animations["Straw_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
         }
 
 
         else if (m_Cursor.x == m_SelectPosX[2])
         {
-            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_selected"]->AniPlay(hdc, { Animations["Roger_selected"]->GetPivots()[0].x + 507,
+                Animations["Roger_selected"]->GetPivots()[0].y + 150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { Animations["Jose_select"]->GetPivots()[0].x + 20,
+             Animations["Jose_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { Animations["Ryno_select"]->GetPivots()[0].x + 262,
+           Animations["Ryno_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { Animations["Straw_select"]->GetPivots()[0].x + 750,
+               Animations["Straw_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
         }
 
         else
         {
-            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
-
+            Animations["Straw_selected"]->AniPlay(hdc, { Animations["Straw_selected"]->GetPivots()[0].x + 750,
+                Animations["Straw_selected"]->GetPivots()[0].y + 150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { Animations["Jose_select"]->GetPivots()[0].x + 20,
+           Animations["Jose_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { Animations["Ryno_select"]->GetPivots()[0].x + 262,
+                Animations["Ryno_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { Animations["Roger_select"]->GetPivots()[0].x + 507,
+                Animations["Roger_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, winRect);
         }
-
-
 
     }
 
 
-    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f, 3.0f, true, winRect);
-    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f, 3.0f, true, winRect);
-    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f, 3.0f, true, winRect);
-    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Jose_tag"]->AniPlay(hdc, { Animations["Jose_tag"]->GetPivots()[0].x + 20, Animations["Jose_tag"]->GetPivots()[0].y + 560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Ryno_tag"]->AniPlay(hdc, { Animations["Ryno_tag"]->GetPivots()[0].x + 262, Animations["Ryno_tag"]->GetPivots()[0].y + 560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Roger_tag"]->AniPlay(hdc, { Animations["Roger_tag"]->GetPivots()[0].x + 507,Animations["Roger_tag"]->GetPivots()[0].y + 560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Straw_tag"]->AniPlay(hdc, { Animations["Straw_tag"]->GetPivots()[0].x + 750,Animations["Straw_tag"]->GetPivots()[0].y + 560 }, 0, 3.0f, 3.0f, true, winRect);
 
-    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f, 3.0f, true, winRect);
-    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f, 3.0f, true, winRect);
-    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f, 3.0f, true, winRect);
-    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Player_select_deco"]->AniPlay(hdc, { Animations["Player_select_deco"]->GetPivots()[0].x + 50,Animations["Player_select_deco"]->GetPivots()[0].y + 65 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Player"]->AniPlay(hdc, { Animations["Player"]->GetPivots()[0].x + 120, Animations["Player"]->GetPivots()[0].y + 40 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Player_select_deco"]->AniPlay(hdc, { Animations["Player_select_deco"]->GetPivots()[0].x + 920, Animations["Player_select_deco"]->GetPivots()[0].y + 65 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Select"]->AniPlay(hdc, { Animations["Select"]->GetPivots()[0].x + 600, Animations["Select"]->GetPivots()[0].y + 40 }, 0, 3.0f, 3.0f, true, winRect);
 
 
 }
 
 void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 2
 {
-    if (Sprites.empty() || Animations.empty())
+    if (Sprites.empty() || Animations.empty() ||Sounds.empty())
     {
-        map<string, shared_ptr<Animation>> temp;
         LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"),Sprites);
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),Animations);
-        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds.txt"), Sounds, hWnd);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"),Sounds, hWnd);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), Sounds, hWnd);
+
+        Sounds["PlayScene_BGM"]->PlayAudio();
 
         Number_ani.push_back(Animations["Pointnum_zreo"]);
         Number_ani.push_back(Animations["Pointnum_one"]);
@@ -270,13 +339,22 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
         Number_ani.push_back(Animations["Pointnum_eight"]);
         Number_ani.push_back(Animations["Pointnum_nine"]);
 
+        map<string, shared_ptr<Animation>> temp;
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp);
+
         map<string, shared_ptr<Sound>> temp1;
+        temp1["Ryno_attack"] = Sounds["Ryno_attack"];
+        temp1["Ryno_dead"] = Sounds["Ryno_dead"];
+        temp1["Ryno_dynamite"] = Sounds["Ryno_dynamite"];
+        temp1["Ryno_dynamite2"] = Sounds["Ryno_dynamite2"];
+        temp1["Ryno_hit"] = Sounds["Ryno_hit"];
+        temp1["Ryno_homerun"] = Sounds["Ryno_homerun"];
 
         m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100,100, 10, temp, temp1));
 
-        LoadStage(1,winRect);
+        LoadStage(hWnd,1,winRect);
     }
-
+    
     m_Player->m_Bitmap = screen;
     ShowBackStage(hdc, winRect);
 
@@ -287,11 +365,9 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
     ShowUI(hdc, winRect);
 
- 
-
 }
 
-void GameManager::LoadStage(int stageNum, RECT winRect)
+void GameManager::LoadStage(HWND hWnd,int stageNum, RECT winRect)
 {
     if (stageNum == 1)
     {
@@ -305,9 +381,13 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp);
 
         map<string, shared_ptr<Sound>> temp1;
+        temp1["Baseball_attack"] = Sounds["Baseball_attack"];
+        temp1["Baseball_dead"] = Sounds["Baseball_dead"];
+
+        //LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), temp1, hWnd);
 
         stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,50,1,temp,temp1,100)));
-        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 700, 700),50,50,1,temp,temp1,100)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(600, 450, 450),50,1,temp,temp1)));
@@ -324,7 +404,7 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(550, 450, 450), 50, 1, temp, temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(550, 550, 550), 50, 1, temp, temp1)));
 
-        m_Stage =shared_ptr<Stage>(new Stage(playArea, limitAreas, stageMonsters));
+        m_Stage = shared_ptr<Stage>(new Stage(playArea, limitAreas, stageMonsters));
     }
 }
 
@@ -399,6 +479,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
         if (GetAsyncKeyState(0x41) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000 && !m_SelectFlag)
         {
             m_SelectTimer = 0;
+            Sounds["Selected_sound"]->PlayAudio();
             m_SelectFlag = true;
         }
 

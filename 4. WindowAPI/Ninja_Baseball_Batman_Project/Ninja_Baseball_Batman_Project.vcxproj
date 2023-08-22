@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="SingletonTemplate.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Charactor.h" />
@@ -136,19 +137,18 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Ninja_Baseball_Batman_Project.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Sound.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Charactor.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Ninja_Baseball_Batman_Project.cpp" />
-    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>

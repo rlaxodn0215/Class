@@ -92,7 +92,7 @@ public:
 	void SetAttackTiming(int num) { m_AttackTiming = num; }
 	int GetTempTimer() { return m_tempTimer; }
 	void SetTempTimer(int num) { m_tempTimer = num; }
-
+	shared_ptr<Sound> GetSounds() { return m_CurSound; }
 
 	void Dead() { if (m_CurHp <= 0)m_isAlive = false; }
 	void Update(bool moveOK);

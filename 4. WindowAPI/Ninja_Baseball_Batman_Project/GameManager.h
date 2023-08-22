@@ -6,6 +6,7 @@
 #include"Charactor.h"
 #include"Stage.h"
 #include"SingletonTemplate.h"
+#include"Sound.h"
 
 class GameManager : public SingletonTemplate<GameManager> //싱글턴으로 만든다.
 {
@@ -41,12 +42,12 @@ public:
 	void GetSentence(int& i, char* buff, char* sentence);
 	void LoadSprites(const TCHAR dataFileName[100], map<string, shared_ptr<Sprite>>& temp);
 	void LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp);
-	void LoadSounds(const TCHAR dataFileName[100]);
+	void LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd);
 	
 	void TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 	void SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 	void PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
-	void LoadStage(int stageNum, RECT winRect);
+	void LoadStage(HWND hWnd, int stageNum, RECT winRect);
 	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
 	void Gravity(int g);
