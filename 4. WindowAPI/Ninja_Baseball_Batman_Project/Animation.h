@@ -19,11 +19,12 @@ public:
 	vector<int> GetWidths() { return m_Width; }
 	vector<int> GetHeights() { return m_Height; }
 	vector<POINT> GetPivots() { return m_Pivot; }
+	vector<POINT> GetOffsets() { return m_Offset; }
 	shared_ptr<Sprite> GetResourceSprite() { return m_ResourceSprite; }
 	
 	Animation();
 	Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100]);
 	~Animation();
-	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatio, bool lookRight, RECT winRect);
+	void AniPlay(HDC hdc, POINT location, int spriteIndex, float imageRatioWidth, float imageRatioHeight, bool lookRight, RECT winRect);
 };
 

@@ -19,7 +19,7 @@ public:
 	map<string, shared_ptr<Animation>> Animations;
 	map<string, shared_ptr<Sound>> Sounds;
 
-	vector<shared_ptr<Animation>> Timer_ani;
+	vector<shared_ptr<Animation>> Number_ani;
 	int m_SceneNum = 0;
 
 	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);
@@ -55,6 +55,8 @@ public:
 	void CheckKeyInput(HDC hdc, RECT winRect);
 	void CheckKeyRelease(WPARAM wParam);
 	void ShowUI(HDC hdc, RECT winRect);
+	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
+	void ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRatioWidth, float imageRatioHeight,const int points);
 	void GameOver();
 };
 

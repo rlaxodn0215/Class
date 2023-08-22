@@ -23,10 +23,8 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             //cout << player->GetAttackTimer() << endl;
             if (player->GetAttackTimer() == player->GetAttackTiming())
             {
-                player->SetPoints(player->GetPoints() + player->GetAttack());
-                iter->get()->SetHP(iter->get()->GetHP() - player->GetAttack());
+                iter->get()->SetCurHP(iter->get()->GetCurHP() - player->GetAttack());
                 iter->get()->Damaged();
-                //cout << iter->get()->GetHP() << endl;
                 //cout << "Player Attack" << endl;
             }
         }
@@ -36,8 +34,9 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1);
             if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming())
             {
-                player->SetHP(player->GetHP() - iter->get()->GetAttack());
+                player->SetCurHP(player->GetCurHP() - iter->get()->GetAttack());
                 player->Damaged();
+
                 if (player->GetAlive())
                 {
                     player->Damaged();
@@ -48,7 +47,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
                     
                 }
 
-                cout << player->GetHP() << endl;
+                //cout << player->GetMaxHP() - player->GetCurHP() << endl;
                 //cout << "Monster Attack" << endl;
             }
         }
@@ -77,7 +76,11 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         iter->get()->MonsterAI(player, 3);
         iter->get()->Update(true);
 
-        if (iter->get()->GetAlive() == false) iter = m_StageMonsters.erase(iter);
+        if (iter->get()->GetAlive() == false)
+        {
+            player->SetPoints(player->GetPoints() + iter->get()->GetDeadPoints());
+            iter = m_StageMonsters.erase(iter);
+        }
         else ++iter;
     }
 

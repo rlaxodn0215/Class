@@ -30,7 +30,8 @@ protected:
 	Status m_Status;
 	Vector3 m_Position = {0,0,0};
 	Vector3 m_Velocity = {0,0,0};
-	int m_Hp;
+	int m_CurHp;
+	int m_MaxHp;
 	int m_MoveSpeed;
 	bool m_isLookRight = true;// false == left
 	bool m_isAlive = true;
@@ -55,7 +56,7 @@ public:
 	HBITMAP m_Bitmap;
 
 	Charactor() = default;
-	Charactor(Vector3 pos, int hp, int moveSpeed,
+	Charactor(Vector3 pos, int maxhp,int curhp, int moveSpeed,
 		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
 	~Charactor() = default;
 
@@ -66,8 +67,10 @@ public:
 	void SetPos(Vector3 vec) { m_Position = vec; }
 	Vector3 GetVel() { return m_Velocity; }
 	void SetVel(Vector3 vec) { m_Velocity = vec; }
-	int GetHP() { return m_Hp; }
-	void SetHP(int hp) { m_Hp = hp; }
+	int GetMaxHP() { return m_MaxHp; }
+	void SetMaxHP(int hp) { m_MaxHp = hp; }
+	int GetCurHP() { return m_CurHp; }
+	void SetCurHP(int hp) { m_CurHp = hp; }
 	int GetMoveSpeed() { return m_MoveSpeed; }
 	int GetAniSpeed() { return m_CurAniSpeed; }
 	bool GetLookRight() { return m_isLookRight; }
@@ -91,7 +94,7 @@ public:
 	void SetTempTimer(int num) { m_tempTimer = num; }
 
 
-	void Dead() { if (m_Hp <= 0)m_isAlive = false; }
+	void Dead() { if (m_CurHp <= 0)m_isAlive = false; }
 	void Update(bool moveOK);
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
 	virtual void ShowColliders(HDC hdc) = 0;
@@ -106,8 +109,8 @@ protected:
 
 public:
 	Player() = default;
-	Player(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
-		: Charactor(pos, hp, moveSpeed, anis, sounds) {
+	Player(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
+		: Charactor(pos, maxhp,curhp, moveSpeed, anis, sounds) {
 		m_Status = NOTHING;
 	};
 
@@ -146,9 +149,9 @@ private:
 	
 public:
 	Ryno() = default;
-	Ryno(Vector3 pos, int hp, int moveSpeed, 
+	Ryno(Vector3 pos, int maxhp, int curhp, int moveSpeed, 
 		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
-		: Player(pos, hp, moveSpeed, anis, sounds) { Idle();};
+		: Player(pos, maxhp,curhp, moveSpeed, anis, sounds) { Idle();};
 
 	BoxCollider GetBodyCollider() { return m_BodyColliders; }
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
@@ -168,12 +171,15 @@ class Monster : public Charactor
 {
 protected:
 	int m_DamagedTime = 0;
+	int m_DeadPoints;
 public:
 	Monster() = default;
-	Monster(Vector3 position, int Hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, Hp, moveSpeed, anis, sounds) {
+	Monster(Vector3 position, int maxhp,int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, maxhp,curhp, moveSpeed, anis, sounds) {
 		m_isLookRight = false;
 	};
+	
+	int GetDeadPoints() { return m_DeadPoints; }
 
 	virtual CircleCollider GetBodyCircleCollider() = 0;
 	virtual BoxCollider GetBodyCollider() = 0;
@@ -196,9 +202,9 @@ private:
 
 public:
 	Baseball()=default;
-	Baseball(Vector3 pos, int hp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds) : Monster(pos, hp, moveSpeed, anis, sounds) {
-		 Move();
+	Baseball(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds, int deadPoint) : Monster(pos, maxhp, curhp, moveSpeed, anis, sounds) {
+		Move(); m_DeadPoints = deadPoint;
 	};
 	~Baseball()=default;
 

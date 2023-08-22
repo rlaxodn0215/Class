@@ -143,7 +143,7 @@ void GameManager::TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect)
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f, true, winRect);
+    Animations["Title_screen"]->AniPlay(hdc, { 35, 0 }, curFrame, 1.55f,1.55f, true, winRect);
     //cout << curFrame << endl;
 }
 
@@ -157,22 +157,22 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect
         LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"), Animations);
 
         // 타이머 애니 로드
-        Timer_ani.push_back(Animations["Num_zero"]);
-        Timer_ani.push_back(Animations["Num_one"]);
-        Timer_ani.push_back(Animations["Num_two"]);
-        Timer_ani.push_back(Animations["Num_three"]);
-        Timer_ani.push_back(Animations["Num_four"]);
-        Timer_ani.push_back(Animations["Num_five"]);
-        Timer_ani.push_back(Animations["Num_six"]);
-        Timer_ani.push_back(Animations["Num_seven"]);
-        Timer_ani.push_back(Animations["Num_eight"]);
-        Timer_ani.push_back(Animations["Num_nine"]);
+        Number_ani.push_back(Animations["Num_zero"]);
+        Number_ani.push_back(Animations["Num_one"]);
+        Number_ani.push_back(Animations["Num_two"]);
+        Number_ani.push_back(Animations["Num_three"]);
+        Number_ani.push_back(Animations["Num_four"]);
+        Number_ani.push_back(Animations["Num_five"]);
+        Number_ani.push_back(Animations["Num_six"]);
+        Number_ani.push_back(Animations["Num_seven"]);
+        Number_ani.push_back(Animations["Num_eight"]);
+        Number_ani.push_back(Animations["Num_nine"]);
     }
     for (int i = 20; i <= 900; i += 30)
     {
         for (int j = 0; j <= 630; j += 35)
         {
-            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f, true, winRect);
+            Animations["Select_background"]->AniPlay(hdc, { i,j }, 0, 1.55f,1.55f, true, winRect);
         }
     }
 
@@ -186,63 +186,66 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect
         if (curFrame < totalFrame - 1) curFrame++;
         else curFrame = 0;
 
-        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f, true, winRect);
+        Animations["1P_select"]->AniPlay(hdc, m_Cursor, curFrame, 3.0f, 3.0f, true, winRect);
 
-        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
-        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
-        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
-        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
+        Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
+        Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
 
-        ShowTimer(hdc, Timer_ani,winRect);
+        ShowTimer(hdc, Number_ani,winRect);
     }
 
     else
     {
         if (m_Cursor.x == m_SelectPosX[0])
         {
-            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f, true, winRect);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
+            Animations["Jose_selected"]->AniPlay(hdc, { 20,150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
         }
 
         else if (m_Cursor.x == m_SelectPosX[1])
         {
-            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f, true, winRect);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
+            Animations["Ryno_selected"]->AniPlay(hdc, { 262,150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
         }
 
 
         else if (m_Cursor.x == m_SelectPosX[2])
         {
-            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f, true, winRect);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
-            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, true, winRect);
+            Animations["Roger_selected"]->AniPlay(hdc, { 507,150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Straw_select"]->AniPlay(hdc, { 750,250 }, 0, 3.0f, 3.0f, true, winRect);
         }
 
         else
         {
-            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f, true, winRect);
-            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, true, winRect);
-            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, true, winRect);
-            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, true, winRect);
+            Animations["Straw_selected"]->AniPlay(hdc, { 750,150 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Jose_select"]->AniPlay(hdc, { 20,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Ryno_select"]->AniPlay(hdc, { 262,250 }, 0, 3.0f, 3.0f, true, winRect);
+            Animations["Roger_select"]->AniPlay(hdc, { 507,250 }, 0, 3.0f, 3.0f, true, winRect);
 
         }
+
+
+
     }
 
 
-    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f, true, winRect);
-    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f, true, winRect);
-    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f, true, winRect);
-    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f, true, winRect);
+    Animations["Jose_tag"]->AniPlay(hdc, { 20,560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Ryno_tag"]->AniPlay(hdc, { 262,560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Roger_tag"]->AniPlay(hdc, { 507,560 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Straw_tag"]->AniPlay(hdc, { 750,560 }, 0, 3.0f, 3.0f, true, winRect);
 
-    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f, true, winRect);
-    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f, true, winRect);
-    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f, true, winRect);
-    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f, true, winRect);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 50,65 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Player"]->AniPlay(hdc, { 120,40 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Player_select_deco"]->AniPlay(hdc, { 920,65 }, 0, 3.0f, 3.0f, true, winRect);
+    Animations["Select"]->AniPlay(hdc, { 600,40 }, 0, 3.0f, 3.0f, true, winRect);
 
 
 }
@@ -256,9 +259,20 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),Animations);
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp);
 
+        Number_ani.push_back(Animations["Pointnum_zreo"]);
+        Number_ani.push_back(Animations["Pointnum_one"]);
+        Number_ani.push_back(Animations["Pointnum_two"]);
+        Number_ani.push_back(Animations["Pointnum_three"]);
+        Number_ani.push_back(Animations["Pointnum_four"]);
+        Number_ani.push_back(Animations["Pointnum_five"]);
+        Number_ani.push_back(Animations["Pointnum_six"]);
+        Number_ani.push_back(Animations["Pointnum_seven"]);
+        Number_ani.push_back(Animations["Pointnum_eight"]);
+        Number_ani.push_back(Animations["Pointnum_nine"]);
+
         map<string, shared_ptr<Sound>> temp1;
 
-        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100, 10, temp, temp1));
+        m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100,100, 10, temp, temp1));
 
         LoadStage(1,winRect);
     }
@@ -267,7 +281,7 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
     ShowBackStage(hdc, winRect);
 
     Animations["Stage_6_boss"]->AniPlay(hdc, { Animations["Stage_6_boss"]->GetPivots()[0].x,
-        Animations["Stage_6_boss"]->GetPivots()[0].y - 3 },0, 3.0f, true, winRect);
+        Animations["Stage_6_boss"]->GetPivots()[0].y - 3 },0, 3.0f, 3.0f, true, winRect);
 
     m_Stage->StageUpdate(hdc, m_TimerFrame, winRect, m_Player, m_Player->GetStopMove());
 
@@ -292,7 +306,7 @@ void GameManager::LoadStage(int stageNum, RECT winRect)
 
         map<string, shared_ptr<Sound>> temp1;
 
-        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,50,1,temp,temp1,100)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
@@ -330,13 +344,13 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni,RE
 
     if (tens > 0)
     {
-        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f, true, winRect);
-        timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f, true, winRect);
+        timerAni[tens]->AniPlay(hdc, { 440,65 }, 0, 3.5f, 3.5f, true, winRect);
+        timerAni[ones]->AniPlay(hdc, { 515,65 }, 0, 3.5f, 3.5f, true, winRect);
     }
 
     else
     {
-        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f, true, winRect);
+        timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f, 3.5f, true, winRect);
     }
     
 }
@@ -395,6 +409,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             Sprites.clear();
             Animations.clear();
             Sounds.clear();
+            Number_ani.clear();
         }
 
         m_SelectTimer--;
@@ -426,7 +441,7 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
 
         }
 
-        if (m_Player->GetHP() > 0)
+        if (m_Player->GetCurHP() > 0)
         {
             if (!m_Player->GetStopMove()) // 움직일 수 없는 애니 작동 여부
             {
@@ -603,10 +618,10 @@ void GameManager::ShowBackStage(HDC hdc, RECT winRect)
     }
 
     Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X + Animations["Background1_BackStage"]->GetPivots()[0].x, pos_Y +
-        Animations["Background1_BackStage"]->GetPivots()[0].y}, 0, 3.0f, true, winRect);
+        Animations["Background1_BackStage"]->GetPivots()[0].y}, 0, 3.0f, 3.0f, true, winRect);
     Animations["Background1_BackStage"]->AniPlay(hdc, { pos_X + Animations["Background1_BackStage"]->GetPivots()[0].x +
         3 * Animations["Background1_BackStage"]->GetWidths()[0], pos_Y
-        + Animations["Background1_BackStage"]->GetPivots()[0].y }, 0, 3.0f, true, winRect);
+        + Animations["Background1_BackStage"]->GetPivots()[0].y }, 0, 3.0f, 3.0f, true, winRect);
 
 }
 
@@ -654,17 +669,99 @@ void GameManager::CheckKeyRelease(WPARAM wParam)
 void GameManager::ShowUI(HDC hdc, RECT winRect)
 {
     // UI
-    Animations["Player_picture_normal"]->AniPlay(hdc, { Animations["Player_picture_normal"]->GetPivots()[0].x + 25,
-       Animations["Player_picture_normal"]->GetPivots()[0].y + 34 }, 0, 3.0f, true, winRect);
+    if (m_Player->GetCurHP() > m_Player->GetMaxHP() * 0.35f)
+    {
+        Animations["Player_picture_normal"]->AniPlay(hdc, { Animations["Player_picture_normal"]->GetPivots()[0].x + 25,
+           Animations["Player_picture_normal"]->GetPivots()[0].y + 34 }, 0, 3.0f, 3.0f, true, winRect);
+    }
+    else
+    {
+        if (!(m_TimerFrame % 5)) m_SelectFlag = !m_SelectFlag; //변수 재활용
+        Animations["Player_picture_hurt"]->AniPlay(hdc, { Animations["Player_picture_hurt"]->GetPivots()[0].x + 25,
+       Animations["Player_picture_hurt"]->GetPivots()[0].y + 34 }, m_SelectFlag, 3.0f, 3.0f, true, winRect);
+    }
 
     Animations["Player_picture_frame"]->AniPlay(hdc, { Animations["Player_picture_frame"]->GetPivots()[0].x + 20,
-        Animations["Player_picture_frame"]->GetPivots()[0].y + 10 }, 0, 3.0f, true, winRect);
+        Animations["Player_picture_frame"]->GetPivots()[0].y + 10 }, 0, 3.0f, 3.0f, true, winRect);
 
-    Animations["Player_hpbar_full"]->AniPlay(hdc, { Animations["Player_hpbar_full"]->GetPivots()[0].x + 100,
-       Animations["Player_hpbar_full"]->GetPivots()[0].y + 80 }, 0, 3.0f, true, winRect);
+    Animations["Player_hpbar_empty"]->AniPlay(hdc, { Animations["Player_hpbar_empty"]->GetPivots()[0].x + 100,
+         Animations["Player_hpbar_empty"]->GetPivots()[0].y + 80 }, 0, 3.0f, 3.0f, true, winRect);
+
+    ShowPlayerHP(hdc, Animations["Player_hpbar_full"], { Animations["Player_hpbar_full"]->GetPivots()[0].x + 105,
+       Animations["Player_hpbar_full"]->GetPivots()[0].y + 80 }, 3.0f, 3.0f,(float)(m_Player->GetMaxHP() - m_Player->GetCurHP())/ m_Player->GetMaxHP());
+
+    ShowPlayerPoints(hdc, { 225,55 }, 3.0f, 3.0f, m_Player->GetPoints());
+
+
 }
 
+void GameManager::ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar , POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio)
+{
+    int bx = hpBar->GetWidths()[0];
+    int by = hpBar->GetHeights()[0];
+    int xStart = hpBar->GetOffsets()[0].x;
+    int yStart = hpBar->GetOffsets()[0].y;
+    int posX = offset_location.x - hpBar->GetPivots()[0].x;
+    int posY = offset_location.y - hpBar->GetPivots()[0].y;
 
+     HDC hMemDC;
+     HBITMAP holdBitmap;
+
+     hMemDC = CreateCompatibleDC(hdc);
+     holdBitmap = (HBITMAP)SelectObject(hMemDC, hpBar->GetResourceSprite()->GetSpriteImage());
+
+     TransparentBlt(hdc, posX, posY, (int)((1 - hpRatio) * bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart + hpRatio * bx, yStart,
+         (1 - hpRatio) * bx, by, RGB(hpBar->GetResourceSprite()->GetTransparentColor().m_X, hpBar->GetResourceSprite()->GetTransparentColor().m_Y,
+             hpBar->GetResourceSprite()->GetTransparentColor().m_Z));
+
+     SelectObject(hMemDC, holdBitmap);
+     DeleteDC(hMemDC);
+
+}
+
+void GameManager::ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRatioWidth, float imageRatioHeight, const int points)
+{
+    int number[5];
+    int temp = points;
+    int showNum = 4;
+
+    for (int i = 0; i < 5; i++)
+    {
+        number[i] = temp % 10;
+        temp /= 10;
+    }
+
+    for (int i = 4; i >=0; i--)
+    {
+        if (number[i] == 0) showNum--;
+        else break;
+    }
+
+    if (showNum < 0) showNum = 0;
+
+    for (int i = 0; i <= showNum; i++)
+    {
+        int bx = Number_ani[number[i]]->GetWidths()[0];
+        int by = Number_ani[number[i]]->GetHeights()[0];
+        int xStart = Number_ani[number[i]]->GetOffsets()[0].x;
+        int yStart = Number_ani[number[i]]->GetOffsets()[0].y;
+        int posX = offset_location.x - Number_ani[number[i]]->GetPivots()[0].x;
+        int posY = offset_location.y - Number_ani[number[i]]->GetPivots()[0].y;
+
+        HDC hMemDC;
+        HBITMAP holdBitmap;
+
+        hMemDC = CreateCompatibleDC(hdc);
+        holdBitmap = (HBITMAP)SelectObject(hMemDC, Number_ani[number[i]]->GetResourceSprite()->GetSpriteImage());
+
+        TransparentBlt(hdc, posX - 25*i, posY, (int)( bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
+             bx, by, RGB(Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_X, Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_Y,
+                 Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_Z));
+
+        SelectObject(hMemDC, holdBitmap);
+        DeleteDC(hMemDC);
+    }
+}
 
 void GameManager::GameOver()
 {

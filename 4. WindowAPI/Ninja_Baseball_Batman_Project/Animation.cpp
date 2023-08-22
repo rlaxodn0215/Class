@@ -90,7 +90,7 @@ Animation::~Animation()
 
 }
 
-void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float imageRatio, bool lookRight, RECT winRect)
+void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float imageRatioWidth, float imageRatioHeight, bool lookRight, RECT winRect)
 {
 	int bx = m_Width[spriteIndex];
 	int by = m_Height[spriteIndex];
@@ -101,14 +101,13 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 
 	if (lookRight)
 	{
-
 		HDC hMemDC;
 		HBITMAP holdBitmap;
 
 		hMemDC = CreateCompatibleDC(hdc);
 		holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());	
 
-		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, xStart, yStart,
+		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
 			bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
 				m_ResourceSprite->GetTransparentColor().m_Z));
 
@@ -123,14 +122,14 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 		HBITMAP holdBitmap, holdBitmap1;
 
 		hMemDC = CreateCompatibleDC(hdc);
-		holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, (int)(bx * imageRatio), (int)(by * imageRatio)));
+		holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight)));
 
 		hMemDC1 = CreateCompatibleDC(hMemDC);
 		holdBitmap1 = (HBITMAP)SelectObject(hMemDC1, m_ResourceSprite->GetSpriteImage());
 
-		StretchBlt(hMemDC, (int)(bx * imageRatio)-1, 0, -(int)(bx*imageRatio) , (int)(by * imageRatio), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
+		StretchBlt(hMemDC, (int)(bx * imageRatioWidth)-1, 0, -(int)(bx* imageRatioWidth) , (int)(by * imageRatioHeight), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
 
-		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatio), (int)(by * imageRatio), hMemDC, 0, 0, (int)(bx * imageRatio), (int)(by * imageRatio),
+		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, 0, 0, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight),
 			RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
 				m_ResourceSprite->GetTransparentColor().m_Z));
 
