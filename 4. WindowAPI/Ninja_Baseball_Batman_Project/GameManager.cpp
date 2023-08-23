@@ -357,6 +357,15 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
 
         Sounds["PlayScene_BGM"]->PlayAudio();
     }
+
+    //if (m_Stage->GetStageFinish())
+    //{
+    //    Sprites.clear();
+    //    Animations.clear();
+    //    Sounds.clear();
+    //    m_SceneNum = 3;
+    //    m_Scene = &GameManager::EndingScene;
+    //}
     
     m_Player->m_Bitmap = screen;
     ShowBackStage(hdc, winRect);
@@ -391,7 +400,7 @@ void GameManager::LoadStage(HWND hWnd,int stageNum, RECT winRect)
         //LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), temp1, hWnd);
 
         stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,50,1,temp,temp1,100)));
-        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 700, 700),50,50,1,temp,temp1,100)));
+        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 700, 700),50,50,1,temp,temp1,100)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(600, 450, 450),50,1,temp,temp1)));
@@ -414,7 +423,12 @@ void GameManager::LoadStage(HWND hWnd,int stageNum, RECT winRect)
 
 void GameManager::EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 3
 {
-
+    if (Sprites.empty() || Animations.empty() || Sounds.empty())
+    {
+        LoadSprites(_T("AniData/Datas/EndingScene_Sprites.txt"), Sprites);
+        LoadAnimations(_T("AniData/Datas/EndingScene_Animations.txt"), Animations);
+        LoadSounds(_T("AniData/Datas/EndingScene_Sounds.txt"), Sounds, hWnd);
+    }
     
 
 }
@@ -846,8 +860,4 @@ void GameManager::ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRa
         SelectObject(hMemDC, holdBitmap);
         DeleteDC(hMemDC);
     }
-}
-
-void GameManager::GameOver()
-{
 }

@@ -171,7 +171,7 @@ BOOL Ryno::Jump(bool & keydown, bool jumping)
 	return 0;
 }
 
-BOOL Ryno::Damaged()
+BOOL Ryno::Damaged(HDC hdc, RECT winRect)
 {
 	if (m_Status != DAMAGED)
 	{
@@ -559,7 +559,7 @@ void Baseball::Move()
 	m_AttackColliders.SetArea({ -2,-2,-2,-2 });
 }
 
-void Baseball::Damaged()
+void Baseball::Damaged(HDC hdc, RECT winRect)
 {
 	if (m_Status != DAMAGED)
 	{
@@ -580,6 +580,11 @@ void Baseball::Damaged()
 	}
 
 	m_CurSound->PlayAudio();
+
+	if(m_isLookRight)
+		m_Animations["Hit_Image"]->AniPlay(hdc, { m_Position.m_X - 30, m_Position.m_Y  - 140 }, 0, 1.0f, 1.0f, m_isLookRight, winRect);
+	else
+		m_Animations["Hit_Image"]->AniPlay(hdc, { m_Position.m_X + 60, m_Position.m_Y - 140 }, 0, 1.0f, 1.0f, m_isLookRight, winRect);
 
 	m_CurAniShowOffset.clear();
 
@@ -615,7 +620,7 @@ void Baseball::Dead()
 	m_CurSound->PlayAudio();
 }
 
-void Baseball::Attack()
+void Baseball::Attack(HDC hdc, RECT winRect)
 {
 	if (m_Status != ATTACK)
 	{
@@ -662,7 +667,7 @@ void Baseball::Attack()
 	m_AttackColliders.SetPosZ(m_Position.m_Z);
 }
 
-void Baseball::MonsterAI(shared_ptr<Player> player, int z_offest)
+void Baseball::MonsterAI(HDC hdc, RECT winRect, shared_ptr<Player> player, int z_offest)
 {
 
 	if (m_CurHp > 0)
@@ -675,7 +680,7 @@ void Baseball::MonsterAI(shared_ptr<Player> player, int z_offest)
 		{
 			m_Velocity = { 0,0,0 };
 			m_DamagedTime++;
-			Damaged();
+			Damaged(hdc,winRect);
 			if (m_DamagedTime >= 20)
 			{
 				m_Status = NOTHING;
@@ -720,7 +725,7 @@ void Baseball::MonsterAI(shared_ptr<Player> player, int z_offest)
 				{
 					m_Velocity.m_X = 0;
 					//АјАн!
-					Attack();
+					Attack(hdc, winRect);
 
 				}
 

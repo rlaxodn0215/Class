@@ -131,7 +131,7 @@ public:
 	virtual BOOL Move() = 0;
 	virtual BOOL Run() = 0;
 	virtual BOOL Jump(bool& keydown, bool jumping)=0;
-	virtual BOOL Damaged()=0;
+	virtual BOOL Damaged(HDC hdc, RECT winRect)=0;
 	virtual BOOL Dead()=0;
 	virtual BOOL Attack(bool isright)=0;
 	virtual BOOL HomeRun(HDC hdc, RECT winRect, bool& keydown)=0;
@@ -160,7 +160,7 @@ public:
 	BOOL Move() override;
 	BOOL Run() override;
 	BOOL Jump(bool& keydown, bool jumping) override;
-	BOOL Damaged() override;
+	BOOL Damaged(HDC hdc, RECT winRect) override;
 	BOOL Dead() override;
 	BOOL Attack(bool isright) override;
 	BOOL HomeRun(HDC hdc, RECT winRect, bool& keydown) override;
@@ -187,11 +187,11 @@ public:
 
 	virtual ~Monster() = default;
 	virtual void Move()=0;
-	virtual void Damaged()=0;
+	virtual void Damaged(HDC hdc, RECT winRect)=0;
 	virtual void Dead()=0;
-	virtual void Attack()=0;
+	virtual void Attack(HDC hdc, RECT winRect)=0;
 	virtual void ShowColliders(HDC hdc) = 0;
-	virtual void MonsterAI(shared_ptr<Player> player, int z_offest) = 0;
+	virtual void MonsterAI(HDC hdc, RECT winRect, shared_ptr<Player> player, int z_offest) = 0;
 };
 
 class Baseball :public Monster
@@ -213,10 +213,10 @@ public:
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
 
 	void Move();
-	void Damaged();
+	void Damaged(HDC hdc, RECT winRect);
 	void Dead();
-	void Attack();
-	void MonsterAI(shared_ptr<Player> player, int z_offest)override;
+	void Attack(HDC hdc, RECT winRect);
+	void MonsterAI(HDC hdc, RECT winRect, shared_ptr<Player> player, int z_offest)override;
 
 	void ShowColliders(HDC hdc)override;
 };

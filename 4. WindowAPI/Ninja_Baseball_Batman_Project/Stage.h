@@ -19,6 +19,7 @@ public:
 	RECT GetPlayArea() { return m_PlayArea; }
 	vector<RECT> GetLimitAreas(){ return m_LimitAreas; }
 	list<shared_ptr<Monster>> GetStageMonsters() { return m_StageMonsters; }
+	bool GetStageFinish() { return m_StageFinish; }
 
 	void StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> player, bool aniWait);
 	//void RenderingCharactor();

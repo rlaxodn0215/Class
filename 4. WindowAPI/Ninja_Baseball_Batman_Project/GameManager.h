@@ -58,6 +58,5 @@ public:
 	void ShowUI(HDC hdc, RECT winRect);
 	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
 	void ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRatioWidth, float imageRatioHeight,const int points);
-	void GameOver();
 };
 

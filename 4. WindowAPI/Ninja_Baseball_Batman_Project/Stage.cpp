@@ -27,7 +27,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             {
                 iter->get()->SetCurHP(iter->get()->GetCurHP() - player->GetAttack());
                 //player->GetSounds()->PlayAudio();
-                iter->get()->Damaged();
+                iter->get()->Damaged(hdc,winRect);
                 //cout << "Player Attack" << endl;
             }
         }
@@ -35,6 +35,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         if (iter->get()->GetAttackCollider().OnTrigger(temp1, 500)) //몬스터 공격
         {
             iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1);
+
             if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming())
             {
                 player->SetCurHP(player->GetCurHP() - iter->get()->GetAttack());
@@ -42,7 +43,8 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
                 if (player->GetAlive())
                 {
                     //player->GetSounds()->PlayAudio();
-                    player->Damaged();
+                    player->Damaged(hdc,winRect);
+                   
                 }
 
                 else
@@ -76,7 +78,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         _stprintf_s(temp, L"[%d, %d, %d]", iter->get()->GetPos().m_X, iter->get()->GetPos().m_Y, iter->get()->GetPos().m_Z);
         TextOut(hdc, iter->get()->GetPos().m_X, iter->get()->GetPos().m_Y, temp, _tcslen(temp));
 
-        iter->get()->MonsterAI(player, 3);
+        iter->get()->MonsterAI(hdc, winRect, player, 3);
         iter->get()->Update(true);
 
         if (iter->get()->GetAlive() == false)
