@@ -134,7 +134,7 @@ public:
 	virtual BOOL Damaged()=0;
 	virtual BOOL Dead()=0;
 	virtual BOOL Attack(bool isright)=0;
-	virtual BOOL HomeRun()=0;
+	virtual BOOL HomeRun(HDC hdc, RECT winRect, bool& keydown)=0;
 	virtual BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
 
 	void ShowColliders(HDC hdc) override;
@@ -163,7 +163,7 @@ public:
 	BOOL Damaged() override;
 	BOOL Dead() override;
 	BOOL Attack(bool isright) override;
-	BOOL HomeRun() override;
+	BOOL HomeRun(HDC hdc, RECT winRect, bool& keydown) override;
 	BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
 };
 

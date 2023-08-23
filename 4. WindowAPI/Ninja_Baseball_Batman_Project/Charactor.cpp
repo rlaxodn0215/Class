@@ -34,7 +34,7 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, RECT winRect)
 		if (m_CurAniFrameNum == m_CurAni->GetFrameTotalCount() - 1)
 		{
 			m_tempTimer++;
-			if (m_tempTimer> TimeDivRatio * 2.5f)
+			if (m_tempTimer> TimeDivRatio * 9.5f)
 			{
 				m_StopMove = false;
 				m_tempTimer = 0;
@@ -69,6 +69,8 @@ BOOL Ryno::Idle()
 		m_CurAni = m_Animations["Ryno_idle"];
 		m_CurAniSpeed = 2;
 		//m_CurAniFrameNum = 0;
+		if(m_CurSound !=NULL)
+			m_CurSound->ResetAudio();
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 		{
@@ -180,6 +182,8 @@ BOOL Ryno::Damaged()
 		m_CurAniSpeed = 4;
 		m_CurAniFrameNum = 0;
 		m_StopMove = true;
+		m_CurSound = m_Sounds["Ryno_hit"];
+		m_Velocity = { 0 ,0,0 };
 
 		//m_Velocity = { 0,0,0 };
 
@@ -187,8 +191,9 @@ BOOL Ryno::Damaged()
 			Charactor::m_Position.m_X + 60, Charactor::m_Position.m_Z + 80 };
 		m_BodyColliders.SetArea(collderPos);
 		m_BodyColliders.SetPosZ(m_Position.m_Z);
-
 	}
+
+	m_CurSound->PlayAudio();
 
 	m_CurAniShowOffset.clear();
 
@@ -214,6 +219,7 @@ BOOL Ryno::Dead()
 		m_CurAniSpeed = 4;
 		m_CurAniFrameNum = 0;
 		m_tempTimer = 0;
+		m_CurSound = m_Sounds["Ryno_dead"];
 
 		for (int t = 0; t < 4; t++)
 		{
@@ -242,9 +248,11 @@ BOOL Ryno::Attack(bool isright)
 		m_CurAniFrameNum = 0;
 		m_AttackTiming = 1;
 		m_AttackTimer = 0;
+		m_CurSound = m_Sounds["Ryno_attack"];
 	}
 
 	//m_Sounds["Ryno_attack"]->PlayAudio();
+	m_CurSound->PlayAudio();
 
 	m_CurAniShowOffset.clear();
 
@@ -257,16 +265,16 @@ BOOL Ryno::Attack(bool isright)
 
 	if (isright)
 	{
-		RECT collderPos = { Charactor::m_Position.m_X + 30, Charactor::m_Position.m_Y - 100,
-		Charactor::m_Position.m_X + 180, Charactor::m_Position.m_Y + 80 };
+		RECT collderPos = { Charactor::m_Position.m_X + 30, Charactor::m_Position.m_Z - 100,
+		Charactor::m_Position.m_X + 180, Charactor::m_Position.m_Z + 80 };
 		m_AttackColliders.SetArea(collderPos);
 		m_AttackColliders.SetPosZ(m_Position.m_Z);
 	}
 
 	else
 	{
-		RECT collderPos = { Charactor::m_Position.m_X - 70, Charactor::m_Position.m_Y - 100,
-		Charactor::m_Position.m_X + 80 , Charactor::m_Position.m_Y + 90 };
+		RECT collderPos = { Charactor::m_Position.m_X - 70, Charactor::m_Position.m_Z - 100,
+		Charactor::m_Position.m_X + 80 , Charactor::m_Position.m_Z + 90 };
 		m_AttackColliders.SetArea(collderPos);
 		m_AttackColliders.SetPosZ(m_Position.m_Z);
 	}
@@ -274,7 +282,7 @@ BOOL Ryno::Attack(bool isright)
 	return 0;
 }
 
-BOOL Ryno::HomeRun()
+BOOL Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 {
 	if (m_Status != HOME_RUN)
 	{
@@ -284,8 +292,18 @@ BOOL Ryno::HomeRun()
 		m_CurAniFrameNum = 0;
 		m_AttackTiming = 6;
 		m_AttackTimer = 0;
-		//m_CurSound = m_Sounds["Ryno_homerun"];
+		m_CurSound = m_Sounds["Ryno_homerun"];
+
+		m_Velocity.m_Y = 0;
+		m_Position.m_Y = m_Position.m_Z;
+		keydown = false;
+		m_Jumping = false;
 	}
+
+	m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X -150, m_Position.m_Y-80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+
+	m_Velocity.m_Y = 0;
+	m_CurSound->PlayAudio();
 		
 	m_CurAniShowOffset.clear();
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -294,15 +312,17 @@ BOOL Ryno::HomeRun()
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
 
-	m_Velocity.m_Y = 0;
-	m_Position.m_Y = m_Position.m_Z;
 	
 	RECT collderPos = { Charactor::m_Position.m_X - 200, Charactor::m_Position.m_Z - 100,
 		Charactor::m_Position.m_X + 230, Charactor::m_Position.m_Z + 80 };
 	m_AttackColliders.SetArea(collderPos);
 	m_AttackColliders.SetPosZ(m_Position.m_Z);
+
+	RECT collderPos1 = { Charactor::m_Position.m_X, Charactor::m_Position.m_Z - 80,
+			Charactor::m_Position.m_X + 60, Charactor::m_Position.m_Z + 80 };
+	m_BodyColliders.SetArea(collderPos1);
 	
-	m_BodyColliders.SetArea({0,0,0,0});
+	//m_BodyColliders.SetArea({0,0,0,0});
 
 	return 0;
 }
@@ -331,7 +351,10 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_CurAni = m_Animations["Ryno_fly"];
 			m_CurAniSpeed = 2;
 			m_CurAniFrameNum = 0;
+			m_CurSound = m_Sounds["Ryno_dynamite"];
 		}
+
+		m_CurSound->PlayAudio();
 
 		m_CurAniShowOffset.clear();
 
@@ -341,7 +364,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[1] / 2 + 12), // 42
 			m_Position.m_Y - m_CurAni->GetHeights()[1] -2}); //14
 
-
+		m_Velocity.m_X = 0;
 		m_Velocity.m_Y = 0;
 		m_Position.m_Y = m_Position.m_Z - 300;
 
@@ -360,6 +383,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		{
 			m_PlayingDynamite = 1;
 			time = temp = temp1 = 0;
+			m_CurSound->ResetAudio();
 		}
 	}
 
@@ -379,7 +403,10 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			time++;
 			if(m_AttackTimer > 3)
 				m_AttackTimer = 0;
+			m_CurSound = m_Sounds["Ryno_dynamite_shooting"];
 		}
+
+		m_CurSound->PlayAudio();
 
 		if (m_isLookRight)
 		{
@@ -420,6 +447,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_PlayingDynamite = 3;
 			time = temp = temp1 = 0;
 			m_AttackTimer = 0;
+			m_CurSound->ResetAudio();
 		}
 	}
 
@@ -436,6 +464,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		{
 			temp = temp1;
 			time++;
+			m_Velocity = { 0 ,0,0 };
 		}
 
 		if (m_CurAni != m_Animations["Ryno_dynamite"])
@@ -446,13 +475,21 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_CurAniFrameNum = 0;
 			m_CurAniSpeed = 4;
 			m_Velocity = { 0,0,0 };
+			m_CurSound = m_Sounds["Ryno_dynamite2"];
 		}
+
+		m_CurSound->PlayAudio();
 
 		if (m_isLookRight)
 		{
 			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left+40, m_AttackColliders.GetArea().top - 40 });
 			m_Position.m_X = m_AttackColliders.GetArea().left + 40;
 			m_Position.m_Y = m_AttackColliders.GetArea().top;
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X + 30, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 20, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
 		}
 
 		else
@@ -460,6 +497,11 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left-170, m_AttackColliders.GetArea().top - 40 });
 			m_Position.m_X = m_AttackColliders.GetArea().left-170;
 			m_Position.m_Y = m_AttackColliders.GetArea().top;
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X + 30, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 20, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
 		}
 
 		m_Position.m_Z = m_Position.m_Y;
@@ -468,6 +510,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		{
 			m_PlayingDynamite = 0;
 			time = temp = temp1 = 0;
+			m_CurSound->ResetAudio();
 			playerDynamite = false;
 			SetTakeGravity(true);
 		}
@@ -494,6 +537,8 @@ void Baseball::Move()
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
 		m_Status = MOVE;
+		if (m_CurSound != NULL)
+			m_CurSound->ResetAudio();
 	}
 
 	m_CurAniShowOffset.clear();
@@ -529,9 +574,13 @@ void Baseball::Damaged()
 
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
+		m_CurSound = m_Sounds["Baseball_hit"];
 
 		m_Status = DAMAGED;
 	}
+
+	m_CurSound->PlayAudio();
+
 	m_CurAniShowOffset.clear();
 
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -551,7 +600,7 @@ void Baseball::Dead()
 		m_Status = DEAD;
 		m_tempTimer = 0;
 		m_CurAniShowOffset.clear();
-
+		m_CurSound = m_Sounds["Baseball_dead"];
 		for (int t = 0; t < 4; t++)
 		{
 			for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -562,6 +611,8 @@ void Baseball::Dead()
 			}
 		}
 	}
+
+	m_CurSound->PlayAudio();
 }
 
 void Baseball::Attack()

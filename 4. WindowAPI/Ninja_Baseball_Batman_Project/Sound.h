@@ -23,5 +23,6 @@ public:
 	~Sound();
 	DWORD LoadMP3(HWND hWnd,const TCHAR lpszWave[100]);
 	void PlayAudio();
+	void ResetAudio();
 };
 

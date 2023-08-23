@@ -164,7 +164,7 @@ void GameManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
         index++;
     }
 
-    channel = 1;
+    //channel = 1;
 }
 
 void GameManager::TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) // SceneNum = 0
@@ -323,10 +323,10 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
         LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"),Sprites);
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),Animations);
         LoadSounds(_T("AniData/Datas/PlayScene_Sounds.txt"), Sounds, hWnd);
-        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"),Sounds, hWnd);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), Sounds, hWnd);
         LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), Sounds, hWnd);
-
-        Sounds["PlayScene_BGM"]->PlayAudio();
+        
+        //PlayScene_BGM
 
         Number_ani.push_back(Animations["Pointnum_zreo"]);
         Number_ani.push_back(Animations["Pointnum_one"]);
@@ -346,6 +346,7 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
         temp1["Ryno_attack"] = Sounds["Ryno_attack"];
         temp1["Ryno_dead"] = Sounds["Ryno_dead"];
         temp1["Ryno_dynamite"] = Sounds["Ryno_dynamite"];
+        temp1["Ryno_dynamite_shooting"] = Sounds["Ryno_dynamite_shooting"];
         temp1["Ryno_dynamite2"] = Sounds["Ryno_dynamite2"];
         temp1["Ryno_hit"] = Sounds["Ryno_hit"];
         temp1["Ryno_homerun"] = Sounds["Ryno_homerun"];
@@ -353,6 +354,8 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect) 
         m_Player = shared_ptr<Ryno>(new Ryno(Vector3(100, 500, 500), 100,100, 10, temp, temp1));
 
         LoadStage(hWnd,1,winRect);
+
+        Sounds["PlayScene_BGM"]->PlayAudio();
     }
     
     m_Player->m_Bitmap = screen;
@@ -383,11 +386,12 @@ void GameManager::LoadStage(HWND hWnd,int stageNum, RECT winRect)
         map<string, shared_ptr<Sound>> temp1;
         temp1["Baseball_attack"] = Sounds["Baseball_attack"];
         temp1["Baseball_dead"] = Sounds["Baseball_dead"];
+        temp1["Baseball_hit"] = Sounds["Baseball_hit"];
 
         //LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), temp1, hWnd);
 
         stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 550, 550),50,50,1,temp,temp1,100)));
-        //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 700, 700),50,50,1,temp,temp1,100)));
+        stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(800, 700, 700),50,50,1,temp,temp1,100)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 450, 450),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(700, 550, 550),50,1,temp,temp1)));
         //stageMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(600, 450, 450),50,1,temp,temp1)));
@@ -617,8 +621,8 @@ void GameManager::CheckKeyInput(HDC hdc, RECT winRect)
             {
                 if (m_ComboFlag[4] && m_ComboFlag[5] && !m_PlayerDynamite)
                 {
-                    m_Player->HomeRun();
-                    m_Player->SetAttack(10);
+                    m_Player->HomeRun(hdc,winRect,m_KeyFlag[5]);
+                    m_Player->SetAttack(15);
 
                     if (m_Player->GetLookRight())
                         m_Player->SetPos(m_Player->GetPos() + Vector3(10, 0, 0));

@@ -18,6 +18,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         CircleCollider temp = iter->get()->GetBodyCircleCollider();
         BoxCollider temp1 = player->GetBodyCollider();
 
+
         if (player->GetAttackCollider().OnTrigger(temp, 10)) //플레이어 공격
         {   
             player->SetAttackTimer(player->GetAttackTimer() + 1);
@@ -25,7 +26,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
             if (player->GetAttackTimer() == player->GetAttackTiming())
             {
                 iter->get()->SetCurHP(iter->get()->GetCurHP() - player->GetAttack());
-                player->GetSounds()->PlayAudio();
+                //player->GetSounds()->PlayAudio();
                 iter->get()->Damaged();
                 //cout << "Player Attack" << endl;
             }
@@ -40,7 +41,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
 
                 if (player->GetAlive())
                 {
-                   // player->GetSounds()["Ryno_hit"]->PlayAudio();
+                    //player->GetSounds()->PlayAudio();
                     player->Damaged();
                 }
 
