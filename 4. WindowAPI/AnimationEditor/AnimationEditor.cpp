@@ -173,9 +173,9 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
-int Red = 0;
+int Red = 255;
 int Green = 0;
-int Blue = 0;
+int Blue = 255;
 
 COLORREF transparentColor = RGB(Red, Green, Blue);
 COLORREF BoxColor = RGB(0, 0, 255);
@@ -188,7 +188,7 @@ bool showAni = false;
 bool recUpdate = false;
 
 TCHAR fileName[100];
-TCHAR ImageName[100] = _T("Bitmap/Ryno_dynamite_ball.bmp");
+TCHAR ImageName[100] = _T("Bitmap/HUD.bmp");
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {

@@ -8,6 +8,17 @@
 #include"SingletonTemplate.h"
 #include"Sound.h"
 
+struct PlayerData
+{
+	string name = "NON";
+	int score = 0;
+
+	bool operator<(const PlayerData & other)
+	{
+		return (score > other.score);
+	}
+};
+
 class GameManager : public SingletonTemplate<GameManager> //싱글턴으로 만든다.
 {
 private:
@@ -21,6 +32,7 @@ public:
 	map<string, shared_ptr<Sound>> Sounds;
 
 	vector<shared_ptr<Animation>> Number_ani;
+	vector<shared_ptr<Animation>> Alpha_ani;
 	int m_SceneNum = 0;
 
 	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);
@@ -38,6 +50,15 @@ public:
 	int m_TimerFrame = 0;
 	int m_SelectTimer = 20*10;
 	int m_ComboTimerCount = 0;
+
+	bool m_FirstPush = true;
+	bool m_ShowLetter[3];
+	int m_NameCursor = 0;
+	int m_NameCount = 0;
+	int m_NameAni = 0;
+	char m_Name[3] = {'A','A','A'};
+
+	PlayerData m_PlayerData;
 
 	void GetSentence(int& i, char* buff, char* sentence);
 	void LoadSprites(const TCHAR dataFileName[100], map<string, shared_ptr<Sprite>>& temp);
@@ -57,6 +78,8 @@ public:
 	void CheckKeyRelease(WPARAM wParam);
 	void ShowUI(HDC hdc, RECT winRect);
 	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
-	void ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRatioWidth, float imageRatioHeight,const int points);
+	void ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRatioWidth, float imageRatioHeight,const int points, int distance);
+	void MakeName(HDC hdc,RECT winRect);
+	void ShowRanking(HDC hdc, RECT winRect, const TCHAR rankFileName[100]);
 };
 
