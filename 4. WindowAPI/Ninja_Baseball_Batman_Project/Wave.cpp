@@ -1,6 +1,6 @@
-#include "Stage.h"
+#include "Wave.h"
 
-Stage::Stage(RECT& playArea, vector<RECT>& limitAreas, queue<shared_ptr<Monster>>& DeadMonsters)
+Wave::Wave(RECT& playArea, vector<RECT>& limitAreas, queue<shared_ptr<Monster>>& DeadMonsters)
 {
 	m_PlayArea = playArea;
 	m_LimitAreas = limitAreas;
@@ -8,17 +8,17 @@ Stage::Stage(RECT& playArea, vector<RECT>& limitAreas, queue<shared_ptr<Monster>
 	m_StageFinish = false;
 }
 
-void Stage::LoadStage(RECT winRect)
+void Wave::LoadStage(RECT winRect)
 {
-
     RECT playArea = { 0,0,326,233 };
+
     vector<RECT> limitAreas;
     limitAreas.push_back({ 0,0,winRect.right,415 });
 
     queue<shared_ptr<Monster>> stageMonsters;
     
     map<string, shared_ptr<Animation>> temp;
-    LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp);
+    m_UseFunc.LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp);
 
     map<string, shared_ptr<Sound>> temp1;
     temp1["Baseball_attack"] = Sounds["Baseball_attack"];
@@ -40,7 +40,7 @@ void Stage::LoadStage(RECT winRect)
 
 }
 
-void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> player, bool aniWait)
+void Wave::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> player, bool aniWait)
 {
     MonsterInstantiate(200, Timer);
 
@@ -141,7 +141,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
 	player->Update(true);
 }
 
-void Stage::MonsterInstantiate(int timeInterval, int timer)
+void Wave::MonsterInstantiate(int timeInterval, int timer)
 {
     if (!(timer % timeInterval) && !m_DeadMonsters.empty()) //시간이 다 되고, 죽은 몬스터 리스트가 비어있지 않다면 
     {

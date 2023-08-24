@@ -139,7 +139,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Ninja_Baseball_Batman_Project.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Stage.h" />
+    <ClInclude Include="Wave.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
@@ -153,7 +153,7 @@
     <ClCompile Include="Charactor.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Ninja_Baseball_Batman_Project.cpp" />
-    <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="Wave.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>

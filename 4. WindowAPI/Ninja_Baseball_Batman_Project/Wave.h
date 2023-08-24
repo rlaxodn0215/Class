@@ -3,8 +3,9 @@
 #include<list>
 #include<queue>
 #include"Charactor.h"
+#include"DataManager.h"
 
-class Stage //플레이 스테이지에 대한 정보저장(플레이 영역, 몬스터 수, 각 위치 등)
+class Wave //플레이 스테이지에 대한 정보저장(플레이 영역, 몬스터 수, 각 위치 등)
 {
 private:
 	RECT m_PlayArea; // 한 스테이지에서 플레이 하는 영역
@@ -14,9 +15,9 @@ private:
 	bool m_StageFinish;
 
 public:
-	Stage() = default;
-	Stage(RECT & playArea, vector<RECT> & limitAreas, queue<shared_ptr<Monster>> & DeadMonsters);
-	~Stage() = default;
+	Wave() = default;
+	Wave(RECT & playArea, vector<RECT> & limitAreas, queue<shared_ptr<Monster>> & DeadMonsters);
+	~Wave() = default;
 
 	RECT GetPlayArea() { return m_PlayArea; }
 	vector<RECT> GetLimitAreas(){ return m_LimitAreas; }

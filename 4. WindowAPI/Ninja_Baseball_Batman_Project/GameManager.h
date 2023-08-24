@@ -4,7 +4,6 @@
 #include<iostream>
 #include<algorithm>
 #include"Charactor.h"
-#include"Stage.h"
 #include"SingletonTemplate.h"
 #include"Sound.h"
 
@@ -19,7 +18,7 @@ struct PlayerData // 플레이어들의 랭킹 저장 구조체
 	}
 };
 
-class GameManager : public SingletonTemplate<GameManager> //싱글턴으로 만든다.
+class GameManager : public SingletonTemplate<GameManager> // 씬, 키 입력, 플레이 영역, UI, Ranking 관리
 {
 private:
 	friend SingletonTemplate; //friend 키워드: SingletonTemplate이 GameManager class의 모든 멤버를 사용할 수 있다
@@ -27,13 +26,6 @@ private:
 	~GameManager();
 
 public:
-	map<string, shared_ptr<Sprite>> Sprites;
-	map<string, shared_ptr<Animation>> Animations;
-	map<string, shared_ptr<Sound>> Sounds;
-
-	vector<shared_ptr<Animation>> Number_ani; // 숫자 이미지 데이터 저장
-	vector<shared_ptr<Animation>> Alpha_ani;  // 알파벳 이미지 데이터 저장
-
 	int m_SceneNum = 0; // 씬 번호 : 0. title / 1. select / 2. play / 3. ending
 
 	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
@@ -62,11 +54,6 @@ public:
 
 	PlayerData m_PlayerData;			// 현재 플레이어 데이터
 	vector<PlayerData> m_RankingDatas;	// 랭킹 텍스트에 있는 플레이어 데이터들
-
-	void GetSentence(int& i, char* buff, char* sentence);												// 텍스트 파일 한 영역 읽기
-	void LoadSprites(const TCHAR dataFileName[100], map<string, shared_ptr<Sprite>>& temp);				// 스프라이트 로드
-	void LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp);		// 애니메이션 로드
-	void LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd);	// 사운드 로드
 	
 	void TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 	void SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
