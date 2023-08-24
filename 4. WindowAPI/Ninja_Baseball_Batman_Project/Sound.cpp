@@ -1,20 +1,19 @@
 #include "Sound.h"
 
-Sound::Sound(HWND hWnd,const TCHAR lpszWave[100], int chanelNum)
+Sound::Sound(HWND hWnd,const TCHAR lpszWave[100])
 {
-    SoundData = LoadMP3(hWnd, lpszWave);
-    m_ChanelNumber = chanelNum;
+    SoundData = LoadWAV(hWnd, lpszWave);
 }
 
 Sound::~Sound()
 {
     if (wDeviceID > 0)
     {
-        mciSendCommand(1, MCI_CLOSE, 0, (DWORD)(LPVOID)NULL);
+        mciSendCommand(wDeviceID, MCI_CLOSE, 0, (DWORD)(LPVOID)NULL);
     }
 }
 
-DWORD Sound::LoadMP3(HWND hWnd,const TCHAR lpszWave[100])
+DWORD Sound::LoadWAV(HWND hWnd,const TCHAR lpszWave[100])
 {
     DWORD Result;
     //WaveAudio 대신 MPEGVideo를 사용하면 mp3 형식을 재생합니다.
@@ -30,12 +29,12 @@ DWORD Sound::LoadMP3(HWND hWnd,const TCHAR lpszWave[100])
     return 0;
 }
 
-void Sound::PlayAudio()
-{
-    SoundData = mciSendCommand(m_ChanelNumber, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
-}
-
-void Sound::ResetAudio()
-{
-    SoundData = mciSendCommand(m_ChanelNumber, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
-}
+//void Sound::PlayAudio()
+//{
+//    SoundData = mciSendCommand(m_ChanelNumber, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
+//}
+//
+//void Sound::ResetAudio()
+//{
+//    SoundData = mciSendCommand(m_ChanelNumber, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
+//}

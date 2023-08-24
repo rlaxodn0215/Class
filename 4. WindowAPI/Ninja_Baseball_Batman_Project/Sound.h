@@ -13,16 +13,13 @@ private:
 	MCI_OPEN_PARMS      mciOpenParms; //파일을 로드
 	MCI_PLAY_PARMS       mciPlayParms; //파일을 재생
 	MCI_STATUS_PARMS   mciStatus; //파일의 상태
-	UINT wDeviceID = 0;
 
-	int m_ChanelNumber;
+	UINT wDeviceID = 0;
 
 public:
 	Sound() {};
-	Sound(HWND hWnd,const TCHAR lpszWave[100], int chanelNum);
+	Sound(HWND hWnd,const TCHAR lpszWave[100]);
 	~Sound();
-	DWORD LoadMP3(HWND hWnd,const TCHAR lpszWave[100]);
-	void PlayAudio();
-	void ResetAudio();
+	DWORD LoadWAV(HWND hWnd,const TCHAR lpszWave[100]);
 };
 
