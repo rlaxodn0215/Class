@@ -4,6 +4,8 @@
 #include<iostream>
 #include<algorithm>
 #include"Charactor.h"
+#include"DataManager.h"
+#include"SoundManager.h"
 #include"SingletonTemplate.h"
 #include"Sound.h"
 
@@ -28,21 +30,28 @@ private:
 public:
 	int m_SceneNum = 0; // 씬 번호 : 0. title / 1. select / 2. play / 3. ending
 
-	void(GameManager:: * m_Scene)(HWND,HDC,HBITMAP&,RECT);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
-	shared_ptr<Stage>  m_Stage;									// 스테이지 관련 포인터
-	shared_ptr< Player> m_Player;								// 플레이어 연결 포인터
+	void(GameManager:: * m_Scene)(HWND,HDC,DataManager*,SoundManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
+	shared_ptr<Wave>  m_Wave;									// 웨이브 관련 포인터
+	shared_ptr<Player> m_Player;								// 플레이어 연결 포인터
+	RECT winRect;
 
-	//SelectScene
+	//Title Scene
+	int totalFrame = 0;
+	int curFrame = 0;
+
+	//Select Scene
 	POINT m_Cursor = { 50,150 };			// select에서 커서의 처음 위치
 	int m_SelectPosX[4] = { 50,290,530,765 }; // 커서의 위치값 지정
 	bool m_SelectFlag = false;				// 선택 유뮤 판단
+	int m_SelectNum = 0;
 
-	//PlayScene
-	bool m_KeyFlag[6] = {};			//0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: ATTACK, 5: JUMP
+	//Play Scene
+	RECT m_PlayArea;				// 플레이 영역
+	bool m_KeyFlag[6] = {};			// 0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: ATTACK, 5: JUMP
 	bool m_ComboFlag[6] = {};		//콤보용 플래그
 	bool m_PlayerDynamite = false;	// 플레이어가 필살기를 쓰는지 확인
 	int m_TimerFrame = 0;			// 타이머 값 저장
-	int m_SelectTimer = 20*10;		//선택 타이머
+	int m_SelectTimer = 20*10;		// 선택 타이머
 	int m_ComboTimerCount = 0;		// 콤보 사용시 이용하는 타이머
 
 	//Ending Scene
@@ -54,24 +63,29 @@ public:
 
 	PlayerData m_PlayerData;			// 현재 플레이어 데이터
 	vector<PlayerData> m_RankingDatas;	// 랭킹 텍스트에 있는 플레이어 데이터들
-	
-	void TitleScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
-	void SelectScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
-	void PlayScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
-	void EndingScene(HWND hWnd, HDC hdc, HBITMAP & screen, RECT winRect);
 
 	void Gravity(int g);
-	void ShowBackStage(HDC hdc, RECT winRect);
-	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni, RECT winRect);
+	
+	void TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
+	void SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
+	void PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
+	void EndingScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
 
-	void CheckKeyInput(HDC hdc, RECT winRect);
-	void CheckKeyRelease(WPARAM wParam);
-
-	void ShowUI(HDC hdc, RECT winRect);
+	void ShowBackStage(HDC hdc, DataManager* dataManager);
+	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
+	void ShowUI(HDC hdc, DataManager* dataManager);
 	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
-	void ShowPlayerPoints(HDC hdc, POINT offset_location, float imageRatioWidth, float imageRatioHeight,const int points, int distance);
-	void MakeName(HDC hdc,RECT winRect);
+	void ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* dataManager, float imageRatioWidth, float imageRatioHeight,const int points, int distance);
+	void ShowRanking(HDC hdc);
+	
+	void CharactorUpdate(HDC hdc, int Timer);
+	void MonsterInstantiate(int timeInterval, int timer);
+
+	void CheckKeyInput(HDC hdc, DataManager* dataManager);
+	void CheckKeyRelease(WPARAM wParam, DataManager* dataManager);
+
+	void MakeName(HDC hdc, DataManager* dataManager);
 	void MakeRanking(const TCHAR rankFileName[100]);
-	void ShowRanking(HDC hdc, RECT winRect);
+	//void MakeTimerInterval();
 };
 

@@ -67,7 +67,7 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
 
 }
 
-void DataManager::LoadAnimations(const TCHAR dataFileName[100])
+void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>> & temp)
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -106,13 +106,13 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100])
         GetSentence(index, chbuff, address);
         TCHAR uniAddress[200] = {};
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-        m_Animations[aniName] = shared_ptr<Animation>(new Animation(m_Sprites[originSprite], uniAddress));
+        temp[aniName] = shared_ptr<Animation>(new Animation(m_Sprites[originSprite], uniAddress));
         index++;
     }
 
 }
 
-void DataManager::LoadSounds(const TCHAR dataFileName[100], HWND hWnd)
+void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd)
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -151,41 +151,113 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], HWND hWnd)
         GetSentence(index, chbuff, address);
         TCHAR uniAddress[200] = {};
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-        m_Sounds[name] = shared_ptr<Sound>(new Sound(hWnd, uniAddress, channel));
+        temp[name] = shared_ptr<Sound>(new Sound(hWnd, uniAddress, channel));
         channel++;
         index++;
     }
 
 }
 
+void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> player)
+{
+    map<string, shared_ptr<Animation>> temp;
+    LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp);
+
+    map<string, shared_ptr<Sound>> temp1;
+    LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), temp1, hWnd);
+
+    player = shared_ptr<Ryno>(new Ryno(Vector3(500, 500, 500), 100, 100, 10, temp, temp1));
+}
+
 void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
 {
-    if()
-
+    m_Sprites.clear();
+    m_Animations.clear();
+    m_Sounds.clear();
+    m_Number_ani.clear();
+    m_Alpha_ani.clear();
 
     if (SceneNum == 0)          // Title Scene
     {
         LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"));
-        LoadSounds(_T("AniData/Datas/TitleScene_Sounds.txt"),hWnd);
+        LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"),m_Animations);
+        LoadSounds(_T("AniData/Datas/TitleScene_Sounds.txt"),m_Sounds,hWnd);
     }
 
     else if (SceneNum == 1)     // Select Scene
     {
+        LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
+        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"),m_Animations);
+        LoadSounds(_T("AniData/Datas/SelectScene_Sounds.txt"),m_Sounds, hWnd);
 
+        for (int i = 0; i < 10; i++)
+        {
+            m_Number_ani.push_back(m_Animations["Num_" + i]);
+        }
     }
 
     else if (SceneNum == 2)     // Play Scene
     {
+        LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"));
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),m_Animations);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds.txt"), m_Sounds, hWnd);
+        //LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), hWnd);
 
+        for (int i = 0; i < 10; i++)
+        {
+            m_Number_ani.push_back(m_Animations["Pointnum_" + i]);
+        }
     }
 
     else                       //Ending Scene
     {
+        LoadSprites(_T("AniData/Datas/EndingScene_Sprites.txt"));
+        LoadAnimations(_T("AniData/Datas/EndingScene_Animations.txt"), m_Animations);
+        LoadSounds(_T("AniData/Datas/EndingScene_Sounds.txt"), m_Sounds, hWnd);
 
+
+        for (int i = 0; i < 10; i++)
+        {
+            m_Number_ani.push_back(m_Animations["Orange_" + i]);
+        }
+
+        for (int i = 1; i <= 5; i++)
+        {
+            m_Number_ani.push_back(m_Animations["Blue_" + i]);
+        }
+
+        for (int i = 0; i < 26; i++)
+        {
+            m_Alpha_ani.push_back(m_Animations["Green_" + (char)(i+65)]);
+        }
+       
+        m_Alpha_ani.push_back(m_Animations["Green_Underbar"]);
     }
 }
 
-void DataManager::LoadWaveDatas(int WaveNum, HWND hWnd)
+void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> wave)
 {
+    wave = shared_ptr<Wave>(new Wave);
+
+    wave->Timer = 200;
+    wave->MaxMonsterNum = 10;
+    wave->LimitArea = { 415, winRect.bottom };
+    
+    wave->SpawnArea.push_back({ -200,415,-150,winRect.bottom });
+    wave->SpawnArea.push_back({ 1150,415,1200,winRect.bottom });
+    
+    wave->StageFinish = false;
+    wave->LiveMonsters.clear();
+
+    map<string, shared_ptr<Animation>> temp;
+    LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"),temp);
+
+    map<string, shared_ptr<Sound>> temp1;
+    LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"),temp1, hWnd);
+
+    for (int i = 0; i < wave->MaxMonsterNum; i++)
+    {
+        wave->DeadMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(0, 0, 0), 50, 50, 1, temp, temp1, 100)));
+    }
+
 }

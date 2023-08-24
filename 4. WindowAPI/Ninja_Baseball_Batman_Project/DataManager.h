@@ -10,9 +10,13 @@
 
 struct Wave
 {
-	list<shared_ptr<Monster>> m_LiveMonsters; // 살아있는 몬스터들
-	queue<shared_ptr<Monster>> m_DeadMonsters; // 죽은 몬스터들
-	bool m_StageFinish = false;
+	int Timer;
+	int MaxMonsterNum;
+	bool StageFinish = false;
+	vector<RECT> SpawnArea;
+	POINT LimitArea;
+	list<shared_ptr<Monster>> LiveMonsters; // 살아있는 몬스터들
+	queue<shared_ptr<Monster>> DeadMonsters; // 죽은 몬스터들
 };
 
 class DataManager : public SingletonTemplate<DataManager> // 해당 씬에 필요한 데이터를 로드한다.
@@ -31,14 +35,14 @@ public:
 	map<string, shared_ptr<Animation>> m_Animations;
 	map<string, shared_ptr<Sound>> m_Sounds;
 
-	shared_ptr<Wave> m_Wave; // 한 Wave에 필요한 데이터들
-
 	void GetSentence(int& i, char* buff, char* sentence);			// 텍스트 파일 한 영역 읽기
 	void LoadSprites(const TCHAR dataFileName[100]);				// 스프라이트 로드
-	void LoadAnimations(const TCHAR dataFileName[100]);				// 애니메이션 로드
-	void LoadSounds(const TCHAR dataFileName[100],HWND hWnd);		// 사운드 로드
+	void LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp);			// 애니메이션 로드
+	void LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd);		// 사운드 로드
 
+	void LoadPlayerDatas(HWND hWnd, shared_ptr<Player> player);
 	void LoadSceneDatas(int SceneNum, HWND hWnd);
-	void LoadWaveDatas(int WaveNum, HWND hWnd);
+	void LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> wave);
+	
 };
 

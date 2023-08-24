@@ -9,6 +9,8 @@
 #include"Collider.h"
 #include"Charactor.h"
 #include"GameManager.h"
+#include"DataManager.h"
+#include"SoundManager.h"
 #include"Sound.h"
 #include"Vector3.h"
 #include<iostream>
@@ -32,8 +34,9 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 GameManager* gameManager;                       // 게임 매니저 싱글톤 객체
+DataManager* dataManager;                       // 데이터 매니저
+SoundManager* soundManager;                     // 사운드 매니저
 HBITMAP Screen;                                 // 화면 저장용 비트맵
-RECT winRect;                                   // 화면의 가로, 세로
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -244,8 +247,13 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Initalize(HWND hWnd)
 {
-    GetClientRect(hWnd, &winRect);
+    RECT temp;                                   // 화면의 가로, 세로
+    GetClientRect(hWnd, &temp);
     gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 되지 않는다.
+    gameManager->GetInstance()->winRect = temp;
+    dataManager = DataManager::GetInstance();
+    soundManager = SoundManager::GetInstance();
+    dataManager->GetInstance()->LoadSceneDatas(0, hWnd);
 }
 
 void EndGame(HWND hWnd)

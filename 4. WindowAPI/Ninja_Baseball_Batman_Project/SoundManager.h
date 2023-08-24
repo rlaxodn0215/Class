@@ -1,12 +1,23 @@
 #pragma once
 #include"Sound.h"
+#include<map>
+#include<string>
+#include<memory>
 #include"SingletonTemplate.h"
-class SoundManager : public SingletonTemplate<SoundManager>
+
+using namespace std;
+
+class SoundManager : public SingletonTemplate<SoundManager> // 사운드 채널 관리
 {
 private:
 	friend SingletonTemplate;
 	SoundManager();
 	~SoundManager();
+
 public:
+	
+
+
+	
 };
 

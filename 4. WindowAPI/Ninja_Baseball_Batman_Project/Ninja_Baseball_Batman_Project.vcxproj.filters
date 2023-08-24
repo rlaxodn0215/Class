@@ -45,9 +45,6 @@
     <ClInclude Include="SingletonTemplate.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Wave.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -78,9 +75,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Wave.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Vector3.cpp">
