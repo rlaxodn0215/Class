@@ -145,7 +145,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
     {
         Sound1 = LoadWAV(hWnd, L"test.wav");
-        Sound2 = LoadWAV(hWnd, L"Sound2.wav");
+        //Sound2 = LoadWAV(hWnd, L"Sound2.wav");
 
         //MCIERROR        Error;
         //MCI_OPEN_PARMS Data = {};
@@ -171,11 +171,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case VK_F1:
-           Sound1 = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
+           Sound1 = mciSendCommand(MusicID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
            // Sound1 = mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
             break;
         case VK_F2:
-            Sound1 = mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
+            Sound1 = mciSendCommand(MusicID, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
             break;
 
         //case VK_F1:
