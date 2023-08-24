@@ -176,7 +176,7 @@ public:
 	Monster() = default;
 	Monster(Vector3 position, int maxhp,int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
 		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, maxhp,curhp, moveSpeed, anis, sounds) {
-		m_isLookRight = false;
+		m_isLookRight = false; m_isAlive = false;
 	};
 	
 	int GetDeadPoints() { return m_DeadPoints; }

@@ -20,35 +20,30 @@
 
 using namespace std;
 
-#ifdef UNICODE
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-#else
-#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
-#endif // UNICODE
+//#ifdef UNICODE
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+//#else
+//#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
+//#endif // UNICODE
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-GameManager* gameManager;
-HBITMAP Screen;
-RECT winRect;
-MCIDEVICEID MusicID = 0;
-
-MCI_OPEN_PARMS      mciOpen; //파일을 로드
-MCI_PLAY_PARMS       mciPlay; //파일을 재생
-MCI_STATUS_PARMS   mciStatus; //파일의 상태
+GameManager* gameManager;                       // 게임 매니저 싱글톤 객체
+HBITMAP Screen;                                 // 화면 저장용 비트맵
+RECT winRect;                                   // 화면의 가로, 세로
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
 
-void Initalize(HWND hWnd);
-void EndGame(HWND hWnd);
+void Initalize(HWND hWnd); // 타이머 초기화, 게임 매니저 생성
+VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime); // 타이머 콜백으로 선언
+void EndGame(HWND hWnd);    //타이머 해제, 게임 매니저 해제
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -155,37 +150,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-PAINTSTRUCT ps;
-HDC hdc;
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    PAINTSTRUCT ps;
+    HDC hdc;
 
     switch (message)
     {
-
     case WM_CREATE:
-        {
-            Initalize(hWnd);
-            SetTimer(hWnd, TIMER, 20, Timer);
-        }
-        break;
-    case WM_CHAR:
-        if (gameManager !=NULL &&  gameManager->GetInstance()->m_SceneNum == 0)
-        {
-            gameManager->GetInstance()->m_Scene = &GameManager::SelectScene;
-            gameManager->GetInstance()->m_SceneNum++;
-
-            gameManager->GetInstance()->Sprites.clear();
-            gameManager->GetInstance()->Animations.clear();
-            gameManager->GetInstance()->Sounds.clear();
-        }
+        Initalize(hWnd);
+        SetTimer(hWnd, TIMER, 20, Timer);
         break;
     case WM_KEYUP:
-    {
         gameManager->GetInstance()->CheckKeyRelease(wParam);
-    }
-    break;
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -219,7 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
             /////////////////////////////////////////////////////////////////////
 
-            (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, Screen, winRect);
+            (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, Screen, winRect); // 더블 버퍼링으로 해당 씬 화면 출력
 
             ////////////////////////////////////////////////////////////////////
             BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
@@ -277,15 +257,15 @@ void EndGame(HWND hWnd)
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
     HDC temp = GetDC(hWnd);
-    gameManager->GetInstance()->CheckKeyInput(temp, winRect);
+    gameManager->GetInstance()->CheckKeyInput(temp, winRect); //키 입력 선언
         
     if(gameManager->GetInstance()->m_Player !=NULL)
-        gameManager->GetInstance()->Gravity(2);
+        gameManager->GetInstance()->Gravity(2); // 중력 만들기
 
     if (gameManager->GetInstance()->m_TimerFrame >= 1000)
         gameManager->GetInstance()->m_TimerFrame = 0;
-    gameManager->GetInstance()->m_TimerFrame++;
+    gameManager->GetInstance()->m_TimerFrame++; //타이머 작동
 
-    InvalidateRect(hWnd, NULL, FALSE);
+    InvalidateRect(hWnd, NULL, FALSE); // 화면 갱신
 }
 

@@ -1,34 +1,64 @@
 #include "Stage.h"
 
-Stage::Stage(RECT& playArea, vector<RECT>& limitAreas, list<shared_ptr<Monster>>& stageMonsters)
+Stage::Stage(RECT& playArea, vector<RECT>& limitAreas, queue<shared_ptr<Monster>>& DeadMonsters)
 {
 	m_PlayArea = playArea;
 	m_LimitAreas = limitAreas;
-	m_StageMonsters = stageMonsters;
+	m_DeadMonsters = DeadMonsters;
 	m_StageFinish = false;
+}
+
+void Stage::LoadStage(RECT winRect)
+{
+
+    RECT playArea = { 0,0,326,233 };
+    vector<RECT> limitAreas;
+    limitAreas.push_back({ 0,0,winRect.right,415 });
+
+    queue<shared_ptr<Monster>> stageMonsters;
+    
+    map<string, shared_ptr<Animation>> temp;
+    LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp);
+
+    map<string, shared_ptr<Sound>> temp1;
+    temp1["Baseball_attack"] = Sounds["Baseball_attack"];
+    temp1["Baseball_dead"] = Sounds["Baseball_dead"];
+    temp1["Baseball_hit"] = Sounds["Baseball_hit"];
+
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(1150, 700, 700), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(-150, 750, 750), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(1150, 750, 750), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(-150, 700, 700), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(1150, 700, 700), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(-150, 750, 750), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(1150, 750, 750), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(-150, 700, 700), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(1150, 700, 700), 50, 50, 1, temp, temp1, 100)));
+    stageMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(-150, 750, 750), 50, 50, 1, temp, temp1, 100)));
+
+    m_Stage = shared_ptr<Stage>(new Stage(playArea, limitAreas, stageMonsters));
+
 }
 
 void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> player, bool aniWait)
 {
-	if (m_StageMonsters.empty()) 
-        m_StageFinish = true;
+    MonsterInstantiate(200, Timer);
 
-    for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
+    for (auto iter = m_LiveMonsters.begin(); iter != m_LiveMonsters.end();iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
     {
         CircleCollider temp = iter->get()->GetBodyCircleCollider();
         BoxCollider temp1 = player->GetBodyCollider();
 
-
         if (player->GetAttackCollider().OnTrigger(temp, 10)) //플레이어 공격
         {   
             player->SetAttackTimer(player->GetAttackTimer() + 1);
-            //cout << player->GetAttackTimer() << endl;
+
             if (player->GetAttackTimer() == player->GetAttackTiming())
             {
                 iter->get()->SetCurHP(iter->get()->GetCurHP() - player->GetAttack());
-                //player->GetSounds()->PlayAudio();
+
                 iter->get()->Damaged(hdc,winRect);
-                //cout << "Player Attack" << endl;
+
             }
         }
 
@@ -42,21 +72,17 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
 
                 if (player->GetAlive())
                 {
-                    //player->GetSounds()->PlayAudio();
                     player->Damaged(hdc,winRect);
                    
                 }
 
                 else
                 {
-                    
+                    m_StageFinish = true;
                 }
 
-                //cout << player->GetMaxHP() - player->GetCurHP() << endl;
-                //cout << "Monster Attack" << endl;
             }
         }
-
 
         if (iter->get()->GetPos().m_Z <= 413) //이동 영역 (몬스터)
         {
@@ -69,7 +95,7 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         }
     }
 
-    for (auto iter = m_StageMonsters.begin(); iter != m_StageMonsters.end();) //몬스터 이동 처리
+    for (auto iter = m_LiveMonsters.begin(); iter != m_LiveMonsters.end();) //몬스터 이동 처리
     {
         iter->get()->ShowCharactor(hdc, iter->get()->GetAniSpeed(), Timer, winRect);
         iter->get()->ShowColliders(hdc);
@@ -84,7 +110,8 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
         if (iter->get()->GetAlive() == false)
         {
             player->SetPoints(player->GetPoints() + iter->get()->GetDeadPoints());
-            iter = m_StageMonsters.erase(iter);
+            m_DeadMonsters.push(*iter);
+            iter = m_LiveMonsters.erase(iter);
         }
         else ++iter;
     }
@@ -112,5 +139,16 @@ void Stage::StageUpdate(HDC hdc, int Timer, RECT winRect, shared_ptr<Player> pla
 	player->ShowCharactor(hdc, player->GetAniSpeed(), Timer, winRect);
 	player->ShowColliders(hdc);
 	player->Update(true);
+}
+
+void Stage::MonsterInstantiate(int timeInterval, int timer)
+{
+    if (!(timer % timeInterval) && !m_DeadMonsters.empty()) //시간이 다 되고, 죽은 몬스터 리스트가 비어있지 않다면 
+    {
+        m_DeadMonsters.front()->SetAlive(true);
+        m_DeadMonsters.front()->SetCurHP(m_DeadMonsters.front()->GetMaxHP());
+        m_LiveMonsters.push_back(m_DeadMonsters.front());
+        m_DeadMonsters.pop();
+    }
 }
 
