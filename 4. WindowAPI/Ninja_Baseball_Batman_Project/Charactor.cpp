@@ -45,7 +45,6 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, RECT winRect)
 
 	else
 	{
-		//cout << m_CurAniFrameNum << endl;
 
 		if (!(Timer % TimeDivRatio))
 		{
@@ -59,7 +58,7 @@ void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, RECT winRect)
 
 }
 
-BOOL Ryno::Idle()
+void Ryno::Idle()
 {
 	if (m_Status != IDLE)
 	{
@@ -87,10 +86,9 @@ BOOL Ryno::Idle()
 
 	m_AttackColliders.SetArea({-1,-1,-1,-1});
 
-	return 0;
 }
 
-BOOL Ryno::Move()
+void Ryno::Move()
 {
 	if (m_Status !=MOVE)
 	{
@@ -108,10 +106,9 @@ BOOL Ryno::Move()
 		}
 
 	}
-	return 0;
 }
 
-BOOL Ryno::Run()
+void Ryno::Run()
 {
 	if (m_Status !=RUN)
 	{
@@ -128,10 +125,9 @@ BOOL Ryno::Run()
 				m_Position.m_Z - m_CurAni->GetHeights()[i] });
 		}
 	}
-	return 0;
-}
 
-BOOL Ryno::Jump(bool & keydown, bool jumping)
+}
+void Ryno::Jump(bool & keydown, bool jumping)
 {
 
 	if (m_Status != JUMP)
@@ -168,10 +164,9 @@ BOOL Ryno::Jump(bool & keydown, bool jumping)
 			m_Position.m_Y - m_CurAni->GetHeights()[i] });
 	}
 
-	return 0;
 }
 
-BOOL Ryno::Damaged(HDC hdc, RECT winRect)
+void Ryno::Damaged(HDC hdc, RECT winRect)
 {
 	if (m_Status != DAMAGED)
 	{
@@ -202,13 +197,9 @@ BOOL Ryno::Damaged(HDC hdc, RECT winRect)
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
 			m_Position.m_Z - m_CurAni->GetHeights()[i] });
 	}
-
-
-
-	return 0;
 }
 
-BOOL Ryno::Dead()
+void Ryno::Dead()
 {
 	if (m_Status != DEAD)
 	{
@@ -233,11 +224,10 @@ BOOL Ryno::Dead()
 		m_BodyColliders.SetArea({0,0,0,0});
 	}
 
-	return 0;
 	
 }
 
-BOOL Ryno::Attack(bool isright)
+void Ryno::Attack(bool isright)
 {
 
 	if (m_Status != ATTACK)
@@ -279,10 +269,9 @@ BOOL Ryno::Attack(bool isright)
 		m_AttackColliders.SetPosZ(m_Position.m_Z);
 	}
 	
-	return 0;
 }
 
-BOOL Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
+void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 {
 	if (m_Status != HOME_RUN)
 	{
@@ -324,10 +313,9 @@ BOOL Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 	
 	//m_BodyColliders.SetArea({0,0,0,0});
 
-	return 0;
 }
 
-BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
+void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 {
 	RECT collderPos = { 0,0,0,0 };
 	m_BodyColliders.SetArea(collderPos);
@@ -410,14 +398,11 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 		if (m_isLookRight)
 		{
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55, m_Position.m_Y+30 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55+20, m_Position.m_Y+30+35 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 40,m_Position.m_Y + 30 + 70}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 60,m_Position.m_Y + 30 + 105}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 80,m_Position.m_Y + 30 + 140 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 100,m_Position.m_Y + 30 + 175 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 120, m_Position.m_Y + 30 +210}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 140,m_Position.m_Y + 30 + 245 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
+			for (int i = 0; i < 8; i++)
+			{
+				m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 20*i,
+					m_Position.m_Y+ 65 + 35*i }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
+			}
 
 			collderPos = { Charactor::m_Position.m_X + 150, Charactor::m_Position.m_Z,
 							Charactor::m_Position.m_X + 350, Charactor::m_Position.m_Z + 100 };
@@ -427,14 +412,11 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 		else
 		{
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y + 30}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 20, m_Position.m_Y + 30 + 35 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 40,m_Position.m_Y + 30 + 70 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 60,m_Position.m_Y + 30 + 105 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 80,m_Position.m_Y + 30 + 140 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 100,m_Position.m_Y + 30 + 175 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 120, m_Position.m_Y + 30 + 210 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 140,m_Position.m_Y + 30 + 245 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
+			for (int i = 0; i < 8; i++)
+			{
+				m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55 - 20*i,
+					m_Position.m_Y + 65 + 35*i}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
+			}
 
 			collderPos = { Charactor::m_Position.m_X - 50, Charactor::m_Position.m_Z,
 							Charactor::m_Position.m_X - 250, Charactor::m_Position.m_Z + 100 };
@@ -485,6 +467,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left+40, m_AttackColliders.GetArea().top - 40 });
 			m_Position.m_X = m_AttackColliders.GetArea().left + 40;
 			m_Position.m_Y = m_AttackColliders.GetArea().top;
+
 			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
 			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
 			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
@@ -497,6 +480,7 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left-170, m_AttackColliders.GetArea().top - 40 });
 			m_Position.m_X = m_AttackColliders.GetArea().left-170;
 			m_Position.m_Y = m_AttackColliders.GetArea().top;
+
 			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
 			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
 			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
@@ -517,7 +501,6 @@ BOOL Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 	}
 
-	return 0;
 }
 
 void Player::ShowColliders(HDC hdc)

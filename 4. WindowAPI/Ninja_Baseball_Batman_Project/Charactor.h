@@ -33,24 +33,24 @@ protected:
 	int m_CurHp;
 	int m_MaxHp;
 	int m_MoveSpeed;
-	bool m_isLookRight = true;// false == left
+	bool m_isLookRight = true;	// false == left
 	bool m_isAlive = true;
 	bool m_takeGravity = true;
 	bool m_Jumping = false;
-	bool m_StopMove = false;
-	int m_CurAniFrameNum = 0;
+	bool m_StopMove = false;	// 특정 애니매이션에서 다른 동작을 멈추는 것
+	int m_CurAniFrameNum = 0;	// 캐릭터 애니매이션의 현재 프레임
 	int m_tempTimer = 0;
-	int m_Attack = 0;
-	int m_AttackTiming = 0;
-	int m_AttackTimer = 0;
+	int m_Attack = 0;			// 공격력
+	int m_AttackTiming = 0;		// 공격 데미지가 들어가는 순간
+	int m_AttackTimer = 0;		// 공격 데미지가 들어가는 순간을 측정하는 타이머
 
-	map<string, shared_ptr<Animation>> m_Animations;
-	shared_ptr<Animation> m_CurAni;
-	vector<POINT> m_CurAniShowOffset;
-	int m_CurAniSpeed = 0;
+	map<string, shared_ptr<Animation>> m_Animations; // 캐릭터의 애니메이션 들
+	shared_ptr<Animation> m_CurAni;					// 캐릭터가 현재 하고 있는 애니메이션
+	vector<POINT> m_CurAniShowOffset;				// 현재 애니메이션이 위치해야하는 좌표들
+	int m_CurAniSpeed = 0;							// 현재 애니메이션 속도
 
-	map<string, shared_ptr<Sound>> m_Sounds;
-	shared_ptr<Sound> m_CurSound;
+	map<string, shared_ptr<Sound>> m_Sounds;		// 캐릭터가 내는 모든 소리
+	shared_ptr<Sound> m_CurSound;					// 현재 캐릭터가 내는 소리
 
 public:
 	HBITMAP m_Bitmap;
@@ -59,7 +59,6 @@ public:
 	Charactor(Vector3 pos, int maxhp,int curhp, int moveSpeed,
 		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
 	~Charactor() = default;
-
 
 	Status GetStatus() { return m_Status; }
 	void SetStatus(Status st) { m_Status = st; }
@@ -94,7 +93,7 @@ public:
 	void SetTempTimer(int num) { m_tempTimer = num; }
 	shared_ptr<Sound> GetSounds() { return m_CurSound; }
 
-	void Dead() { if (m_CurHp <= 0)m_isAlive = false; }
+	void Dead() { if (m_CurHp <= 0) m_isAlive = false; }
 	void Update(bool moveOK);
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
 	virtual void ShowColliders(HDC hdc) = 0;
@@ -103,9 +102,8 @@ public:
 class Player : public Charactor // 상태 패턴
 {
 protected:
-	int m_PlayingDynamite = 0;
-	int m_PlayerLife = 3;
-	int m_Points = 0;
+	int m_PlayingDynamite = 0; // 플레이어가 필살기를 쓸 때 시간 측정
+	int m_Points = 0;			// 플레이어 점수
 
 public:
 	Player() = default;
@@ -117,9 +115,6 @@ public:
 	virtual ~Player() = default;
 	int GetPlayDynamite() { return m_PlayingDynamite; }
 	void SetPlayDynamite(int num) { m_PlayingDynamite=num; }
-
-	int GetPlayerLife() { return m_PlayerLife; }
-	void SetPlayerLife(int num) { m_PlayerLife = num; }
 	int GetPoints() { return m_Points; }
 	void SetPoints(int num) { m_Points = num; }
 
@@ -127,15 +122,15 @@ public:
 	virtual BoxCollider GetAttackCollider() = 0;
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
-	virtual BOOL Idle()=0;
-	virtual BOOL Move() = 0;
-	virtual BOOL Run() = 0;
-	virtual BOOL Jump(bool& keydown, bool jumping)=0;
-	virtual BOOL Damaged(HDC hdc, RECT winRect)=0;
-	virtual BOOL Dead()=0;
-	virtual BOOL Attack(bool isright)=0;
-	virtual BOOL HomeRun(HDC hdc, RECT winRect, bool& keydown)=0;
-	virtual BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
+	virtual void Idle()=0;
+	virtual void Move() = 0;
+	virtual void Run() = 0;
+	virtual void Jump(bool& keydown, bool jumping)=0;
+	virtual void Damaged(HDC hdc, RECT winRect)=0;
+	virtual void Dead()=0;
+	virtual void Attack(bool isright)=0;
+	virtual void HomeRun(HDC hdc, RECT winRect, bool& keydown)=0;
+	virtual void Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
 
 	void ShowColliders(HDC hdc) override;
 
@@ -156,22 +151,23 @@ public:
 	BoxCollider GetBodyCollider() { return m_BodyColliders; }
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
 
-	BOOL Idle() override;
-	BOOL Move() override;
-	BOOL Run() override;
-	BOOL Jump(bool& keydown, bool jumping) override;
-	BOOL Damaged(HDC hdc, RECT winRect) override;
-	BOOL Dead() override;
-	BOOL Attack(bool isright) override;
-	BOOL HomeRun(HDC hdc, RECT winRect, bool& keydown) override;
-	BOOL Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
+	void Idle() override;
+	void Move() override;
+	void Run() override;
+	void Jump(bool& keydown, bool jumping) override;
+	void Damaged(HDC hdc, RECT winRect) override;
+	void Dead() override;
+	void Attack(bool isright) override;
+	void HomeRun(HDC hdc, RECT winRect, bool& keydown) override;
+	void Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
 };
 
 class Monster : public Charactor
 {
 protected:
-	int m_DamagedTime = 0;
-	int m_DeadPoints;
+	int m_DamagedTime = 0;	//공격을 받으면 잠시 일시 정지 하는 시간
+	int m_DeadPoints;		//죽을 때 얻는 점수
+
 public:
 	Monster() = default;
 	Monster(Vector3 position, int maxhp,int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
