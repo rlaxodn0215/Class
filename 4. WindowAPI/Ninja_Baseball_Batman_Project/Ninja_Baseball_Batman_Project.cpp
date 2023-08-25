@@ -21,11 +21,11 @@
 
 using namespace std;
 
-//#ifdef UNICODE
-//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-//#else
-//#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
-//#endif // UNICODE
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
+#endif // UNICODE
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -37,14 +37,24 @@ DataManager* dataManager;                       // 데이터 매니저
 HBITMAP Screen;                                 // 화면 저장용 비트맵
 RECT winRect;                                   // 화면의 가로, 세로
 
+bool PlayerEternal = false;
+bool PlayerNoHitAni = false;
+
+int MonsterSpawnTime = 300;
+int MonsterHp = 50; // Max & Cur
+int MonsterAttack = 10;
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-void Initalize(HWND hWnd); // 타이머 초기화, 게임 매니저 생성
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime); // 타이머 콜백으로 선언
+INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
+void Initalize(HWND hWnd); // 타이머 초기화, 게임 매니저 생성
 void EndGame(HWND hWnd);    //타이머 해제, 게임 매니저 해제
 
 
@@ -174,6 +184,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
+            case ID_CONTROL:
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_HowToPlay), hWnd, Control);
+                break;
+            case ID_SETTING:
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_Settings), hWnd, Setting);
+                break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
@@ -271,5 +287,92 @@ VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
     gameManager->GetInstance()->m_TimerFrame++; //타이머 작동
 
     InvalidateRect(hWnd, NULL, FALSE); // 화면 갱신
+}
+
+INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        TCHAR control[200] = {};
+
+        HANDLE hFile = CreateFile(_T("Control.txt"), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+
+        if (hFile == NULL)
+        {
+            MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+        }
+
+        DWORD rbytes;
+        size_t convertedChars = 0;
+
+        ReadFile(hFile, control, sizeof(control), &rbytes, NULL);
+
+        if (control[0] == 65279)
+        {
+            SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
+            ReadFile(hFile, control, sizeof(control), &rbytes, NULL);
+        }
+
+        SetDlgItemText(hDlg, IDC_CONTROL, control);
+    }
+    return (INT_PTR)TRUE;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        CheckDlgButton(hDlg,IDC_CHECKPLAYERHP, PlayerEternal);
+        CheckDlgButton(hDlg, IDC_CHECKPLAYERNOHIT, PlayerNoHitAni);
+        SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime, FALSE);
+        SetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, MonsterHp, FALSE);
+        SetDlgItemInt(hDlg, IDC_EDIT_ATTACK, MonsterAttack, FALSE);
+    }
+    return (INT_PTR)TRUE;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_CHECKPLAYERHP:
+            PlayerEternal = !PlayerEternal;
+            break;
+        case IDC_CHECKPLAYERNOHIT:
+            PlayerNoHitAni = !PlayerNoHitAni;
+            break;
+        case IDOK:
+            MonsterSpawnTime = GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE);
+            MonsterHp = GetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, NULL, FALSE);
+            MonsterAttack = GetDlgItemInt(hDlg, IDC_EDIT_ATTACK, NULL, FALSE);
+
+            gameManager->GetInstance()->m_Wave->TimeInterval = MonsterSpawnTime;
+
+            for (auto iter : gameManager->GetInstance()->m_Wave->WaveMonsters)
+            {
+                iter->SetCurHP(MonsterHp);
+                iter->SetMaxHP(MonsterHp);
+                iter->SetAttack(MonsterAttack);
+            }
+
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
 }
 

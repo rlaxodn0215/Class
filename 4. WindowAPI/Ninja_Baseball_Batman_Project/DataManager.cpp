@@ -264,6 +264,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
 {
     wave = shared_ptr<Wave>(new Wave);
     wave->MaxMonsterNum = 10;
+    wave->TimeInterval = 300;
     wave->LimitArea = { 415, winRect.bottom };
 
 
@@ -288,7 +289,8 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
 
     for (int i = 0; i < wave->MaxMonsterNum; i++)
     {
-        wave->DeadMonsters.push(shared_ptr<Baseball>(new Baseball(Vector3(0, 0, 0), 50, 50, 1, temp, temp1, 100)));
+        wave->WaveMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(0, 0, 0), 50, 50, 1, temp, temp1, 100)));
+        wave->DeadMonsters.push(wave->WaveMonsters[i]);
     }
 
 }

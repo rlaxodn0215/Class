@@ -108,7 +108,7 @@ protected:
 	int m_PlayingDynamite = 0; // 플레이어가 필살기를 쓸 때 순서 확인
 	int m_DynamiteTimer[3] = { 0,0,0 };
 	int m_Points = 0;			// 플레이어 점수
-
+	RECT m_DynamiteCollderPos = { 0,0,0,0 };
 public:
 	Player() = default;
 	Player(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)

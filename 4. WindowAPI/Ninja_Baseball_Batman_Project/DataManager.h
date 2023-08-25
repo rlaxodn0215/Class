@@ -11,16 +11,19 @@
 struct Wave
 {
 	int MaxMonsterNum;
+	int TimeInterval;
 	bool StageFinish = false;
 	vector<POINT> SpawnArea;
 	POINT LimitArea;
+
+	vector<shared_ptr<Monster>> WaveMonsters;
 	list<shared_ptr<Monster>> LiveMonsters; // 살아있는 몬스터들
 	queue<shared_ptr<Monster>> DeadMonsters; // 죽은 몬스터들
 };
 
 struct PlayerData // 플레이어들의 랭킹 저장 구조체
 {
-	char name[4] = "NON";
+	char name[4] = "";
 	int score = 0;
 
 	bool operator<(const PlayerData& other)

@@ -23,7 +23,11 @@ public:
 	~Sound();
 	DWORD LoadWAV(HWND hWnd,const TCHAR lpszWave[100]);
 
+	MCI_PLAY_PARMS GetMciPlayParms() { return mciPlayParms; }
+	MCI_STATUS_PARMS GetMciStatus() { return mciStatus; }
+
 	void PlayAudio();
 	void ResetAudio();
+	void LoopAudio();
 };
 

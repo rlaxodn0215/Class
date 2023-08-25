@@ -312,8 +312,7 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 
 void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 {
-	RECT collderPos = { 0,0,0,0 };
-	m_BodyColliders.SetArea(collderPos);
+	m_BodyColliders.SetArea({0,0,0,0});
 
 	if (m_PlayingDynamite == 0) //flying
 	{
@@ -391,13 +390,13 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 55 + 20*i,
+				m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X + 75 + 20*i,
 					m_Position.m_Y+ 65 + 35*i }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
 			}
 
-			collderPos = { Charactor::m_Position.m_X + 150, Charactor::m_Position.m_Z,
+			m_DynamiteCollderPos = { Charactor::m_Position.m_X + 150, Charactor::m_Position.m_Z,
 							Charactor::m_Position.m_X + 350, Charactor::m_Position.m_Z + 100 };
-			m_AttackColliders.SetArea(collderPos);
+			m_AttackColliders.SetArea(m_DynamiteCollderPos);
 			m_AttackColliders.SetPosZ(m_Position.m_Z);
 		}
 
@@ -409,13 +408,13 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 					m_Position.m_Y + 65 + 35*i}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
 			}
 
-			collderPos = { Charactor::m_Position.m_X - 50, Charactor::m_Position.m_Z,
+			m_DynamiteCollderPos = { Charactor::m_Position.m_X - 50, Charactor::m_Position.m_Z,
 							Charactor::m_Position.m_X - 250, Charactor::m_Position.m_Z + 100 };
-			m_AttackColliders.SetArea(collderPos);
+			m_AttackColliders.SetArea(m_DynamiteCollderPos);
 			m_AttackColliders.SetPosZ(m_Position.m_Z);
 		}
 
-		if (m_DynamiteTimer[0] > 50)
+		if (m_DynamiteTimer[0] > 45)
 		{
 			m_PlayingDynamite = 3;
 			for (int i = 0; i < 3; i++)
@@ -427,8 +426,6 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 	else if (m_PlayingDynamite == 3) //squish...
 	{
-
-
 		m_AttackTiming = 3;
 		m_Attack = 50;
 
@@ -450,34 +447,42 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			m_CurAniSpeed = 4;
 			m_Velocity = { 0,0,0 };
 			m_CurSound = m_Sounds["Ryno_dynamite2"];
+			SetStopMove(true);
 		}
 
 		m_CurSound->PlayAudio();
+		m_Sounds["Ryno_dynamite_crush"]->PlayAudio();
 
 		if (m_isLookRight)
 		{
 			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left+40, m_AttackColliders.GetArea().top - 40 });
-			m_Position.m_X = m_AttackColliders.GetArea().left + 40;
+			m_Position.m_X = m_AttackColliders.GetArea().left + 170;
 			m_Position.m_Y = m_AttackColliders.GetArea().top;
 
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X + 30, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 20, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X-70, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X-170, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 35, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 5, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+
+			m_AttackColliders.SetArea({ m_DynamiteCollderPos.left-80, m_DynamiteCollderPos.top, m_DynamiteCollderPos.right+130, m_DynamiteCollderPos.bottom});
+			m_AttackColliders.SetPosZ(m_Position.m_Z);
 		}
 
 		else
 		{
 			m_CurAniShowOffset.push_back({ m_AttackColliders.GetArea().left-170, m_AttackColliders.GetArea().top - 40 });
-			m_Position.m_X = m_AttackColliders.GetArea().left-170;
+			m_Position.m_X = m_AttackColliders.GetArea().left + 190;
 			m_Position.m_Y = m_AttackColliders.GetArea().top;
 
-			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 55, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_dynamite_ball"]->AniPlay(hdc, { m_Position.m_X - 75, m_Position.m_Y - 30 }, 0, 4.0f, 4.0f, m_isLookRight, winRect);
 			m_Animations["Ryno_area_attack"]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 80 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X + 30, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
-			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 20, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X-20, m_Position.m_Y - 380 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X + 10, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+			m_Animations["Ryno_thunder"]->AniPlay(hdc, { m_Position.m_X - 40, m_Position.m_Y - 420 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+
+			m_AttackColliders.SetArea({ m_DynamiteCollderPos.left - 300,m_DynamiteCollderPos.top, m_DynamiteCollderPos.right + 250, m_DynamiteCollderPos.bottom });
+			m_AttackColliders.SetPosZ(m_Position.m_Z);
 		}
 
 		m_Position.m_Z = m_Position.m_Y;
@@ -488,8 +493,11 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 			for (int i = 0; i < 3; i++)
 				m_DynamiteTimer[i] = 0;
 			m_CurSound->ResetAudio();
+			m_Sounds["Ryno_dynamite_crush"]->ResetAudio();
 			playerDynamite = false;
 			SetTakeGravity(true);
+			SetStopMove(false);
+			m_DynamiteCollderPos = { 0,0,0,0 };
 		}
 	}
 

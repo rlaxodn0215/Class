@@ -39,3 +39,8 @@ void Sound::ResetAudio()
 {
     SoundData = mciSendCommand(m_ChanelNumber, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
 }
+
+void Sound::LoopAudio() 
+{
+    SoundData = mciSendCommand(m_ChanelNumber, MCI_PLAY, MCI_DGV_PLAY_REPEAT, (DWORD)(LPVOID)&mciPlayParms);
+}

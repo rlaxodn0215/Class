@@ -1,10 +1,13 @@
 #include "GameManager.h"
 
+extern bool PlayerEternal;
+extern bool PlayerNoHitAni;
+
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 3;
-    m_Scene = &GameManager::EndingScene;
+	m_SceneNum = 2;
+    m_Scene = &GameManager::PlayScene;
     ///
 	m_Player = NULL;
 }
@@ -109,29 +112,23 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->LoadWaveDatas(hWnd, m_WinRect, m_Wave);
         dataManager->LoadPlayerDatas(hWnd, m_Player);
-        dataManager->m_Sounds["PlayScene_BGM"]->PlayAudio();
+        dataManager->m_Sounds["PlayScene_BGM"]->LoopAudio();
         m_Start = false;
     }
+
     
     ShowBackStage(hdc, dataManager);
     CharactorUpdate(hdc, m_TimerFrame);
     ShowUI(hdc,dataManager);
 
-    if (m_Wave->StageFinish)
-    {
-        m_SceneNum++;
-        m_Scene = &GameManager::EndingScene;
-    }
-
 }
 
 void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // SceneNum = 3
 {
-
     if (m_Start)
     {
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
-        dataManager->m_Sounds["Ending"]->PlayAudio();
+        dataManager->m_Sounds["Ending"]->LoopAudio();
         m_Start = false;
     }
 
@@ -256,10 +253,6 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
     else if (m_SceneNum == 2)
     {
-
-        //TCHAR temp[20];
-        //_stprintf_s(temp, L"[%d, %d, %d]", m_Player->GetPos().m_X, m_Player->GetPos().m_Y+125, m_Player->GetPos().m_Z+125);
-        //TextOut(hdc, m_Player->GetPos().m_X, m_Player->GetPos().m_Y + 125, temp, _tcslen(temp)); //Sprite는 해당 값에서 확대 비율을 나눈다
 
         if (m_ComboFlag[0] || m_ComboFlag[1] || m_ComboFlag[2] ||
             m_ComboFlag[3] || m_ComboFlag[4] || m_ComboFlag[5])
@@ -421,6 +414,9 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
             if (m_Player->GetDeadTimer() == m_Player->GetCurAni()->GetFrameTotalCount())
             {
                 m_Player->SetAlive(false);
+                m_Wave->StageFinish = true;
+                m_SceneNum++;
+                m_Scene = &GameManager::EndingScene;
             }
 
         }
@@ -565,8 +561,9 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
                 }
                 else
                 {
-                    //dataManager->m_PlayerData.name = m_Name;
-                    //dataManager->m_PlayerData.score = m_Player->GetPoints();
+                    for(int i = 0; i < 4;i++)
+                        dataManager->m_PlayerData.name[i] = m_Name[i];
+                    dataManager->m_PlayerData.score = m_Player->GetPoints();
                     dataManager->MakeRanking(_T("PlayerRankings.txt"));
                     m_ShowLetter[m_NameCursor] = true;
 
@@ -797,7 +794,7 @@ void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
 
 void GameManager::CharactorUpdate(HDC hdc, int Timer)
 {
-    MonsterInstantiate(300, Timer);
+    MonsterInstantiate(m_Wave->TimeInterval, Timer);
 
     for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
     {
@@ -819,19 +816,16 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
         {
             iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1); //공격 타이밍 측정
 
-            if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming())
+            if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming() && !PlayerEternal)
             {
                 m_Player->SetCurHP(m_Player->GetCurHP() - iter->get()->GetAttack());
 
                 if (m_Player->GetAlive())
                 {
-                    m_Player->Damaged(hdc, m_WinRect);
+                    if(!PlayerNoHitAni)
+                        m_Player->Damaged(hdc, m_WinRect);
                 }
 
-                else
-                {
-                    m_Wave->StageFinish = true;
-                }
 
             }
         }
@@ -891,6 +885,10 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
     m_Player->ShowCharactor(hdc, m_Player->GetAniSpeed(), Timer, m_WinRect);
     m_Player->ShowColliders(hdc);
     m_Player->Update(true);
+
+    TCHAR temp[20];
+    _stprintf_s(temp, L"[%d, %d, %d]", m_Player->GetPos().m_X, m_Player->GetPos().m_Y+125, m_Player->GetPos().m_Z+125);
+    TextOut(hdc, m_Player->GetPos().m_X, m_Player->GetPos().m_Y + 125, temp, _tcslen(temp)); //Sprite는 해당 값에서 확대 비율을 나눈다
 }
 
 void GameManager::MonsterInstantiate(int timeInterval, int timer)
