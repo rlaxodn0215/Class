@@ -329,8 +329,8 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     while (1)
     {
         PlayerData temp;
-        char ranking[2], score[6], name[4];
-        GetSentence(index, chbuff, ranking);
+        char rank[2], score[6], name[4];
+        GetSentence(index, chbuff, rank);
         if (buff[index] == '\0') break;
         GetSentence(index, chbuff, score);
         if (buff[index] == '\0') break;
@@ -342,7 +342,8 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
             number = 10 * number + (score[i] - 48);
             i++;
         }
-        temp.name = name;
+        for(int i=0;i<4;i++)
+            temp.name[i] = name[i];
         temp.score = number;
         m_RankingDatas.push_back(temp);
         num++;
@@ -354,6 +355,9 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     if (m_RankingDatas.size() > 5) m_RankingDatas.pop_back();
 
     DWORD size;
+    LARGE_INTEGER curPtr;
+    curPtr.QuadPart = 0;
+    SetFilePointerEx(hFile,curPtr , NULL, FILE_BEGIN);
 
     int n = m_RankingDatas.size();
     for (int i = 0; i < n; i++)
@@ -366,9 +370,9 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
         _stprintf_s(score, L"%d\t", m_RankingDatas[i].score);
         WriteFile(hFile, score, (DWORD)_tcslen(score) * sizeof(TCHAR), &size, NULL);
 
-        TCHAR name[50];
-        _stprintf_s(name, L"%s\n", m_RankingDatas[i].name);
-        WriteFile(hFile, name, (DWORD)_tcslen(name) * sizeof(TCHAR), &size, NULL);
+        TCHAR uniName[50] = {};  //\nÃß°¡
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_RankingDatas[i].name, strlen(m_RankingDatas[i].name), uniName, 200);
+        WriteFile(hFile, uniName, (DWORD)_tcslen(uniName) * sizeof(TCHAR), &size, NULL);
     }
 
     CloseHandle(hFile);

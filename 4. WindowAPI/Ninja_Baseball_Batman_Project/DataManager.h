@@ -20,7 +20,7 @@ struct Wave
 
 struct PlayerData // 플레이어들의 랭킹 저장 구조체
 {
-	string name = "";
+	char name[4] = "NON";
 	int score = 0;
 
 	bool operator<(const PlayerData& other)

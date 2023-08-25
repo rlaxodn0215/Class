@@ -567,7 +567,7 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
                 {
                     //dataManager->m_PlayerData.name = m_Name;
                     //dataManager->m_PlayerData.score = m_Player->GetPoints();
-                    dataManager->MakeRanking(_T("AniData/Datas/PlayerRankings.txt"));
+                    dataManager->MakeRanking(_T("PlayerRankings.txt"));
                     m_ShowLetter[m_NameCursor] = true;
 
                 }
