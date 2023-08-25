@@ -17,6 +17,7 @@ private:
 
 public:
 	int m_SceneNum = 0; // 씬 번호 : 0. title / 1. select / 2. play / 3. ending
+	bool m_Start = true; // 초기화 함수용 (void Start())
 
 	void(GameManager:: * m_Scene)(HWND,HDC,DataManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
 	shared_ptr<Wave>  m_Wave;									// 웨이브 관련 포인터

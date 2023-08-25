@@ -10,7 +10,6 @@
 
 struct Wave
 {
-	int Timer;
 	int MaxMonsterNum;
 	bool StageFinish = false;
 	vector<POINT> SpawnArea;
@@ -36,6 +35,7 @@ private:
 	friend SingletonTemplate;
 	DataManager();
 	~DataManager();
+	int m_ChannelIndex = 1;
 
 public:
 	vector<shared_ptr<Animation>> m_Number_ani; // 숫자 이미지 데이터 저장
@@ -55,9 +55,9 @@ public:
 	void LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp, bool isReference);			// 애니메이션 로드
 	void LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd, bool isReference);		// 사운드 로드
 
-	void LoadPlayerDatas(HWND hWnd, shared_ptr<Player> player);
+	void LoadPlayerDatas(HWND hWnd, shared_ptr<Player> & player);
 	void LoadSceneDatas(int SceneNum, HWND hWnd);
-	void LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> wave);
+	void LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave);
 	void MakeRanking(const TCHAR rankFileName[100]);
 	
 };

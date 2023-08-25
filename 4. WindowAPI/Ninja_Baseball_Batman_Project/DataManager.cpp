@@ -148,7 +148,6 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
     strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
 #endif
 
-    int channel = 1;
     int index = 0;
     while (chbuff[index++] != '\n');
     while (1)
@@ -167,8 +166,8 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
         {
             TCHAR uniAddress[200] = {};
             MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
-            temp[name] = shared_ptr<Sound>(new Sound(hWnd, uniAddress, channel));
-            channel++;
+            temp[name] = shared_ptr<Sound>(new Sound(hWnd, uniAddress, m_ChannelIndex));
+            m_ChannelIndex++;
         }
 
         index++;
@@ -176,7 +175,7 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
 
 }
 
-void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> player)
+void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> & player)
 {
     map<string, shared_ptr<Animation>> temp;
     LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp, true);
@@ -200,6 +199,7 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
         LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
         LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"),m_Animations,false);
         LoadSounds(_T("AniData/Datas/TitleScene_Sounds.txt"),m_Sounds,hWnd,false);
+        m_ChannelIndex = 1;
     }
 
     else if (SceneNum == 1)     // Select Scene
@@ -207,6 +207,7 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
         LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
         LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"),m_Animations,false);
         LoadSounds(_T("AniData/Datas/SelectScene_Sounds.txt"),m_Sounds, hWnd, false);
+        m_ChannelIndex = 1;
 
         for (int i = 0; i < 10; i++)
         {
@@ -217,12 +218,13 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
     else if (SceneNum == 2)     // Play Scene
     {
         LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"));
-        LoadSounds(_T("AniData/Datas/PlayScene_Sounds.txt"), m_Sounds, hWnd, false);
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"),m_Animations,false);
-        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"),m_Sounds, hWnd, false);
         LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),m_Animations,false);
-        LoadSounds(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"),m_Sounds, hWnd,false);
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), m_Animations,false);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds.txt"), m_Sounds, hWnd, false);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"),m_Sounds, hWnd, false);
         LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"),m_Sounds, hWnd,false);
+        m_ChannelIndex = 1;
 
         for (int i = 0; i < 10; i++)
         {
@@ -249,18 +251,18 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
 
         for (int i = 0; i < 26; i++)
         {
-            m_Alpha_ani.push_back(m_Animations["Green_" + to_string((char)(i + 65))]);
+            string temp = "Green_";
+            temp.push_back((char)(i + 65));
+            m_Alpha_ani.push_back(m_Animations[temp]);
         }
        
         m_Alpha_ani.push_back(m_Animations["Green_Underbar"]);
     }
 }
 
-void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> wave)
+void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave)
 {
     wave = shared_ptr<Wave>(new Wave);
-
-    wave->Timer = 200;
     wave->MaxMonsterNum = 10;
     wave->LimitArea = { 415, winRect.bottom };
 
@@ -272,7 +274,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> wave)
 
     for (int i = 0; i < 5; i++)
     {
-        wave->SpawnArea.push_back({ 11500, 425 + 20 * i });
+        wave->SpawnArea.push_back({ 1150, 425 + 20 * i });
     }
     
     wave->StageFinish = false;
