@@ -87,8 +87,6 @@ public class GameCenter : MonoBehaviour
         Debug.Log("[GAMECENTER] OnDied_Player : " + playerID);
     }
 
-
-
     void TEST_UpdateInputKey()
     {
         if(Input.GetKeyDown(KeyCode.Space))
