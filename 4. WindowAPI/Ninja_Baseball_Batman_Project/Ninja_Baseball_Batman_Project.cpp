@@ -250,7 +250,6 @@ void Initalize(HWND hWnd)
     gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 되지 않는다.
     gameManager->GetInstance()->m_WinRect = winRect;
     dataManager = DataManager::GetInstance();
-    dataManager->GetInstance()->LoadSceneDatas(0, hWnd);
 }
 
 void EndGame(HWND hWnd)

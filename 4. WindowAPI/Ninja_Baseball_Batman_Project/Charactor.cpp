@@ -317,8 +317,6 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 	if (m_PlayingDynamite == 0) //flying
 	{
-		for(int i = 0; i < 3; i++)
-			m_DynamiteTimer[i] = 0;
 
 		m_DynamiteTimer[2] = timer;
 		if (m_DynamiteTimer[1] < m_DynamiteTimer[2])
@@ -373,8 +371,6 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 	else if (m_PlayingDynamite == 1) //shooting balls
 	{
 
-		for (int i = 0; i < 3; i++)
-			m_DynamiteTimer[i] = 0;
 
 		m_AttackTiming = 3;
 		m_Attack = 1;
@@ -431,8 +427,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 
 	else if (m_PlayingDynamite == 3) //squish...
 	{
-		for (int i = 0; i < 3; i++)
-			m_DynamiteTimer[i] = 0;
+
 
 		m_AttackTiming = 3;
 		m_Attack = 50;
