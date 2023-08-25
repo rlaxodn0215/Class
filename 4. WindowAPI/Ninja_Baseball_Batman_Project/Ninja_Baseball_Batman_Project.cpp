@@ -10,7 +10,6 @@
 #include"Charactor.h"
 #include"GameManager.h"
 #include"DataManager.h"
-#include"SoundManager.h"
 #include"Sound.h"
 #include"Vector3.h"
 #include<iostream>
@@ -35,8 +34,8 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 
 GameManager* gameManager;                       // 게임 매니저 싱글톤 객체
 DataManager* dataManager;                       // 데이터 매니저
-SoundManager* soundManager;                     // 사운드 매니저
 HBITMAP Screen;                                 // 화면 저장용 비트맵
+RECT winRect;                                   // 화면의 가로, 세로
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -167,7 +166,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetTimer(hWnd, TIMER, 20, Timer);
         break;
     case WM_KEYUP:
-        gameManager->GetInstance()->CheckKeyRelease(wParam);
+        gameManager->GetInstance()->CheckKeyRelease(hWnd,wParam,dataManager);
         break;
     case WM_COMMAND:
         {
@@ -202,7 +201,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
             /////////////////////////////////////////////////////////////////////
 
-            (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, Screen, winRect); // 더블 버퍼링으로 해당 씬 화면 출력
+            (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, dataManager); // 더블 버퍼링으로 해당 씬 화면 출력
 
             ////////////////////////////////////////////////////////////////////
             BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
@@ -247,12 +246,10 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Initalize(HWND hWnd)
 {
-    RECT temp;                                   // 화면의 가로, 세로
-    GetClientRect(hWnd, &temp);
+    GetClientRect(hWnd, &winRect);
     gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 되지 않는다.
-    gameManager->GetInstance()->winRect = temp;
+    gameManager->GetInstance()->m_WinRect = winRect;
     dataManager = DataManager::GetInstance();
-    soundManager = SoundManager::GetInstance();
     dataManager->GetInstance()->LoadSceneDatas(0, hWnd);
 }
 
@@ -265,7 +262,7 @@ void EndGame(HWND hWnd)
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
     HDC temp = GetDC(hWnd);
-    gameManager->GetInstance()->CheckKeyInput(temp, winRect); //키 입력 선언
+    gameManager->GetInstance()->CheckKeyInput(temp, dataManager); //키 입력 선언
         
     if(gameManager->GetInstance()->m_Player !=NULL)
         gameManager->GetInstance()->Gravity(2); // 중력 만들기

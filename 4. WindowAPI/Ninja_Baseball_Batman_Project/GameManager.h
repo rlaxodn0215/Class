@@ -5,22 +5,10 @@
 #include<algorithm>
 #include"Charactor.h"
 #include"DataManager.h"
-#include"SoundManager.h"
 #include"SingletonTemplate.h"
 #include"Sound.h"
 
-struct PlayerData // 플레이어들의 랭킹 저장 구조체
-{
-	string name = "";
-	int score = 0;
-
-	bool operator<(const PlayerData & other)
-	{
-		return (score > other.score);
-	}
-};
-
-class GameManager : public SingletonTemplate<GameManager> // 씬, 키 입력, 플레이 영역, UI, Ranking 관리
+class GameManager : public SingletonTemplate<GameManager> // 씬, 키 입력, 플레이 영역, UI 관리
 {
 private:
 	friend SingletonTemplate; //friend 키워드: SingletonTemplate이 GameManager class의 모든 멤버를 사용할 수 있다
@@ -30,10 +18,10 @@ private:
 public:
 	int m_SceneNum = 0; // 씬 번호 : 0. title / 1. select / 2. play / 3. ending
 
-	void(GameManager:: * m_Scene)(HWND,HDC,DataManager*,SoundManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
+	void(GameManager:: * m_Scene)(HWND,HDC,DataManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
 	shared_ptr<Wave>  m_Wave;									// 웨이브 관련 포인터
 	shared_ptr<Player> m_Player;								// 플레이어 연결 포인터
-	RECT winRect;
+	RECT m_WinRect;
 
 	//Title Scene
 	int totalFrame = 0;
@@ -61,31 +49,26 @@ public:
 	int m_NameCount = 0;				// 알파벳 선택용 카운트		
 	char m_Name[3] = {'A','A','A'};		// 저장할 이름
 
-	PlayerData m_PlayerData;			// 현재 플레이어 데이터
-	vector<PlayerData> m_RankingDatas;	// 랭킹 텍스트에 있는 플레이어 데이터들
-
 	void Gravity(int g);
 	
-	void TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
-	void SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
-	void PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
-	void EndingScene(HWND hWnd, HDC hdc, DataManager* dataManager, SoundManager* soundManager);
+	void TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager);
+	void SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager);
+	void PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager);
+	void EndingScene(HWND hWnd, HDC hdc, DataManager* dataManager);
 
 	void ShowBackStage(HDC hdc, DataManager* dataManager);
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
 	void ShowUI(HDC hdc, DataManager* dataManager);
 	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
 	void ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* dataManager, float imageRatioWidth, float imageRatioHeight,const int points, int distance);
-	void ShowRanking(HDC hdc);
+	void ShowRanking(HDC hdc, DataManager* dataManager);
 	
 	void CharactorUpdate(HDC hdc, int Timer);
 	void MonsterInstantiate(int timeInterval, int timer);
 
 	void CheckKeyInput(HDC hdc, DataManager* dataManager);
-	void CheckKeyRelease(WPARAM wParam, DataManager* dataManager);
+	void CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager* dataManager);
 
 	void MakeName(HDC hdc, DataManager* dataManager);
-	void MakeRanking(const TCHAR rankFileName[100]);
-	//void MakeTimerInterval();
 };
 

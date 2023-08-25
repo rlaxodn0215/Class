@@ -39,7 +39,8 @@ protected:
 	bool m_Jumping = false;
 	bool m_StopMove = false;	// 특정 애니매이션에서 다른 동작을 멈추는 것
 	int m_CurAniFrameNum = 0;	// 캐릭터 애니매이션의 현재 프레임
-	int m_tempTimer = 0;
+	int m_DeadTimer = 0;		// 죽을때 시간 측정용
+	int m_DelayTimer = 0;		// 특정 애니메이션에서 멈추는 용 타이머
 	int m_Attack = 0;			// 공격력
 	int m_AttackTiming = 0;		// 공격 데미지가 들어가는 순간
 	int m_AttackTimer = 0;		// 공격 데미지가 들어가는 순간을 측정하는 타이머
@@ -89,8 +90,10 @@ public:
 	void SetAttackTimer(int num) { m_AttackTimer = num; }
 	int GetAttackTiming() { return m_AttackTiming; }
 	void SetAttackTiming(int num) { m_AttackTiming = num; }
-	int GetTempTimer() { return m_tempTimer; }
-	void SetTempTimer(int num) { m_tempTimer = num; }
+	int GetDeadTimer() { return m_DeadTimer; }
+	void SetDeadTimer(int num) { m_DeadTimer = num; }
+	int GetDelayTimer() { return m_DelayTimer; }
+	void SetDelayTimer(int num) { m_DelayTimer = num; }
 	shared_ptr<Sound> GetSounds() { return m_CurSound; }
 
 	void Dead() { if (m_CurHp <= 0) m_isAlive = false; }
@@ -102,7 +105,8 @@ public:
 class Player : public Charactor // 상태 패턴
 {
 protected:
-	int m_PlayingDynamite = 0; // 플레이어가 필살기를 쓸 때 시간 측정
+	int m_PlayingDynamite = 0; // 플레이어가 필살기를 쓸 때 순서 확인
+	int m_DynamiteTimer[3] = { 0,0,0 };
 	int m_Points = 0;			// 플레이어 점수
 
 public:
