@@ -210,7 +210,7 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
 
         for (int i = 0; i < 10; i++)
         {
-            m_Number_ani.push_back(m_Animations["Num_" + i]);
+            m_Number_ani.push_back(m_Animations["Num_" + to_string(i)]);
         }
     }
 
@@ -226,7 +226,7 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
 
         for (int i = 0; i < 10; i++)
         {
-            m_Number_ani.push_back(m_Animations["Pointnum_" + i]);
+            m_Number_ani.push_back(m_Animations["Pointnum_" + to_string(i)]);
         }
     }
 
@@ -239,17 +239,17 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
 
         for (int i = 0; i < 10; i++)
         {
-            m_Number_ani.push_back(m_Animations["Orange_" + i]);
+            m_Number_ani.push_back(m_Animations["Orange_" + to_string(i)]);
         }
 
         for (int i = 1; i <= 5; i++)
         {
-            m_Number_ani.push_back(m_Animations["Blue_" + i]);
+            m_Number_ani.push_back(m_Animations["Blue_" + to_string(i)]);
         }
 
         for (int i = 0; i < 26; i++)
         {
-            m_Alpha_ani.push_back(m_Animations["Green_" + (char)(i+65)]);
+            m_Alpha_ani.push_back(m_Animations["Green_" + to_string((char)(i + 65))]);
         }
        
         m_Alpha_ani.push_back(m_Animations["Green_Underbar"]);

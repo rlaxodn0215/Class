@@ -262,7 +262,7 @@ void EndGame(HWND hWnd)
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
     HDC temp = GetDC(hWnd);
-    gameManager->GetInstance()->CheckKeyInput(temp, dataManager); //키 입력 선언
+    gameManager->GetInstance()->CheckKeyInput(hWnd, temp, dataManager); //키 입력 선언
         
     if(gameManager->GetInstance()->m_Player !=NULL)
         gameManager->GetInstance()->Gravity(2); // 중력 만들기

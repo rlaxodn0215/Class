@@ -66,7 +66,7 @@ public:
 	void CharactorUpdate(HDC hdc, int Timer);
 	void MonsterInstantiate(int timeInterval, int timer);
 
-	void CheckKeyInput(HDC hdc, DataManager* dataManager);
+	void CheckKeyInput(HWND hWnd, HDC hdc, DataManager* dataManager);
 	void CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager* dataManager);
 
 	void MakeName(HDC hdc, DataManager* dataManager);

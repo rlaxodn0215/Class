@@ -32,6 +32,8 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
     string name[4] = { "Jose", "Ryno", "Roger", "Straw" };
     int xOffset[4] = { 20,262,507,750 };
 
+    dataManager->m_Sounds["Select_BGM"]->PlayAudio();
+
     for (int i = 20; i <= 900; i += 30) // Background
     {
         for (int j = 0; j <= 630; j += 35)
@@ -51,8 +53,9 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
 
         for (int i = 0; i < 4; i++)
         {
-            dataManager->m_Animations[ name[i] + "_select"]->AniPlay(hdc, {dataManager->m_Animations[ name[i] + "_select"]->GetPivots()[0].x + xOffset[i],
-                dataManager->m_Animations[name[i] + "select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
+            //string temp = name[i] + "_select";
+            dataManager->m_Animations[ name[i] + "_select"]->AniPlay(hdc, { dataManager->m_Animations[ name[i] + "_select"]->GetPivots()[0].x + xOffset[i],
+                dataManager->m_Animations[name[i] + "_select"]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
         }
 
         ShowTimer(hdc, dataManager->m_Number_ani);
@@ -179,7 +182,7 @@ void GameManager::Gravity(int g)
    } 
 }
 
-void GameManager::CheckKeyInput(HDC hdc, DataManager * dataManager)
+void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 {
     if (m_SceneNum == 1)
     {
@@ -212,10 +215,7 @@ void GameManager::CheckKeyInput(HDC hdc, DataManager * dataManager)
 
         if (m_SelectTimer <= -20)
         {
-            dataManager->m_Sprites.clear();
-            dataManager->m_Animations.clear();
-            dataManager->m_Sounds.clear();
-            dataManager->m_Number_ani.clear();
+            dataManager->LoadSceneDatas(2, hWnd);
             m_SceneNum = 2;
             m_Scene = &GameManager::PlayScene;
         }
@@ -440,10 +440,9 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
         m_Scene = &GameManager::SelectScene;
         m_SceneNum++;
         dataManager->LoadSceneDatas(1, hWnd);
-
     }
 
-    else if (m_SceneNum == 2)
+    else if (m_SceneNum==1 || m_SceneNum == 2)
     {
         if (wParam == VK_UP)
         {
