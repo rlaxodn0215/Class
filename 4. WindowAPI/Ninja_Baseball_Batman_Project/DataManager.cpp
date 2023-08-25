@@ -370,9 +370,14 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
         _stprintf_s(score, L"%d\t", m_RankingDatas[i].score);
         WriteFile(hFile, score, (DWORD)_tcslen(score) * sizeof(TCHAR), &size, NULL);
 
-        TCHAR uniName[50] = {};  //\n추가
+        TCHAR uniName[50] = {};
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_RankingDatas[i].name, strlen(m_RankingDatas[i].name), uniName, 200);
         WriteFile(hFile, uniName, (DWORD)_tcslen(uniName) * sizeof(TCHAR), &size, NULL);
+
+        //\n추가
+        TCHAR temp[5];
+        _stprintf_s(temp, L"\n");
+        WriteFile(hFile, temp, (DWORD)_tcslen(temp) * sizeof(TCHAR), &size, NULL);
     }
 
     CloseHandle(hFile);

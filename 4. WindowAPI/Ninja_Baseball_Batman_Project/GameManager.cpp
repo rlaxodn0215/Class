@@ -139,7 +139,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
 
     if (m_ShowLetter[0] && m_ShowLetter[1] && m_ShowLetter[2])
     {
-        //ShowRanking(hdc,winRect);
+        ShowRanking(hdc,dataManager);
     }
 
     else
@@ -750,12 +750,41 @@ void GameManager::MakeName(HDC hdc, DataManager* dataManager)
 
 void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
 {
+
+    char title[13] = { 'R','A','N','K','S','C','O','R','E','N','A','M','E' };
+
+    for (int i = 0; i < 4; i++) //RANK
+    {
+        string temp = "Pink_";
+        temp.push_back(title[i]);
+        dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 20 + 50 * i,
+            dataManager->m_Animations[temp]->GetPivots()[0].y + 100 }, 0, 2.5f, 2.5f, true, m_WinRect);
+    }
+
+    for (int i = 4; i < 9;i++ ) //SCORE
+    {
+        string temp = "Pink_";
+        temp.push_back(title[i]);
+        dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 180 + 50 * i,
+            dataManager->m_Animations[temp]->GetPivots()[0].y + 100 }, 0, 2.5f, 2.5f, true, m_WinRect);
+    }
+
+    for (int i = 9; i < 13; i++) //NAME
+    {
+        string temp = "Pink_";
+        temp.push_back(title[i]);
+        dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 310 + 50 * i,
+            dataManager->m_Animations[temp]->GetPivots()[0].y + 100 }, 0, 2.5f, 2.5f, true, m_WinRect);
+    }
+
+
+
     for (int i = 0; i < dataManager->m_RankingDatas.size(); i++)
     {
         dataManager->m_Number_ani[10 + i]->AniPlay(hdc, { dataManager->m_Number_ani[10 + i]->GetPivots()[0].x + 70,
         dataManager->m_Number_ani[10 + i]->GetPivots()[0].y + 200 + 100*i }, 0, 3.5f, 3.5f, true, m_WinRect);
 
-        ShowPlayerPoints(hdc, { 570 , 210 + 100 * i },dataManager, 3.0f, 3.0f, dataManager->m_RankingDatas[0].score, 55);
+        ShowPlayerPoints(hdc, { 570 , 210 + 100 * i },dataManager, 3.0f, 3.0f, dataManager->m_RankingDatas[i].score, 55);
 
         dataManager->m_Alpha_ani[dataManager->m_RankingDatas[i].name[0] - 'A']->AniPlay(hdc, { dataManager->m_Alpha_ani[dataManager->m_RankingDatas[i].name[0] - 'A']->GetPivots()[0].x + 720,
                 dataManager->m_Alpha_ani[dataManager->m_RankingDatas[i].name[0] - 'A']->GetPivots()[0].y + 195 + 100 * i }, 0, 4.0f, 4.0f, true, m_WinRect);
