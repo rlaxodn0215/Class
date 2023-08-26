@@ -438,7 +438,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite)
 		}
 
 
-		if (m_CurAni != m_Animations["Ryno_dynamite"])
+		if (m_CurAni != m_Animations["Ryno_dynamite"]) // define으로 정리 한다
 		{
 			m_CurAniShowOffset.clear();
 
@@ -556,7 +556,6 @@ void Baseball::Damaged(HDC hdc, RECT winRect)
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
 		m_CurSound = m_Sounds["Baseball_hit"];
-
 		m_Status = DAMAGED;
 	}
 

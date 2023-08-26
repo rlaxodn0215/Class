@@ -897,6 +897,7 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
     {
         m_Wave->DeadMonsters.front()->SetAlive(true);
         m_Wave->DeadMonsters.front()->SetCurHP(m_Wave->DeadMonsters.front()->GetMaxHP());
+        m_Wave->DeadMonsters.front()->SetStatus(IDLE);
 
         // spawn 지역에 랜덤으로 소환
         int n = rand() % 10;

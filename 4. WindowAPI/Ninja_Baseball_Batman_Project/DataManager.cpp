@@ -264,7 +264,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
 {
     wave = shared_ptr<Wave>(new Wave);
     wave->MaxMonsterNum = 10;
-    wave->TimeInterval = 200;
+    wave->TimeInterval = 300;
     wave->LimitArea = { 415, winRect.bottom };
 
 

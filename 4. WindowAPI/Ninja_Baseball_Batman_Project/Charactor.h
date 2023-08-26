@@ -94,7 +94,7 @@ public:
 	void SetDeadTimer(int num) { m_DeadTimer = num; }
 	int GetDelayTimer() { return m_DelayTimer; }
 	void SetDelayTimer(int num) { m_DelayTimer = num; }
-	shared_ptr<Sound> GetSounds() { return m_CurSound; }
+	map<string, shared_ptr<Sound>> GetSounds() { return m_Sounds; }
 
 	void Dead() { if (m_CurHp <= 0) m_isAlive = false; }
 	void Update(bool moveOK);
