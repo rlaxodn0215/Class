@@ -115,7 +115,6 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->m_Sounds["PlayScene_BGM"]->LoopAudio();
         m_Start = false;
     }
-
     
     ShowBackStage(hdc, dataManager);
     CharactorUpdate(hdc, m_TimerFrame);
@@ -417,6 +416,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 m_Wave->StageFinish = true;
                 m_SceneNum++;
                 m_Scene = &GameManager::EndingScene;
+                m_Start = true;
             }
 
         }
