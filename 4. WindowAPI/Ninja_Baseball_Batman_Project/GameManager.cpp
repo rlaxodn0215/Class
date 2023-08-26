@@ -410,7 +410,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
             m_Player->SetVel({ 0,0,0 });
             m_Player->Dead();
             m_Player->SetDeadTimer(m_Player->GetDeadTimer()+1);
-            if (m_Player->GetDeadTimer() == m_Player->GetCurAni()->GetFrameTotalCount())
+            if (m_Player->GetDeadTimer() >= 30)
             {
                 m_Player->SetAlive(false);
                 m_Wave->StageFinish = true;
