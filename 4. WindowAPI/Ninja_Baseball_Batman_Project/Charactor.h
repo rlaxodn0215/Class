@@ -7,6 +7,7 @@
 #include"Collider.h"
 #include"Vector3.h"
 #include<list>
+#include"Data_Names.h"
 
 using namespace std;
 
@@ -27,6 +28,8 @@ enum Status
 class Charactor
 {
 protected:
+	int m_CharactorID;
+
 	Status m_Status;
 	Vector3 m_Position = {0,0,0};
 	Vector3 m_Velocity = {0,0,0};
@@ -57,7 +60,7 @@ public:
 	HBITMAP m_Bitmap;
 
 	Charactor() = default;
-	Charactor(Vector3 pos, int maxhp,int curhp, int moveSpeed,
+	Charactor(int ID, Vector3 pos, int maxhp,int curhp,int attack, int moveSpeed,
 		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
 	~Charactor() = default;
 
@@ -111,8 +114,8 @@ protected:
 	RECT m_DynamiteCollderPos = { 0,0,0,0 };
 public:
 	Player() = default;
-	Player(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
-		: Charactor(pos, maxhp,curhp, moveSpeed, anis, sounds) {
+	Player(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
+		: Charactor(ID,pos, maxhp,curhp,attack, moveSpeed, anis, sounds) {
 		m_Status = NOTHING;
 	};
 
@@ -148,9 +151,9 @@ private:
 	
 public:
 	Ryno() = default;
-	Ryno(Vector3 pos, int maxhp, int curhp, int moveSpeed, 
+	Ryno(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed,
 		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
-		: Player(pos, maxhp,curhp, moveSpeed, anis, sounds) { Idle();};
+		: Player(ID,pos, maxhp,curhp,attack, moveSpeed, anis, sounds) { Idle();};
 
 	BoxCollider GetBodyCollider() { return m_BodyColliders; }
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
@@ -174,8 +177,8 @@ protected:
 
 public:
 	Monster() = default;
-	Monster(Vector3 position, int maxhp,int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, maxhp,curhp, moveSpeed, anis, sounds) {
+	Monster(int ID, Vector3 position, int maxhp,int curhp, int attack, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds) :Charactor(ID,position, maxhp,curhp,attack, moveSpeed, anis, sounds) {
 		m_isLookRight = false; m_isAlive = false;
 	};
 	
@@ -202,8 +205,8 @@ private:
 
 public:
 	Baseball()=default;
-	Baseball(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds, int deadPoint) : Monster(pos, maxhp, curhp, moveSpeed, anis, sounds) {
+	Baseball(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds, int deadPoint) : Monster(ID, pos, maxhp, curhp,attack, moveSpeed, anis, sounds) {
 		Move(); m_DeadPoints = deadPoint;
 	};
 	~Baseball()=default;

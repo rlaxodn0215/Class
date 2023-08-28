@@ -183,7 +183,7 @@ void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> & player)
     map<string, shared_ptr<Sound>> temp1;
     LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), temp1, hWnd,true);
 
-    player = shared_ptr<Ryno>(new Ryno(Vector3(500, 500, 500), 100, 100, 10, temp, temp1));
+    player = shared_ptr<Ryno>(new Ryno(100,Vector3(500, 500, 500), 100, 100, 0, 10, temp, temp1));
 }
 
 void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
@@ -289,7 +289,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
 
     for (int i = 0; i < wave->MaxMonsterNum; i++)
     {
-        wave->WaveMonsters.push_back(shared_ptr<Baseball>(new Baseball(Vector3(0, 0, 0), 50, 50, 1, temp, temp1, 100)));
+        wave->WaveMonsters.push_back(shared_ptr<Baseball>(new Baseball(i,Vector3(0, 0, 0), 50, 50,5, 1, temp, temp1, 100)));
         wave->DeadMonsters.push(wave->WaveMonsters[i]);
     }
 

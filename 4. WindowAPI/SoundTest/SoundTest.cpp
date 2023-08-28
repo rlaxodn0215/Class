@@ -23,6 +23,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave);
 
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -128,15 +129,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-MCI_OPEN_PARMS      mciOpenParms; //파일을 로드
-MCI_PLAY_PARMS       mciPlayParms; //파일을 재생
-MCI_STATUS_PARMS   mciStatus; //파일의 상태
-UINT wDeviceID = 0;
-
 DWORD Sound1, Sound2;
 
-MCIDEVICEID MusicID = 0;
-MCI_PLAY_PARMS Play;
+MCI_OPEN_PARMS openBgm;
+MCI_PLAY_PARMS playBgm;
+UINT wDeviceID = 0;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
@@ -144,26 +141,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        Sound1 = LoadWAV(hWnd, L"test.wav");
-        //Sound2 = LoadWAV(hWnd, L"Sound2.wav");
+        openBgm.lpstrElementName = L"test.wav";            //파일 오픈
+        openBgm.lpstrDeviceType = L"mpegvideo";    //mp3 형식
+        mciSendCommand(wDeviceID, MCI_OPEN, MCI_OPEN_ELEMENT | MCI_OPEN_TYPE, (DWORD)(LPVOID)&openBgm);
+        wDeviceID = openBgm.wDeviceID;
+        //mciSendCommandA(wDeviceID, MCI_PLAY, MCI_NOTIFY, (DWORD_PTR)&playBgm);
+        Sound1 = mciSendCommand(wDeviceID, MCI_PLAY, MCI_DGV_PLAY_REPEAT, (DWORD)(LPVOID)&openBgm);    //음악 반복 재생
 
-        //MCIERROR        Error;
-        //MCI_OPEN_PARMS Data = {};
-
-        //Data.lpstrDeviceType = L"WaveAudio";
-        //Data.lpstrElementName = _T("test.wav");
-
-        //Error = mciSendCommandA(
-        //    0,
-        //    MCI_OPEN,
-        //    MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
-        //    (DWORD_PTR)&Data
-        //);
-
-        //if (Error == 0)
-        //{
-        //    MusicID = Data.wDeviceID;
-        //}
     }
         break;
     case WM_KEYDOWN:
@@ -171,12 +155,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case VK_F1:
-           Sound1 = mciSendCommand(MusicID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
+            //Sound1 = mciSendCommand(wDeviceID, MCI_PLAY, MCI_DGV_PLAY_REPEAT, (DWORD)(LPVOID)&openBgm);    //음악 반복 재생
            // Sound1 = mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
             break;
-        case VK_F2:
-            Sound1 = mciSendCommand(MusicID, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
-            break;
+        //case VK_F2:
+        //    Sound1 = mciSendCommand(MusicID, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
+        //    break;
 
         //case VK_F1:
         //    PlaySoundA("test.wav", nullptr, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
@@ -254,22 +238,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    return 0;
-}
-
-DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave)
-{
-    DWORD Result;
-    //WaveAudio 대신 MPEGVideo를 사용하면 mp3 형식을 재생합니다.
-    mciOpenParms.lpstrDeviceType = L"WaveAudio";
-    mciOpenParms.lpstrElementName = lpszWave;
-    Result = mciSendCommand(wDeviceID, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPVOID)&mciOpenParms);
-    if (Result)
-        return Result;
-    wDeviceID = mciOpenParms.wDeviceID;
-    mciPlayParms.dwCallback = (DWORD)hWnd;
-    if (Result)
-        return Result;
     return 0;
 }
 

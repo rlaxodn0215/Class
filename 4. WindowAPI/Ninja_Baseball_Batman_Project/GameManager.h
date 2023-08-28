@@ -7,6 +7,7 @@
 #include"DataManager.h"
 #include"SingletonTemplate.h"
 #include"Sound.h"
+#include"Data_Names.h"
 
 class GameManager : public SingletonTemplate<GameManager> // 씬, 키 입력, 플레이 영역, UI 관리
 {

@@ -18,7 +18,7 @@ DWORD Sound::LoadWAV(HWND hWnd,const TCHAR lpszWave[100])
 {
     DWORD Result;
     //WaveAudio 대신 MPEGVideo를 사용하면 mp3 형식을 재생합니다.
-    mciOpenParms.lpstrDeviceType = L"WaveAudio"; //MPEGVideo
+    mciOpenParms.lpstrDeviceType = L"mpegvideo"; //MPEGVideo
     mciOpenParms.lpstrElementName = lpszWave;
     Result = mciSendCommand(wDeviceID, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPVOID)&mciOpenParms);
     if (Result)
@@ -42,5 +42,5 @@ void Sound::ResetAudio()
 
 void Sound::LoopAudio() 
 {
-    SoundData = mciSendCommand(m_ChanelNumber, MCI_PLAY, MCI_DGV_PLAY_REPEAT, (DWORD)(LPVOID)NULL);
+    SoundData = mciSendCommand(m_ChanelNumber, MCI_PLAY, MCI_DGV_PLAY_REPEAT, (DWORD)(LPVOID)&mciOpenParms);
 }
