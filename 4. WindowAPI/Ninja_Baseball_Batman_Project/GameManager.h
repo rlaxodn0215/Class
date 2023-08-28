@@ -23,6 +23,7 @@ public:
 	void(GameManager:: * m_Scene)(HWND,HDC,DataManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
 	shared_ptr<Wave>  m_Wave;									// 웨이브 관련 포인터
 	shared_ptr<Player> m_Player;								// 플레이어 연결 포인터
+
 	RECT m_WinRect;
 
 	//Title Scene
@@ -41,7 +42,7 @@ public:
 	bool m_ComboFlag[6] = {};		//콤보용 플래그
 	bool m_PlayerDynamite = false;	// 플레이어가 필살기를 쓰는지 확인
 	int m_TimerFrame = 0;			// 타이머 값 저장
-	int m_SelectTimer = 20*10;		// 선택 타이머
+	int m_SelectTimer = 201;		// 선택 타이머
 	int m_ComboTimerCount = 0;		// 콤보 사용시 이용하는 타이머
 
 	//Ending Scene

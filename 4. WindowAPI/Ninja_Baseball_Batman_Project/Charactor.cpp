@@ -97,9 +97,10 @@ void Ryno::Idle()
 		m_BodyColliders.SetArea(collderPos);
 		m_BodyColliders.SetPosZ(m_Position.m_Z);
 
+		m_AttackColliders.SetArea({ -1,-1,-1,-1 });
+
 	}
 
-	m_AttackColliders.SetArea({-1,-1,-1,-1});
 
 }
 
@@ -586,6 +587,7 @@ void Baseball::Dead()
 		m_CurAniShowOffset.clear();
 		m_CurSound = m_Sounds[BASEBALL_DEAD];
 		m_CurSound->ResetAudio();
+		m_CurSound->PlayAudio();
 		for (int t = 0; t < 4; t++)
 		{
 			for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -597,8 +599,6 @@ void Baseball::Dead()
 		}
 		m_AttackColliders.SetArea({-10,-10,-1,-2});
 	}
-
-	m_CurSound->PlayAudio();
 }
 
 void Baseball::Attack(HDC hdc, RECT winRect)

@@ -6,8 +6,8 @@ extern bool PlayerNoHitAni;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 2;
-    m_Scene = &GameManager::PlayScene;
+	m_SceneNum = 0;
+    m_Scene = &GameManager::TitleScene;
     ///
 	m_Player = NULL;
 }
@@ -69,8 +69,8 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
         for (int i = 0; i < 4; i++)
         {
             //string temp = name[i] + "_select";
-            dataManager->m_Animations[ name[i] + SELECT]->AniPlay(hdc, { dataManager->m_Animations[ name[i] + SELECT]->GetPivots()[0].x + xOffset[i],
-                dataManager->m_Animations[name[i] + SELECT]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
+            dataManager->m_Animations[ name[i] + _SELECT]->AniPlay(hdc, { dataManager->m_Animations[ name[i] + _SELECT]->GetPivots()[0].x + xOffset[i],
+                dataManager->m_Animations[name[i] + _SELECT]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
         }
 
         ShowTimer(hdc, dataManager->m_Number_ani);
@@ -82,12 +82,12 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
         {
             if (m_Cursor.x == m_SelectPosX[i])
             {
-                dataManager->m_Animations[name[i] + SELECTED]->AniPlay(hdc, { dataManager->m_Animations[name[i] + SELECTED]->GetPivots()[0].x + xOffset[i],
-                    dataManager->m_Animations[name[i] + SELECTED]->GetPivots()[0].y + 150 }, 0, 3.0f, 3.0f, true, m_WinRect);
+                dataManager->m_Animations[name[i] + _SELECTED]->AniPlay(hdc, { dataManager->m_Animations[name[i] + _SELECTED]->GetPivots()[0].x + xOffset[i],
+                    dataManager->m_Animations[name[i] + _SELECTED]->GetPivots()[0].y + 150 }, 0, 3.0f, 3.0f, true, m_WinRect);
                 continue;
             }
-            dataManager->m_Animations[name[i] + SELECT]->AniPlay(hdc, { dataManager->m_Animations[name[i] + SELECT]->GetPivots()[0].x + xOffset[i],
-                dataManager->m_Animations[name[i] + SELECT]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
+            dataManager->m_Animations[name[i] + _SELECT]->AniPlay(hdc, { dataManager->m_Animations[name[i] + _SELECT]->GetPivots()[0].x + xOffset[i],
+                dataManager->m_Animations[name[i] + _SELECT]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
         }
 
     }
@@ -384,7 +384,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 if (m_ComboFlag[4] && m_ComboFlag[5] && !m_PlayerDynamite)
                 {
                     m_Player->HomeRun(hdc,m_WinRect,m_KeyFlag[5]);
-                    m_Player->SetAttack(15);
+                    m_Player->SetAttack(25);
 
                     if (m_Player->GetLookRight())
                         m_Player->SetPos(m_Player->GetPos() + Vector3(10, 0, 0));
@@ -880,17 +880,27 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
 {
     if (!(timer % timeInterval) && !m_Wave->DeadMonsters.empty()) //시간이 다 되고, 죽은 몬스터 리스트가 비어있지 않다면 
     {
-        m_Wave->DeadMonsters.front()->SetAlive(true);
-        m_Wave->DeadMonsters.front()->SetCurHP(m_Wave->DeadMonsters.front()->GetMaxHP());
+        shared_ptr<Monster> temp = m_Wave->DeadMonsters.front();
+        temp->SetAlive(true);
+        temp->SetCurHP(m_Wave->DeadMonsters.front()->GetMaxHP());
 
-        // spawn 지역에 랜덤으로 소환
         int n = rand() % 10;
-        m_Wave->DeadMonsters.front()->SetPos(Vector3(m_Wave->SpawnArea[n].x, m_Wave->SpawnArea[n].y, m_Wave->SpawnArea[n].y));
-
-        m_Wave->DeadMonsters.front()->Move();
-
-        m_Wave->LiveMonsters.push_back(m_Wave->DeadMonsters.front());
+        temp->SetPos(Vector3(m_Wave->SpawnArea[n].x, m_Wave->SpawnArea[n].y, m_Wave->SpawnArea[n].y));
+        temp->Move();
+        m_Wave->LiveMonsters.push_back(temp);
         m_Wave->DeadMonsters.pop();
+
+        //m_Wave->DeadMonsters.front()->SetAlive(true);
+        //m_Wave->DeadMonsters.front()->SetCurHP(m_Wave->DeadMonsters.front()->GetMaxHP());
+
+        //// spawn 지역에 랜덤으로 소환
+        //int n = rand() % 10;
+        //m_Wave->DeadMonsters.front()->SetPos(Vector3(m_Wave->SpawnArea[n].x, m_Wave->SpawnArea[n].y, m_Wave->SpawnArea[n].y));
+
+        //m_Wave->DeadMonsters.front()->Move();
+
+        //m_Wave->LiveMonsters.push_back(m_Wave->DeadMonsters.front());
+        //m_Wave->DeadMonsters.pop();
     }
 }
 
