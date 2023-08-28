@@ -813,7 +813,7 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
             }
         }
 
-        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 500)) //몬스터 공격
+        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 10)) //몬스터 공격
         {
             iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1); //공격 타이밍 측정
 
@@ -843,13 +843,6 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
 
     for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end();) //몬스터 이동 처리
     {
-        iter->get()->ShowCharactor(hdc, iter->get()->GetAniSpeed(), Timer, m_WinRect);
-        iter->get()->ShowColliders(hdc);
-
-        TCHAR temp[20];
-        _stprintf_s(temp, L"[%d, %d, %d]", iter->get()->GetPos().m_X, iter->get()->GetPos().m_Y, iter->get()->GetPos().m_Z);
-        TextOut(hdc, iter->get()->GetPos().m_X, iter->get()->GetPos().m_Y, temp, _tcslen(temp));
-
         iter->get()->MonsterAI(hdc, m_WinRect, m_Player, 3);
         iter->get()->Update(true);
 
@@ -872,23 +865,19 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
         m_Player->SetPos({ m_WinRect.right - 110,m_Player->GetPos().m_Y, m_Player->GetPos().m_Z });
     }
 
-    if (m_Player->GetPos().m_Z < 335)
+    if (m_Player->GetPos().m_Z < 450)
     {
-        m_Player->SetPos({ m_Player->GetPos().m_X, 335, 335 });
+        m_Player->SetPos({ m_Player->GetPos().m_X, 450, 450 });
     }
 
-    else if (m_Player->GetPos().m_Z > m_WinRect.bottom - 100)
+    else if (m_Player->GetPos().m_Z > m_WinRect.bottom)
     {
-        m_Player->SetPos({ m_Player->GetPos().m_X, m_WinRect.bottom - 100, m_WinRect.bottom - 100 });
+        m_Player->SetPos({ m_Player->GetPos().m_X, m_WinRect.bottom, m_WinRect.bottom });
     }
 
-    m_Player->ShowCharactor(hdc, m_Player->GetAniSpeed(), Timer, m_WinRect);
-    m_Player->ShowColliders(hdc);
     m_Player->Update(true);
 
-    TCHAR temp[20];
-    _stprintf_s(temp, L"[%d, %d, %d]", m_Player->GetPos().m_X, m_Player->GetPos().m_Y+125, m_Player->GetPos().m_Z+125);
-    TextOut(hdc, m_Player->GetPos().m_X, m_Player->GetPos().m_Y + 125, temp, _tcslen(temp)); //Sprite는 해당 값에서 확대 비율을 나눈다
+    RenderingCharactor(hdc, Timer);
 }
 
 void GameManager::MonsterInstantiate(int timeInterval, int timer)
@@ -908,7 +897,29 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
     }
 }
 
-void GameManager::RenderingCharactor(HDC hdc, int Timer)
+void GameManager::RenderingCharactor(HDC hdc, int timer)
 {
+    vector<shared_ptr<Charactor>> RenderingIndex;
+
+    RenderingIndex.push_back(m_Player);
+
+    for (auto iter : m_Wave->LiveMonsters)
+    {
+        RenderingIndex.push_back(iter);
+    }
+
+    sort(RenderingIndex.begin(), RenderingIndex.end());
+
+    for (int i = 0; i< RenderingIndex.size();i++)
+    {
+        RenderingIndex[i]->ShowCharactor(hdc, RenderingIndex[i]->GetAniSpeed(), timer, m_WinRect);
+
+        RenderingIndex[i]->ShowColliders(hdc);
+
+        TCHAR temp[20];
+        _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
+        TextOut(hdc, RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, temp, _tcslen(temp));
+    }
+
 
 }

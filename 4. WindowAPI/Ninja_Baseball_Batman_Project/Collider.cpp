@@ -144,7 +144,7 @@ BOOL BoxCollider::OnTrigger(Collider& other, int zOffsetDelta)
 {
 	Collider* base = &other;
 
-	if (m_PosZ + 120 <= base->GetPosZ() + zOffsetDelta && m_PosZ + 120 >= base->GetPosZ() - zOffsetDelta)
+	if (m_PosZ <= base->GetPosZ() + zOffsetDelta && m_PosZ >= base->GetPosZ() - zOffsetDelta)
 	{
 		if (other.GetType() == CIRCLE)
 		{
