@@ -281,7 +281,7 @@ VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
     if(gameManager->GetInstance()->m_Player !=NULL)
         gameManager->GetInstance()->Gravity(2); // 중력 만들기
 
-    if (gameManager->GetInstance()->m_TimerFrame >= 1000)
+    if (gameManager->GetInstance()->m_TimerFrame >= 100000)
         gameManager->GetInstance()->m_TimerFrame = 0;
     gameManager->GetInstance()->m_TimerFrame++; //타이머 작동
 
@@ -339,7 +339,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
         CheckDlgButton(hDlg,IDC_CHECKPLAYERHP, PlayerEternal);
         CheckDlgButton(hDlg, IDC_CHECKPLAYERNOHIT, PlayerNoHitAni);
-        SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime, FALSE);
+        SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime*10, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, MonsterHp, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_ATTACK, MonsterAttack, FALSE);
     }
@@ -354,7 +354,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             PlayerNoHitAni = !PlayerNoHitAni;
             break;
         case IDOK:
-            MonsterSpawnTime = GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE);
+            MonsterSpawnTime = (GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE))/10;
             MonsterHp = GetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, NULL, FALSE);
             MonsterAttack = GetDlgItemInt(hDlg, IDC_EDIT_ATTACK, NULL, FALSE);
 

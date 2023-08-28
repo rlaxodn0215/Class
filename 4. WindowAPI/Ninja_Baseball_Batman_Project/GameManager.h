@@ -66,6 +66,8 @@ public:
 	void ShowRanking(HDC hdc, DataManager* dataManager);
 	
 	void CharactorUpdate(HDC hdc, int Timer);
+	void MonsterUpdate(HDC hdc);
+	void TriggerCheck(HDC hdc);
 	void MonsterInstantiate(int timeInterval, int timer);
 	void RenderingCharactor(HDC hdc, int Timer);
 	static bool RenderingOrder(const shared_ptr<Charactor> & a, const shared_ptr<Charactor> & b)

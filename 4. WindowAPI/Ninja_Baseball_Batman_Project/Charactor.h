@@ -108,7 +108,7 @@ class Player : public Charactor // 상태 패턴
 {
 protected:
 	int m_PlayingDynamite = 0; // 플레이어가 필살기를 쓸 때 순서 확인
-	int m_DynamiteTimer[3] = { 0,0,0 };
+	int m_DynamiteTimer =  0;
 	int m_Points = 0;			// 플레이어 점수
 	RECT m_DynamiteCollderPos = { 0,0,0,0 };
 public:
@@ -132,7 +132,7 @@ public:
 	virtual void Move() = 0;
 	virtual void Run() = 0;
 	virtual void Jump(bool& keydown, bool jumping)=0;
-	virtual void Damaged(HDC hdc, RECT winRect)=0;
+	virtual void Damaged(HDC hdc, RECT winRect, bool& keydown)=0;
 	virtual void Dead()=0;
 	virtual void Attack(bool isright)=0;
 	virtual void HomeRun(HDC hdc, RECT winRect, bool& keydown)=0;
@@ -161,7 +161,7 @@ public:
 	void Move() override;
 	void Run() override;
 	void Jump(bool& keydown, bool jumping) override;
-	void Damaged(HDC hdc, RECT winRect) override;
+	void Damaged(HDC hdc, RECT winRect, bool& keydown) override;
 	void Dead() override;
 	void Attack(bool isright) override;
 	void HomeRun(HDC hdc, RECT winRect, bool& keydown) override;

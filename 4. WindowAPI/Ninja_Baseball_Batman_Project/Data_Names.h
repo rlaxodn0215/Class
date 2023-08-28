@@ -47,7 +47,6 @@
 #define	BASEBALL_KICK						"Baseball_kick"
 #define	BASEBALL_PUNCH						"Baseball_punch"
 #define	BASEBALL_READYFORFIGHT				"Baseball_readyforfight"
-#define	HIT_IMAGE							"Hit_Image"
 #define STAGE_6_BOSS						"Stage_6_boss"
 #define BACKGROUND1_BACKSTAGE				"Background1_BackStage"
 #define PLAYER_HPBAR_EMPTY					"Player_hpbar_empty"

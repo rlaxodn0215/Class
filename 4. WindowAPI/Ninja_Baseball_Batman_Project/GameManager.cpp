@@ -115,12 +115,10 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->m_Sounds[PLAYSCENE_BGM]->LoopAudio();
         m_Start = false;
     }
-
     
     ShowBackStage(hdc, dataManager);
     CharactorUpdate(hdc, m_TimerFrame);
     ShowUI(hdc,dataManager);
-
 }
 
 void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // SceneNum = 3
@@ -287,6 +285,11 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
                     if (!m_Player->GetJumping())
                     {
+                        if (m_Player->GetPos().m_Z < 450)
+                        {
+                            m_Player->SetPos({ m_Player->GetPos().m_X, 450, 450 });
+                        }
+
                         m_Player->SetVel(Vector3(0, -m_Player->GetMoveSpeed() / 1.5f, -m_Player->GetMoveSpeed() / 1.5f));
                         m_Player->Move();
                     }
@@ -298,6 +301,11 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
                     if (!m_Player->GetJumping())
                     {
+                        if (m_Player->GetPos().m_Z > m_WinRect.bottom)
+                        {
+                            m_Player->SetPos({ m_Player->GetPos().m_X, m_WinRect.bottom, m_WinRect.bottom });
+                        }
+
                         m_Player->SetVel(Vector3(0, m_Player->GetMoveSpeed() / 1.5f, m_Player->GetMoveSpeed() / 1.5f));
                         m_Player->Move();
                     }
@@ -324,11 +332,16 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
                         if (!m_PlayerDynamite)
                         {
-                            m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+                            m_Player->SetVel(Vector3(- m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
 
                             if (!m_Player->GetJumping())
                                 m_Player->Run();
                         }
+                    }
+
+                    if (m_Player->GetPos().m_X < 25)
+                    {
+                        m_Player->SetPos({ 25, m_Player->GetPos().m_Y,m_Player->GetPos().m_Z });
                     }
                 }
 
@@ -357,6 +370,11 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                             if (!m_Player->GetJumping())
                                 m_Player->Run();
                         }
+                    }
+
+                    if (m_Player->GetPos().m_X > m_WinRect.right - 90)
+                    {
+                        m_Player->SetPos({ m_WinRect.right - 90,m_Player->GetPos().m_Y, m_Player->GetPos().m_Z });
                     }
                 }
             }
@@ -411,7 +429,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
             m_Player->SetVel({ 0,0,0 });
             m_Player->Dead();
             m_Player->SetDeadTimer(m_Player->GetDeadTimer()+1);
-            if (m_Player->GetDeadTimer() >= 30)
+            if (m_Player->GetDeadTimer() >= 50)
             {
                 m_Player->SetAlive(false);
                 m_Wave->StageFinish = true;
@@ -795,54 +813,16 @@ void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
 
 void GameManager::CharactorUpdate(HDC hdc, int Timer)
 {
+    MonsterUpdate(hdc);
+    TriggerCheck(hdc);
     MonsterInstantiate(m_Wave->TimeInterval, Timer);
     RenderingCharactor(hdc, Timer);
+    m_Player->Update(true);
+}
 
-    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
-    {
-        CircleCollider temp = iter->get()->GetBodyCircleCollider();
-        BoxCollider temp1 = m_Player->GetBodyCollider();
-
-        if (m_Player->GetAttackCollider().OnTrigger(temp, 10)) //플레이어 공격
-        {
-            m_Player->SetAttackTimer(m_Player->GetAttackTimer() + 1); //공격 타이밍 측정
-
-            if (m_Player->GetAttackTimer() == m_Player->GetAttackTiming())
-            {
-                iter->get()->SetCurHP(iter->get()->GetCurHP() - m_Player->GetAttack());
-                iter->get()->Damaged(hdc, m_WinRect);
-            }
-        }
-
-        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 10)) //몬스터 공격
-        {
-            iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1); //공격 타이밍 측정
-
-            if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming() && !PlayerEternal)
-            {
-                m_Player->SetCurHP(m_Player->GetCurHP() - iter->get()->GetAttack());
-
-                if (m_Player->GetAlive())
-                {
-                    if(!PlayerNoHitAni)
-                        m_Player->Damaged(hdc, m_WinRect);
-                }
-
-            }
-        }
-
-        if (iter->get()->GetPos().m_Z <= 413) //이동 영역 (몬스터)
-        {
-            iter->get()->SetPos({ iter->get()->GetPos().m_X, 413, 413 });
-        }
-
-        else if (iter->get()->GetPos().m_Z >= m_WinRect.bottom)
-        {
-            iter->get()->SetPos({ iter->get()->GetPos().m_X, m_WinRect.bottom, m_WinRect.bottom });
-        }
-    }
-
-    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end();) //몬스터 이동 처리
+void GameManager::MonsterUpdate(HDC hdc) //몬스터 이동 밎 죽음 처리
+{
+    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end();) 
     {
         iter->get()->MonsterAI(hdc, m_WinRect, m_Player, 3);
         iter->get()->Update(true);
@@ -853,30 +833,47 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
             m_Wave->DeadMonsters.push(*iter);
             iter = m_Wave->LiveMonsters.erase(iter);
         }
-        else ++iter;
-    }
 
-    if (m_Player->GetPos().m_X < 25) //이동 영역 (플레이어)
+        else ++iter; // 살아있는 몬스터를 계속 체크 (거의 while). 비어있는 경우 제외하기 위해
+
+    }
+}
+
+void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
+{
+    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++) 
     {
-        m_Player->SetPos({ 25, m_Player->GetPos().m_Y,m_Player->GetPos().m_Z });
-    }
+        CircleCollider temp = iter->get()->GetBodyCircleCollider();
+        BoxCollider temp1 = m_Player->GetBodyCollider();
 
-    else if (m_Player->GetPos().m_X > m_WinRect.right - 110)
-    {
-        m_Player->SetPos({ m_WinRect.right - 110,m_Player->GetPos().m_Y, m_Player->GetPos().m_Z });
-    }
+        if (m_Player->GetAttackCollider().OnTrigger(temp, 5)) //플레이어 공격
+        {
+            m_Player->SetAttackTimer(m_Player->GetAttackTimer() + 1); //공격 타이밍 측정
 
-    if (m_Player->GetPos().m_Z < 450)
-    {
-        m_Player->SetPos({ m_Player->GetPos().m_X, 450, 450 });
-    }
+            if (m_Player->GetAttackTimer() == m_Player->GetAttackTiming())
+            {
+                iter->get()->SetCurHP(iter->get()->GetCurHP() - m_Player->GetAttack());
+                iter->get()->Damaged(hdc, m_WinRect);
+            }
+        }
 
-    else if (m_Player->GetPos().m_Z > m_WinRect.bottom)
-    {
-        m_Player->SetPos({ m_Player->GetPos().m_X, m_WinRect.bottom, m_WinRect.bottom });
-    }
+        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 5)) //몬스터 공격
+        {
+            iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1); //공격 타이밍 측정
 
-    m_Player->Update(true);
+            if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming() && !PlayerEternal)
+            {
+                m_Player->SetCurHP(m_Player->GetCurHP() - iter->get()->GetAttack());
+
+                if (m_Player->GetAlive())
+                {
+                    if (!PlayerNoHitAni)
+                        m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
+                }
+
+            }
+        }
+    }
 }
 
 void GameManager::MonsterInstantiate(int timeInterval, int timer)
@@ -885,11 +882,12 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
     {
         m_Wave->DeadMonsters.front()->SetAlive(true);
         m_Wave->DeadMonsters.front()->SetCurHP(m_Wave->DeadMonsters.front()->GetMaxHP());
-        m_Wave->DeadMonsters.front()->SetStatus(IDLE);
 
         // spawn 지역에 랜덤으로 소환
         int n = rand() % 10;
         m_Wave->DeadMonsters.front()->SetPos(Vector3(m_Wave->SpawnArea[n].x, m_Wave->SpawnArea[n].y, m_Wave->SpawnArea[n].y));
+
+        m_Wave->DeadMonsters.front()->Move();
 
         m_Wave->LiveMonsters.push_back(m_Wave->DeadMonsters.front());
         m_Wave->DeadMonsters.pop();
@@ -914,7 +912,6 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
         RenderingIndex[i]->ShowCharactor(hdc, RenderingIndex[i]->GetAniSpeed(), timer, m_WinRect);
 
         RenderingIndex[i]->ShowColliders(hdc);
-
         TCHAR temp[20];
         _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
         TextOut(hdc, RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, temp, _tcslen(temp));
