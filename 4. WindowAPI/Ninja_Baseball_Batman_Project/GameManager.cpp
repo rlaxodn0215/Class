@@ -796,6 +796,7 @@ void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
 void GameManager::CharactorUpdate(HDC hdc, int Timer)
 {
     MonsterInstantiate(m_Wave->TimeInterval, Timer);
+    RenderingCharactor(hdc, Timer);
 
     for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
     {
@@ -876,8 +877,6 @@ void GameManager::CharactorUpdate(HDC hdc, int Timer)
     }
 
     m_Player->Update(true);
-
-    RenderingCharactor(hdc, Timer);
 }
 
 void GameManager::MonsterInstantiate(int timeInterval, int timer)
@@ -908,7 +907,7 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
         RenderingIndex.push_back(iter);
     }
 
-    sort(RenderingIndex.begin(), RenderingIndex.end());
+    sort(RenderingIndex.begin(), RenderingIndex.end(), RenderingOrder);
 
     for (int i = 0; i< RenderingIndex.size();i++)
     {
@@ -920,6 +919,4 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
         _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
         TextOut(hdc, RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, temp, _tcslen(temp));
     }
-
-
 }

@@ -68,6 +68,10 @@ public:
 	void CharactorUpdate(HDC hdc, int Timer);
 	void MonsterInstantiate(int timeInterval, int timer);
 	void RenderingCharactor(HDC hdc, int Timer);
+	static bool RenderingOrder(const shared_ptr<Charactor> & a, const shared_ptr<Charactor> & b)
+	{
+		return (a->GetPos().m_Z < b->GetPos().m_Z);
+	}
 
 	void CheckKeyInput(HWND hWnd, HDC hdc, DataManager* dataManager);
 	void CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager* dataManager);

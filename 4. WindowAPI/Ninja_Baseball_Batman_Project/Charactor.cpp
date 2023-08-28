@@ -239,6 +239,7 @@ void Ryno::Attack(bool isright)
 		m_AttackTiming = 1;
 		m_AttackTimer = 0;
 		m_CurSound = m_Sounds[RYNO_ATTACK];
+		m_CurSound->ResetAudio();
 	}
 
 	m_CurSound->PlayAudio();
@@ -556,6 +557,7 @@ void Baseball::Damaged(HDC hdc, RECT winRect)
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
 		m_CurSound = m_Sounds[BASEBALL_HIT];
+		m_CurSound->ResetAudio();
 		m_Status = DAMAGED;
 	}
 
