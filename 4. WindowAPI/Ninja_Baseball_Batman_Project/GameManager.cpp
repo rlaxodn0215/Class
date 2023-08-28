@@ -907,3 +907,8 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
         m_Wave->DeadMonsters.pop();
     }
 }
+
+void GameManager::RenderingCharactor(HDC hdc, int Timer)
+{
+
+}

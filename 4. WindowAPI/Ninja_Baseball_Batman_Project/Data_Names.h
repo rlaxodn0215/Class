@@ -1,5 +1,4 @@
 #pragma once
-
 // Animations
 #define TITLE_SCREEN						"Title_screen"
 #define SELECT_1P							"1P_select"
@@ -57,25 +56,14 @@
 #define PLAYER_PICTURE_FRAME				"Player_picture_frame"
 #define PLAYER_PICTURE_HURT					"Player_picture_hurt"
 #define PLAYER_PICTURE_NORMAL				"Player_picture_normal"
-
-#define NUM									"Num"
-#define POINTNUM							"Pointnum"
+#define NUM									"Num_"
+#define POINTNUM							"Pointnum_"
 #define BLUE								"Blue_"
 #define ORANGE								"Orange_"
 #define ORANGE_DASH							"Orange_dash"
 #define	GREEN								"Green_"
 #define	PINK								"Pink_"
 #define GREEN_UNDERBAR						"Green_Underbar"
-#define _0									"0"
-#define _1									"1"
-#define _2									"2"
-#define _3									"3"
-#define _4									"4"
-#define _5									"5"
-#define _6									"6"
-#define _7									"7"
-#define _8									"8"
-#define _9									"9"
 
 //Sounds
 #define TITLE_SOUND							"Title_sound"
