@@ -813,10 +813,10 @@ void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
 
 void GameManager::CharactorUpdate(HDC hdc, int Timer)
 {
+    RenderingCharactor(hdc, Timer);
     MonsterUpdate(hdc);
     TriggerCheck(hdc);
     MonsterInstantiate(m_Wave->TimeInterval, Timer);
-    RenderingCharactor(hdc, Timer);
     m_Player->Update(true);
 }
 
