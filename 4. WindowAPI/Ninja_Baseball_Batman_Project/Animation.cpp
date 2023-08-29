@@ -92,6 +92,7 @@ Animation::~Animation()
 
 void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float imageRatioWidth, float imageRatioHeight, bool lookRight, RECT winRect)
 {
+
 	int bx = m_Width[spriteIndex];
 	int by = m_Height[spriteIndex];
 	int xStart = m_Offset[spriteIndex].x;
@@ -99,48 +100,17 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 	int posX = offset_location.x - m_Pivot[spriteIndex].x;
 	int posY = offset_location.y - m_Pivot[spriteIndex].y;
 
-	if (lookRight)
-	{
-		HDC hMemDC;
-		HBITMAP holdBitmap;
+	HDC hMemDC;
+	HBITMAP holdBitmap;
 
-		hMemDC = CreateCompatibleDC(hdc);
-		holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());	
+	hMemDC = CreateCompatibleDC(hdc);
+	holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());	
 
-		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
-			bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
-				m_ResourceSprite->GetTransparentColor().m_Z));
+	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
+		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
+			m_ResourceSprite->GetTransparentColor().m_Z));
 
-		SelectObject(hMemDC, holdBitmap);
-		DeleteDC(hMemDC);
-
-	}
-
-	else
-	{
-		HDC hMemDC, hMemDC1;
-		HBITMAP holdBitmap, holdBitmap1;
-
-		hMemDC = CreateCompatibleDC(hdc);
-		holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight)));
-
-		hMemDC1 = CreateCompatibleDC(hMemDC);
-		holdBitmap1 = (HBITMAP)SelectObject(hMemDC1, m_ResourceSprite->GetSpriteImage());
-
-		StretchBlt(hMemDC, (int)(bx * imageRatioWidth)-1, 0, -(int)(bx* imageRatioWidth) , (int)(by * imageRatioHeight), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
-
-		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, 0, 0, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight),
-			RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
-				m_ResourceSprite->GetTransparentColor().m_Z));
-
-		SelectObject(hMemDC1, holdBitmap1);
-		DeleteDC(hMemDC1);
-
-		SelectObject(hMemDC, holdBitmap);
-		DeleteDC(hMemDC);
-
-
-	}
-
+	SelectObject(hMemDC, holdBitmap);
+	DeleteDC(hMemDC);
 	
 }

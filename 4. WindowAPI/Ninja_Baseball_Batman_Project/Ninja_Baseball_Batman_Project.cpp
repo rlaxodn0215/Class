@@ -13,6 +13,9 @@
 #include"Sound.h"
 #include"Vector3.h"
 #include<iostream>
+//#include<stdlib.h>
+//#include<crtdbg.h>
+//#include<vld.h>
 
 #define MAX_LOADSTRING 100
 #define TIMER 1
@@ -63,6 +66,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -83,15 +87,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    // 기본 메시지 루프입니다:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+
+    while (true) {
+        if (!GetMessage(&msg, nullptr, 0, 0)) {
+            DWORD dwError = GetLastError();
+            if (dwError != 0) { // : 오류 발생시
+                char errorString[256];
+                sprintf_s(errorString, "GetMessage failed with error code %d", dwError);
+                MessageBox(nullptr, (LPCWSTR)errorString, L"Error", MB_OK | MB_ICONERROR);
+                break;
+            }
+            else {
+                // : 0 - 종료
+                break;
+            }
         }
+
+        // : 
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
+
+    //// 기본 메시지 루프입니다:
+    //while (GetMessage(&msg, nullptr, 0, 0))
+    //{
+    //    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+    //    {
+    //        TranslateMessage(&msg);
+    //        DispatchMessage(&msg);
+    //    }
+    //}
 
     return (int) msg.wParam;
 }
