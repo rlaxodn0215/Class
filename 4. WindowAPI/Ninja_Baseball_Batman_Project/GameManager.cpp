@@ -385,7 +385,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 if (m_ComboFlag[4] && m_ComboFlag[5] && !m_PlayerDynamite)
                 {
                     m_Player->HomeRun(hdc,m_WinRect,m_KeyFlag[5]);
-                    m_Player->SetAttack(25);
+                    m_Player->SetAttack(20);
 
                     if (m_Player->GetLookRight())
                         m_Player->SetPos(m_Player->GetPos() + Vector3(10, 0, 0));
@@ -418,9 +418,15 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
                 if (m_ComboFlag[0] && m_ComboFlag[1] && m_ComboFlag[5] || m_PlayerDynamite)
                 {
-                    m_PlayerDynamite = true;
-                    m_Player->SetTakeGravity(false);
-                    m_Player->Dynamite(hdc, m_TimerFrame, m_WinRect, m_PlayerDynamite);
+                    if (m_Player->GetCurHP() > 5 || PlayerEternal)
+                    {
+                        if(!PlayerEternal && !m_PlayerDynamite)
+                            m_Player->SetCurHP(m_Player->GetCurHP() - 5);
+
+                        m_PlayerDynamite = true;
+                        m_Player->SetTakeGravity(false);
+                        m_Player->Dynamite(hdc, m_TimerFrame, m_WinRect, m_PlayerDynamite);
+                    }
                 }
             }
         }
