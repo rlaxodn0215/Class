@@ -852,7 +852,7 @@ void GameManager::MonsterUpdate(HDC hdc) //몬스터 이동 밎 죽음 처리
 
 void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 body Collider이 접촉 확인
 {
-    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++) 
+    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++)
     {
         CircleCollider temp = iter->get()->GetBodyCircleCollider();
         BoxCollider temp1 = m_Player->GetBodyCollider();
@@ -863,26 +863,39 @@ void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 b
 
             if (m_Player->GetAttackTimer() == m_Player->GetAttackTiming())
             {
-                iter->get()->SetCurHP(iter->get()->GetCurHP() - m_Player->GetAttack());
-                iter->get()->Damaged(hdc, m_WinRect);
+                for (auto iter1 = m_Wave->LiveMonsters.begin(); iter1 != m_Wave->LiveMonsters.end(); iter1++)
+                {
+                    CircleCollider temp1 = iter1->get()->GetBodyCircleCollider();
+
+                    if (m_Player->GetAttackCollider().OnTrigger(temp1, 5))
+                    {
+                        iter1->get()->SetCurHP(iter1->get()->GetCurHP() - m_Player->GetAttack());
+                        iter1->get()->Damaged(hdc, m_WinRect);
+                    }
+                }
             }
         }
 
-        if (iter->get()->GetAttackCollider().OnTrigger(temp1, 5)) //몬스터 공격
+        for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end(); iter++)
         {
-            iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1); //공격 타이밍 측정
 
-            if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming() && !PlayerEternal)
+            if (iter->get()->GetAttackCollider().OnTrigger(temp1, 5)) //몬스터 공격
             {
-                m_Player->SetCurHP(m_Player->GetCurHP() - iter->get()->GetAttack());
+                iter->get()->SetAttackTimer(iter->get()->GetAttackTimer() + 1); //공격 타이밍 측정
 
-                if (m_Player->GetAlive())
+                if (iter->get()->GetAttackTimer() == iter->get()->GetAttackTiming() && !PlayerEternal)
                 {
-                    if (!PlayerNoHitAni)
-                        m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
-                }
+                    m_Player->SetCurHP(m_Player->GetCurHP() - iter->get()->GetAttack());
 
+                    if (m_Player->GetAlive())
+                    {
+                        if (!PlayerNoHitAni)
+                            m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
+                    }
+
+                }
             }
+
         }
     }
 }

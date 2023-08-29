@@ -477,7 +477,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 
 	else if (m_PlayingDynamite == 3) //squish...
 	{
-		m_AttackTiming = 3;
+		m_AttackTiming = 1;
 		m_Attack = 50;
 
 		m_DynamiteTimer++;
@@ -539,6 +539,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 			m_Position.m_Y = m_Position.m_Z;
 			m_PlayingDynamite = 0;
 			m_DynamiteTimer = 0;
+			m_AttackTimer = 0;
 			m_CurSound->ResetAudio();
 			m_Sounds[RYNO_DYNAMITE_CRUSH]->ResetAudio();
 			playerDynamite = false;
@@ -620,7 +621,12 @@ void Baseball::Damaged(HDC hdc, RECT winRect)
 		}
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
-		m_CurSound = m_Sounds[BASEBALL_HIT];
+
+		if(m_CurHp<=0)
+			m_CurSound = m_Sounds[BASEBALL_DEAD];
+		else
+			m_CurSound = m_Sounds[BASEBALL_HIT];
+
 		m_CurSound->ResetAudio();
 		m_CurSound->PlayAudio();
 		m_Status = DAMAGED;
@@ -653,6 +659,9 @@ void Baseball::Dead()
 		m_Status = DEAD;
 		m_DeadTimer = 0;
 		m_CurAniShowOffset.clear();
+
+		if(m_CurSound != NULL)
+			m_CurSound->ResetAudio();
 		m_CurSound = m_Sounds[BASEBALL_DEAD];
 		m_CurSound->ResetAudio();
 		m_CurSound->PlayAudio();
