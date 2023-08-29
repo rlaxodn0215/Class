@@ -10,6 +10,7 @@ GameManager::GameManager()
     m_Scene = &GameManager::TitleScene;
     ///
 	m_Player = NULL;
+    m_Wave = NULL;
 }
 
 GameManager::~GameManager()
@@ -112,6 +113,7 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->LoadWaveDatas(hWnd, m_WinRect, m_Wave);
         dataManager->LoadPlayerDatas(hWnd, m_Player);
+        //cout << "load datas" << endl;
         dataManager->m_Sounds[PLAYSCENE_BGM]->LoopAudio();
         m_Start = false;
     }
@@ -128,6 +130,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[ENDING]->LoopAudio();
         m_Start = false;
+        //cout << "LOAD DATAS" << endl;
     }
 
     ShowBackStage(hdc, dataManager);
@@ -172,7 +175,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
         dataManager->m_Animations[ORANGE_DASH]->AniPlay(hdc, {dataManager->m_Animations[ORANGE_DASH]->GetPivots()[0].x + 450,
                 dataManager->m_Animations[ORANGE_DASH]->GetPivots()[0].y + 260 }, 0, 3.5f, 3.5f, true, m_WinRect);
 
-        ShowPlayerPoints(hdc, { 800,270 },dataManager, 3.5f, 3.5f, 12345, 60);
+        ShowPlayerPoints(hdc, { 800,270 },dataManager, 3.5f, 3.5f, m_Player->GetPoints(), 60);
 
         MakeName(hdc,dataManager);
     }
@@ -212,7 +215,6 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 {
     if (m_SceneNum == 1)
     {
-
         if (GetAsyncKeyState(VK_LEFT) & 0x8000 && !m_SelectFlag)
         {
             if (m_SelectNum > 0 && !m_KeyFlag[2])
@@ -220,7 +222,6 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 m_Cursor.x = m_SelectPosX[--m_SelectNum];
                 m_KeyFlag[2] = true;
             }
-
         }
 
         if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && !m_SelectFlag)
@@ -232,14 +233,14 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
             }
         }
 
-        if (GetAsyncKeyState(0x41) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000 && !m_SelectFlag)
+        if ((GetAsyncKeyState(0x41) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) && !m_SelectFlag)
         {
             m_SelectTimer = 0;
             dataManager->m_Sounds[SELECTED_SOUND]->PlayAudio();
             m_SelectFlag = true;
         }
 
-        if (m_SelectTimer <= -20)
+        if (m_SelectTimer <= -25)
         {
             m_SceneNum++;
             m_Scene = &GameManager::PlayScene;
@@ -251,7 +252,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
     else if (m_SceneNum == 2)
     {
-
+        //cout << "input" << endl;
         if (m_ComboFlag[0] || m_ComboFlag[1] || m_ComboFlag[2] ||
             m_ComboFlag[3] || m_ComboFlag[4] || m_ComboFlag[5])
         {
@@ -429,6 +430,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
             m_Player->SetVel({ 0,0,0 });
             m_Player->Dead();
             m_Player->SetDeadTimer(m_Player->GetDeadTimer()+1);
+
             if (m_Player->GetDeadTimer() >= 50)
             {
                 m_Player->SetAlive(false);
@@ -436,59 +438,23 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 m_SceneNum++;
                 m_Scene = &GameManager::EndingScene;
                 m_Start = true;
+                //cout << "MOVE NEXT SCENE" << endl;
             }
 
         }
     }
 }
 
-void GameManager::ShowBackStage(HDC hdc, DataManager * dataManager)
-{
-    static int pos_X = 0; // startOffset 설정
-    static int pos_Y = 0;
-    static bool down = true;
-
-    if (pos_X > -3 * dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetWidths()[0]) pos_X -= 40;
-    else pos_X = 0;
-
-    if (down)
-    {
-        if (pos_Y >= -(3 * dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetHeights()[0] - m_WinRect.bottom / 2))
-            pos_Y -= 2;
-        else
-            down = false;
-
-    }
-
-    else
-    {
-        if (pos_Y <= 0)
-            pos_Y += 2;
-        else
-            down = true;
-    }
-
-    dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->AniPlay(hdc, { pos_X + dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].x, pos_Y +
-        dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].y}, 0, 3.0f, 3.0f, true, m_WinRect);
-    dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->AniPlay(hdc, { pos_X + dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].x +
-        3 * dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetWidths()[0], pos_Y
-        + dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].y }, 0, 3.0f, 3.0f, true, m_WinRect);
-
-    dataManager->m_Animations[STAGE_6_BOSS]->AniPlay(hdc, { dataManager->m_Animations[STAGE_6_BOSS]->GetPivots()[0].x,
-        dataManager->m_Animations[STAGE_6_BOSS]->GetPivots()[0].y - 3 }, 0, 3.0f, 3.0f, true, m_WinRect);
-
-}
-
 void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataManager)
 {
     if (m_SceneNum == 0)
     {
-        m_Start = true;
         m_SceneNum++;
         m_Scene = &GameManager::SelectScene;
+        m_Start = true;
     }
 
-    else if (m_SceneNum==1 || m_SceneNum == 2)
+    else if (m_SceneNum == 1 || m_SceneNum == 2)
     {
         if (wParam == VK_UP)
         {
@@ -534,10 +500,13 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
 
     else if (m_SceneNum == 3)
     {
+       // cout << "INPUTS" << endl;
+
         if (m_FirstPush)
         {
             m_FirstPush = false;
         }
+
         else
         {
             if (wParam == VK_UP || wParam == VK_RIGHT)
@@ -593,6 +562,43 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
 
     }
     
+}
+
+void GameManager::ShowBackStage(HDC hdc, DataManager* dataManager)
+{
+    static int pos_X = 0; // startOffset 설정
+    static int pos_Y = 0;
+    static bool down = true;
+
+    if (pos_X > -3 * dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetWidths()[0]) pos_X -= 40;
+    else pos_X = 0;
+
+    if (down)
+    {
+        if (pos_Y >= -(3 * dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetHeights()[0] - m_WinRect.bottom / 2))
+            pos_Y -= 2;
+        else
+            down = false;
+
+    }
+
+    else
+    {
+        if (pos_Y <= 0)
+            pos_Y += 2;
+        else
+            down = true;
+    }
+
+    dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->AniPlay(hdc, { pos_X + dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].x, pos_Y +
+        dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].y }, 0, 3.0f, 3.0f, true, m_WinRect);
+    dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->AniPlay(hdc, { pos_X + dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].x +
+        3 * dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetWidths()[0], pos_Y
+        + dataManager->m_Animations[BACKGROUND1_BACKSTAGE]->GetPivots()[0].y }, 0, 3.0f, 3.0f, true, m_WinRect);
+
+    dataManager->m_Animations[STAGE_6_BOSS]->AniPlay(hdc, { dataManager->m_Animations[STAGE_6_BOSS]->GetPivots()[0].x,
+        dataManager->m_Animations[STAGE_6_BOSS]->GetPivots()[0].y - 3 }, 0, 3.0f, 3.0f, true, m_WinRect);
+
 }
 
 void GameManager::ShowUI(HDC hdc, DataManager * dataManager)

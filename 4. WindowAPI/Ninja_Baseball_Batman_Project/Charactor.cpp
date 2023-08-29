@@ -373,7 +373,6 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 			m_Animations[RYNO_DYNAMITE_BALL]->AniPlay(hdc, { m_Position.m_X - 70, m_Position.m_Y - 75 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
 		}
 		
-
 		if (m_DynamiteTimer > 20)
 		{
 			m_PlayingDynamite = 1;

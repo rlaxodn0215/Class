@@ -271,6 +271,7 @@ void EndGame(HWND hWnd)
 {
     KillTimer(hWnd, TIMER);
     gameManager->Release();
+    dataManager->Release();
 }
 
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
@@ -281,9 +282,10 @@ VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
     if(gameManager->GetInstance()->m_Player !=NULL)
         gameManager->GetInstance()->Gravity(2); // 중력 만들기
 
-    if (gameManager->GetInstance()->m_TimerFrame >= 100000)
+    if (gameManager->GetInstance()->m_TimerFrame >= 10000)
         gameManager->GetInstance()->m_TimerFrame = 0;
-    gameManager->GetInstance()->m_TimerFrame++; //타이머 작동
+    else
+        gameManager->GetInstance()->m_TimerFrame++; //타이머 작동
 
     InvalidateRect(hWnd, NULL, FALSE); // 화면 갱신
 }

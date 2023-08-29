@@ -31,9 +31,9 @@ public:
 	int curFrame = 0;
 
 	//Select Scene
-	POINT m_Cursor = { 50,150 };			// select에서 커서의 처음 위치
-	int m_SelectPosX[4] = { 50,290,530,765 }; // 커서의 위치값 지정
-	bool m_SelectFlag = false;				// 선택 유뮤 판단
+	POINT m_Cursor = { 50,150 };				// select에서 커서의 처음 위치
+	int m_SelectPosX[4] = { 50,290,530,765 };	// 커서의 위치값 지정
+	bool m_SelectFlag = false;					// 선택 유뮤 판단
 	int m_SelectNum = 0;
 
 	//Play Scene
