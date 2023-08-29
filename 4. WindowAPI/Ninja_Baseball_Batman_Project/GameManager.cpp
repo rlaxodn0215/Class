@@ -900,18 +900,6 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
         temp->Move();
         m_Wave->LiveMonsters.push_back(temp);
         m_Wave->DeadMonsters.pop();
-
-        //m_Wave->DeadMonsters.front()->SetAlive(true);
-        //m_Wave->DeadMonsters.front()->SetCurHP(m_Wave->DeadMonsters.front()->GetMaxHP());
-
-        //// spawn 지역에 랜덤으로 소환
-        //int n = rand() % 10;
-        //m_Wave->DeadMonsters.front()->SetPos(Vector3(m_Wave->SpawnArea[n].x, m_Wave->SpawnArea[n].y, m_Wave->SpawnArea[n].y));
-
-        //m_Wave->DeadMonsters.front()->Move();
-
-        //m_Wave->LiveMonsters.push_back(m_Wave->DeadMonsters.front());
-        //m_Wave->DeadMonsters.pop();
     }
 }
 

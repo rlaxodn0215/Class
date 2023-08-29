@@ -212,8 +212,10 @@ void Ryno::Damaged(HDC hdc, RECT winRect, bool& keydown)
 
 		else
 		{
-			if (n) m_CurAni = m_Animations[RYNO_DAMAGED_REV];
-			else m_CurAni = m_Animations[RYNO_DAMAGED1_REV];
+			if (n) 
+				m_CurAni = m_Animations[RYNO_DAMAGED_REV];
+			else
+				m_CurAni = m_Animations[RYNO_DAMAGED1_REV];
 		}
 
 		m_CurAniSpeed = 4;
@@ -671,6 +673,12 @@ void Baseball::Attack(HDC hdc, RECT winRect)
 {
 	if (m_Status != ATTACK)
 	{
+
+		m_CurAniSpeed = 5;
+		m_CurAniFrameNum = 0;
+		m_AttackTiming = 8;
+		m_AttackTimer = 0;
+
 		if (m_isLookRight)
 		{
 			if (rand() % 2)
@@ -686,11 +694,6 @@ void Baseball::Attack(HDC hdc, RECT winRect)
 			else
 				m_CurAni = m_Animations[BASEBALL_PUNCH_REV];
 		}
-
-		m_CurAniSpeed = 5;
-		m_CurAniFrameNum = 0;
-		m_AttackTiming = 8;
-		m_AttackTimer = 0;
 
 		m_Status = ATTACK;
 	}
