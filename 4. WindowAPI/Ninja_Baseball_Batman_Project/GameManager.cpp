@@ -7,8 +7,8 @@ extern bool OnCollider;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 1;
-    m_Scene = &GameManager::TitleScene;
+	m_SceneNum = 2;
+    m_Scene = &GameManager::PlayScene;
     ///
 	m_Player = NULL;
     m_Wave = NULL;
