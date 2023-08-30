@@ -396,7 +396,7 @@ INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             return (INT_PTR)TRUE;
         }
 
-        SetDlgItemText(hDlg, IDC_CONTROL, control);
+        SetDlgItemText(hDlg, IDC_CONTROL_TEXT, control);
         CloseHandle(hFile);
     }
     return (INT_PTR)TRUE;

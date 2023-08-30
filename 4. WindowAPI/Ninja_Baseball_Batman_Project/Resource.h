@@ -20,7 +20,7 @@
 #define IDC_EDIT_MONSTER_HP             1004
 #define IDC_CHECKPLAYERHP               1005
 #define IDC_CHECKPLAYERNOHIT            1006
-#define IDC_CONTROL                     1006
+#define IDC_CONTROL_TEXT                1006
 #define IDC_EDIT_ATTACK                 1007
 #define IDC_text11                      1008
 #define ID_text4                        1009
