@@ -7,8 +7,8 @@ extern bool OnCollider;
 GameManager::GameManager()
 {
     ///
-    m_SceneNum = 1;
-    m_Scene = &GameManager::SelectScene;
+    m_SceneNum = 0;
+    m_Scene = &GameManager::TitleScene;
     ///
     m_Player = NULL;
     m_Wave = NULL;
@@ -880,7 +880,8 @@ void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 b
                     if (m_Player->GetAlive())
                     {
                         if (!PlayerNoHitAni)
-                            m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
+                            m_Player->Damaged(hdc, m_WinRect);
+                            //m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
                     }
 
                 }
