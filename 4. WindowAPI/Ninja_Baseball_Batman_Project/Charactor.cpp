@@ -409,7 +409,8 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 		m_CurAniFrameNum = 0;
 		m_AttackTiming = 6;
 		m_AttackTimer = 0;
-		m_CurSound->ResetAudio();
+		if(m_CurSound !=NULL)
+			m_CurSound->ResetAudio();
 		m_CurSound = m_Sounds[RYNO_HOMERUN_SOUND];
 		if (!m_CurSound)
 		{
