@@ -83,6 +83,13 @@ void Ryno::Idle()
 		m_Status = IDLE;
 		m_CurAniShowOffset.clear();
 
+		m_CurAniSpeed = 2;
+
+		m_Position = { m_Position.m_X, m_Position.m_Z, m_Position.m_Z };
+
+		if (m_CurSound != NULL)
+			m_CurSound->ResetAudio();
+
 		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_IDLE];
 		else
@@ -93,13 +100,6 @@ void Ryno::Idle()
 			MessageBox(NULL, _T("Ryno Idle m_CurAni -> NULL"), _T("¿¡·¯"), MB_OK);
 			return;
 		}
-
-		m_CurAniSpeed = 2;
-
-		m_Position = { m_Position.m_X, m_Position.m_Z, m_Position.m_Z };
-
-		if (m_CurSound != NULL)
-			m_CurSound->ResetAudio();
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 		{
@@ -115,7 +115,6 @@ void Ryno::Idle()
 		m_AttackColliders.SetArea({ -1,-1,-1,-1 });
 
 	}
-
 
 }
 
