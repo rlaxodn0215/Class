@@ -29,32 +29,45 @@ Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])
 
 	if (hFile == NULL)
 	{
-		MessageBox(NULL, _T("데이터 파일 로드 에러"), _T("에러"), MB_OK);
+		MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
 	}
-
 
 	TCHAR buff[1000] = {};
 	char chbuff[1000] = {};
 	size_t convertedChars = 0;
 
-	
-	ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-	//텍스트 직접 수정하면 안됨
-	if (buff[0] == 65279)
+	if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
 	{
-		SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-		ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+		if (buff[0] == 0xFEFF)
+		{
+			_LARGE_INTEGER temp;
+			temp.QuadPart = 2;
+			if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+				ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+			else
+			{
+				MessageBox(NULL, _T("Animation 데이터 파일 커서 이동 에러"), _T("에러"), MB_OK);
+				CloseHandle(hFile);
+				return;
+			}
+		}
+	}
+
+	else
+	{
+		MessageBox(NULL, _T("Animation 데이터 파일 읽기 에러"), _T("에러"), MB_OK);
+		CloseHandle(hFile);
+		return;
 	}
 
 #ifdef UNICODE
-		wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
+	wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
 #else
-		strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
+	strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
 #endif
 
 	int i = 0;
-	m_FrameTotalCount = FindNum(i,chbuff);
+	m_FrameTotalCount = FindNum(i, chbuff);
 
 	for (int j = 0; j < m_FrameTotalCount; j++)
 	{
@@ -99,48 +112,17 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 	int posX = offset_location.x - m_Pivot[spriteIndex].x;
 	int posY = offset_location.y - m_Pivot[spriteIndex].y;
 
-	if (lookRight)
-	{
-		HDC hMemDC;
-		HBITMAP holdBitmap;
+	HDC hMemDC;
+	HBITMAP holdBitmap;
 
-		hMemDC = CreateCompatibleDC(hdc);
-		holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());	
+	hMemDC = CreateCompatibleDC(hdc);
+	holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());
 
-		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
-			bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
-				m_ResourceSprite->GetTransparentColor().m_Z));
+	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
+		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
+			m_ResourceSprite->GetTransparentColor().m_Z));
 
-		SelectObject(hMemDC, holdBitmap);
-		DeleteDC(hMemDC);
+	SelectObject(hMemDC, holdBitmap);
+	DeleteDC(hMemDC);
 
-	}
-
-	else
-	{
-		HDC hMemDC, hMemDC1;
-		HBITMAP holdBitmap, holdBitmap1;
-
-		hMemDC = CreateCompatibleDC(hdc);
-		holdBitmap = (HBITMAP)SelectObject(hMemDC, CreateCompatibleBitmap(hdc, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight)));
-
-		hMemDC1 = CreateCompatibleDC(hMemDC);
-		holdBitmap1 = (HBITMAP)SelectObject(hMemDC1, m_ResourceSprite->GetSpriteImage());
-
-		StretchBlt(hMemDC, (int)(bx * imageRatioWidth)-1, 0, -(int)(bx* imageRatioWidth) , (int)(by * imageRatioHeight), hMemDC1, xStart, yStart, bx, by, SRCCOPY);
-
-		TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, 0, 0, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight),
-			RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
-				m_ResourceSprite->GetTransparentColor().m_Z));
-
-		SelectObject(hMemDC1, holdBitmap1);
-		DeleteDC(hMemDC1);
-
-		SelectObject(hMemDC, holdBitmap);
-		DeleteDC(hMemDC);
-
-
-	}
-
-	
 }
