@@ -18,7 +18,7 @@ BOOL CircleCollider::OnTrigger(Collider& other, int zOffsetDelta)
 {
 	Collider* base = &other;
 
-	if (m_PosZ  <= base->GetPosZ() + zOffsetDelta && m_PosZ  >= base->GetPosZ() - zOffsetDelta)
+	if (m_PosZ <= base->GetPosZ() + zOffsetDelta && m_PosZ >= base->GetPosZ() - zOffsetDelta)
 	{
 		if (other.GetType() == CIRCLE)
 		{
@@ -52,7 +52,7 @@ BOOL CircleCollider::OnTrigger(Collider& other, int zOffsetDelta)
 		return FALSE;
 }
 
-BOOL CircleCollider::OnCollision(Collider & other, int zOffsetDelta)
+BOOL CircleCollider::OnCollision(Collider& other, int zOffsetDelta)
 {
 	Collider* base = &other;
 
@@ -94,7 +94,7 @@ BOOL CircleCollider::OnCollision(Collider & other, int zOffsetDelta)
 			{
 				POINT way = { m_Center.x - nearX , m_Center.y - nearY };
 
-				double xGo = way.x * (m_Radius - sqrt(distance)) /sqrt(distance);
+				double xGo = way.x * (m_Radius - sqrt(distance)) / sqrt(distance);
 				double yGo = way.y * (m_Radius - sqrt(distance)) / sqrt(distance);
 
 				m_Center.x += xGo;
@@ -154,7 +154,7 @@ BOOL BoxCollider::OnTrigger(Collider& other, int zOffsetDelta)
 			int nearY = Clamp(circleOther->GetCenter().y, m_Area.top, m_Area.bottom);
 
 			int distance = (circleOther->GetCenter().x - nearX) * (circleOther->GetCenter().x - nearX)
-							+ (circleOther->GetCenter().y - nearY) * (circleOther->GetCenter().y - nearY);
+				+ (circleOther->GetCenter().y - nearY) * (circleOther->GetCenter().y - nearY);
 
 			if (circleOther->GetRadius() * circleOther->GetRadius() >= distance) return TRUE;
 			else return FALSE;
@@ -170,7 +170,7 @@ BOOL BoxCollider::OnTrigger(Collider& other, int zOffsetDelta)
 			BOOL yAxis = FALSE;
 
 			if (m_Area.left <= boxOther->GetArea().left)
-			{                   
+			{
 				if (m_Area.right >= boxOther->GetArea().left) xAxis = TRUE;
 				else xAxis = FALSE;
 			}
@@ -223,7 +223,7 @@ BOOL BoxCollider::OnCollision(Collider& other, int zOffsetDelta)
 
 			if (circleOther->GetRadius() * circleOther->GetRadius() >= distance)
 			{
-				POINT way = { nearX -  circleOther->GetCenter().x , nearY - circleOther->GetCenter().y };
+				POINT way = { nearX - circleOther->GetCenter().x , nearY - circleOther->GetCenter().y };
 
 				double xGo = way.x * (circleOther->GetRadius() - sqrt(distance)) / sqrt(distance);
 				double yGo = way.y * (circleOther->GetRadius() - sqrt(distance)) / sqrt(distance);
@@ -288,7 +288,7 @@ BOOL BoxCollider::OnCollision(Collider& other, int zOffsetDelta)
 				if (m_Area.top <= boxOther->GetArea().bottom)
 				{
 					yDiff = boxOther->GetArea().bottom - m_Area.top;
-					if(yDiff > boxOther->GetArea().bottom - boxOther->GetArea().top) yDiff = 0;
+					if (yDiff > boxOther->GetArea().bottom - boxOther->GetArea().top) yDiff = 0;
 					yAxis = TRUE;
 				}
 				else yAxis = FALSE;

@@ -2,7 +2,7 @@
 
 extern int MonsterSpawnTime;
 
-DataManager::DataManager():m_Number_ani(NULL), m_Alpha_ani(NULL)
+DataManager::DataManager() :m_Number_ani(NULL), m_Alpha_ani(NULL)
 {
     m_Sprites.clear();
     m_Animations.clear();
@@ -91,7 +91,7 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
     CloseHandle(hFile);
 }
 
-void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>> & temp, bool isReference)
+void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp, bool isReference)
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -236,15 +236,15 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
     CloseHandle(hFile);
 }
 
-void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> & player)
+void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player>& player)
 {
     map<string, shared_ptr<Animation>> temp;
     LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), temp, true);
 
     map<string, shared_ptr<Sound>> temp1;
-    LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), temp1, hWnd,true);
+    LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), temp1, hWnd, true);
 
-    if(player ==NULL)
+    if (player == NULL)
         player = shared_ptr<Ryno>(new Ryno(100, Vector3(500, 600, 600), 100, 100, 0, 10, temp, temp1));
 }
 
@@ -324,7 +324,7 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
     m_ChannelIndex = 1;// 사운드 채널 초기화
 }
 
-void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave)
+void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave>& wave)
 {
     if (wave != NULL)
     {
@@ -337,7 +337,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
     wave->WaveMonsters.clear();
     wave->LiveMonsters.clear();
 
-    while(!wave->DeadMonsters.empty())
+    while (!wave->DeadMonsters.empty())
     {
         wave->DeadMonsters.pop();
     }
@@ -349,7 +349,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
 
     for (int i = 0; i < 5; i++)
     {
-        wave->SpawnArea.push_back({ -200, 425 + 20*i });
+        wave->SpawnArea.push_back({ -200, 425 + 20 * i });
     }
 
     for (int i = 0; i < 5; i++)
@@ -358,14 +358,14 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
     }
 
     map<string, shared_ptr<Animation>> temp;
-    LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"),temp,true);
+    LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), temp, true);
 
     map<string, shared_ptr<Sound>> temp1;
-    LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"),temp1, hWnd, true);
+    LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), temp1, hWnd, true);
 
     for (int i = 0; i < wave->MaxMonsterNum; i++)
     {
-        wave->WaveMonsters.push_back(shared_ptr<Baseball>(new Baseball(i,Vector3(0, 0, 0), 50, 50,5, 1, temp, temp1, 100)));
+        wave->WaveMonsters.push_back(shared_ptr<Baseball>(new Baseball(i, Vector3(0, 0, 0), 50, 50, 5, 1, temp, temp1, 100)));
         wave->DeadMonsters.push(wave->WaveMonsters[i]);
     }
 
@@ -437,7 +437,7 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
             number = 10 * number + (score[i] - 48);
             i++;
         }
-        for(int i=0;i<4;i++)
+        for (int i = 0; i < 4; i++)
             temp.name[i] = name[i];
         temp.score = number;
         m_RankingDatas.push_back(temp);
@@ -453,7 +453,7 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     DWORD size;
     LARGE_INTEGER curPtr;
     curPtr.QuadPart = 0;
-    if(!SetFilePointerEx(hFile,curPtr , NULL, FILE_BEGIN))
+    if (!SetFilePointerEx(hFile, curPtr, NULL, FILE_BEGIN))
         MessageBox(NULL, _T("Ranking 파일 커서 이동 에러"), _T("에러"), MB_OK);
 
     int n = m_RankingDatas.size();
@@ -461,12 +461,12 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     {
         TCHAR rank[10];
         _stprintf_s(rank, L"%d\t", i + 1);
-        if(!WriteFile(hFile, rank, (DWORD)_tcslen(rank) * sizeof(TCHAR), &size, NULL))
+        if (!WriteFile(hFile, rank, (DWORD)_tcslen(rank) * sizeof(TCHAR), &size, NULL))
             MessageBox(NULL, _T("Ranking 파일 rank 쓰기 에러"), _T("에러"), MB_OK);
 
         TCHAR score[50];
         _stprintf_s(score, L"%d\t", m_RankingDatas[i].score);
-        if(!WriteFile(hFile, score, (DWORD)_tcslen(score) * sizeof(TCHAR), &size, NULL))
+        if (!WriteFile(hFile, score, (DWORD)_tcslen(score) * sizeof(TCHAR), &size, NULL))
             MessageBox(NULL, _T("Ranking 파일 score 쓰기 에러"), _T("에러"), MB_OK);
 
         TCHAR uniName[50] = {};

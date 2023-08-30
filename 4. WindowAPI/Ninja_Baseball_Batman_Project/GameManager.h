@@ -20,7 +20,7 @@ public:
 	int m_SceneNum = 0; // 씬 번호 : 0. title / 1. select / 2. play / 3. ending
 	bool m_Start = true; // 초기화 함수용 (void Start())
 
-	void(GameManager:: * m_Scene)(HWND,HDC,DataManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
+	void(GameManager::* m_Scene)(HWND, HDC, DataManager*);		// 해당 씬을 함수 포인터로 선언하여 화면에 출력
 	shared_ptr<Wave>  m_Wave;									// 웨이브 관련 포인터
 	shared_ptr<Player> m_Player;								// 플레이어 연결 포인터
 
@@ -50,10 +50,10 @@ public:
 	bool m_ShowLetter[3];				// 글사 선택시 보여주는 영역 확인
 	int m_NameCursor = 0;				// 이름 정할 때 정하는 위치
 	int m_NameCount = 0;				// 알파벳 선택용 카운트		
-	char m_Name[4] = {'A','A','A','\0'};		// 저장할 이름
+	char m_Name[4] = { 'A','A','A','\0' };		// 저장할 이름
 
 	void Gravity(int g);
-	
+
 	void TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager);
 	void SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager);
 	void PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager);
@@ -63,17 +63,17 @@ public:
 	void ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni);
 	void ShowUI(HDC hdc, DataManager* dataManager);
 	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
-	void ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* dataManager, float imageRatioWidth, float imageRatioHeight,const int points, int distance);
+	void ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* dataManager, float imageRatioWidth, float imageRatioHeight, const int points, int distance);
 	void MoveLetter(HDC hdc, int nameCursor, bool firstPush, DataManager* dataManager);
 	void ShowLetter(HDC hdc, DataManager* dataManager);
 	void ShowRanking(HDC hdc, DataManager* dataManager);
-	
+
 	void CharactorUpdate(HDC hdc, int Timer);
 	void MonsterUpdate(HDC hdc);
 	void TriggerCheck(HDC hdc);
 	void MonsterInstantiate(int timeInterval, int timer);
 	void RenderingCharactor(HDC hdc, int Timer);
-	static bool RenderingOrder(const shared_ptr<Charactor> & a, const shared_ptr<Charactor> & b)
+	static bool RenderingOrder(const shared_ptr<Charactor>& a, const shared_ptr<Charactor>& b)
 	{
 		return (a->GetPos().m_Z < b->GetPos().m_Z);
 	}

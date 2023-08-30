@@ -63,9 +63,9 @@ void EndGame(HWND hWnd);    //타이머 해제, 게임 매니저 해제
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
@@ -118,7 +118,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     //    }
     //}
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
 
@@ -133,17 +133,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_NINJABASEBALLBATMANPROJECT));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_NINJABASEBALLBATMANPROJECT);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_NINJABASEBALLBATMANPROJECT));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_NINJABASEBALLBATMANPROJECT);
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
@@ -160,20 +160,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+        200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
 
-   return TRUE;
+    return TRUE;
 }
 
 //
@@ -200,60 +200,60 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetTimer(hWnd, TIMER, 20, Timer);
         break;
     case WM_KEYUP:
-        if(gameManager !=NULL)
-            gameManager->GetInstance()->CheckKeyRelease(hWnd,wParam,dataManager);
+        if (gameManager != NULL)
+            gameManager->GetInstance()->CheckKeyRelease(hWnd, wParam, dataManager);
         break;
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // 메뉴 선택을 구문 분석합니다:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case ID_CONTROL:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_HowToPlay), hWnd, Control);
-                break;
-            case ID_SETTING:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_Settings), hWnd, Setting);
-                break;
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case ID_CONTROL:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_HowToPlay), hWnd, Control);
+            break;
+        case ID_SETTING:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_Settings), hWnd, Setting);
+            break;
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
-        {
-            hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+    {
+        hdc = BeginPaint(hWnd, &ps);
+        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
 
-            HDC hMemDC;
-            HBITMAP hOldBitmap;
+        HDC hMemDC;
+        HBITMAP hOldBitmap;
 
-            hMemDC = CreateCompatibleDC(hdc);
+        hMemDC = CreateCompatibleDC(hdc);
 
-            if (Screen == NULL)
-                Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
+        if (Screen == NULL)
+            Screen = CreateCompatibleBitmap(hdc, winRect.right, winRect.bottom);
 
-            hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
-            /////////////////////////////////////////////////////////////////////
+        hOldBitmap = (HBITMAP)SelectObject(hMemDC, Screen);
+        /////////////////////////////////////////////////////////////////////
 
-            (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, dataManager); // 더블 버퍼링으로 해당 씬 화면 출력
+        (gameManager->*(gameManager->GetInstance()->m_Scene))(hWnd, hMemDC, dataManager); // 더블 버퍼링으로 해당 씬 화면 출력
 
-            ////////////////////////////////////////////////////////////////////
-            BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
+        ////////////////////////////////////////////////////////////////////
+        BitBlt(hdc, 0, 0, winRect.right, winRect.bottom, hMemDC, 0, 0, SRCCOPY);
 
-            SelectObject(hMemDC, hOldBitmap);
-            DeleteDC(hMemDC);
+        SelectObject(hMemDC, hOldBitmap);
+        DeleteDC(hMemDC);
 
 
-            EndPaint(hWnd, &ps);
-        }
-        break;
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         EndGame(hWnd);
         PostQuitMessage(0);
@@ -312,7 +312,7 @@ void EndGame(HWND hWnd)
 {
     KillTimer(hWnd, TIMER);
 
-    if(gameManager !=NULL)
+    if (gameManager != NULL)
         gameManager->Release();
     if (dataManager != NULL)
         dataManager->Release();
@@ -340,8 +340,8 @@ VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
     HDC temp = GetDC(hWnd);
 
     gameInstance->GetInstance()->CheckKeyInput(hWnd, temp, dataInstance); //키 입력 선언
-        
-    if(gameInstance->GetInstance()->m_Player !=NULL)
+
+    if (gameInstance->GetInstance()->m_Player != NULL)
         gameInstance->GetInstance()->Gravity(2); // 중력 만들기
 
     if (gameInstance->GetInstance()->m_TimerFrame >= 10000)
@@ -378,7 +378,7 @@ INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 _LARGE_INTEGER temp;
                 temp.QuadPart = 2;
-                if(SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+                if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
                     ReadFile(hFile, control, sizeof(control), &rbytes, NULL);
                 else
                 {
@@ -396,7 +396,7 @@ INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             return (INT_PTR)TRUE;
         }
 
-        SetDlgItemText(hDlg, IDC_CONTROL, control);
+        SetDlgItemText(hDlg, IDC_CONTROL_TEXT, control);
         CloseHandle(hFile);
     }
     return (INT_PTR)TRUE;
@@ -419,10 +419,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_INITDIALOG:
     {
-        CheckDlgButton(hDlg,IDC_CHECKPLAYERHP, PlayerEternal);
+        CheckDlgButton(hDlg, IDC_CHECKPLAYERHP, PlayerEternal);
         CheckDlgButton(hDlg, IDC_CHECKPLAYERNOHIT, PlayerNoHitAni);
         CheckDlgButton(hDlg, IDC_ONCOLLIDER, OnCollider);
-        SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime*20, FALSE);
+        SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime * 20, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, MonsterHp, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_ATTACK, MonsterAttack, FALSE);
     }
@@ -441,7 +441,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             OnCollider = !OnCollider;
             break;
         case IDOK:
-            MonsterSpawnTime = (GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE))/20;
+            MonsterSpawnTime = (GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE)) / 20;
             MonsterHp = GetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, NULL, FALSE);
             MonsterAttack = GetDlgItemInt(hDlg, IDC_EDIT_ATTACK, NULL, FALSE);
 

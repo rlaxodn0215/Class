@@ -7,10 +7,10 @@ extern bool OnCollider;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 1;
+    m_SceneNum = 0;
     m_Scene = &GameManager::TitleScene;
     ///
-	m_Player = NULL;
+    m_Player = NULL;
     m_Wave = NULL;
 }
 
@@ -19,12 +19,12 @@ GameManager::~GameManager()
 
 }
 
-void GameManager::TitleScene(HWND hWnd, HDC hdc, DataManager * dataManager) // SceneNum = 0
+void GameManager::TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 0
 {
-    if (dataManager == NULL) return;
 
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->GetInstance()->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[TITLE_SOUND]->PlayAudio();
         m_Start = false;
@@ -36,17 +36,17 @@ void GameManager::TitleScene(HWND hWnd, HDC hdc, DataManager * dataManager) // S
         else curFrame = 0;
 
     dataManager->m_Animations[TITLE_SCREEN]->AniPlay(hdc, { dataManager->m_Animations[TITLE_SCREEN]->GetPivots()[0].x + 35,
-        dataManager->m_Animations[TITLE_SCREEN]->GetPivots()[0].y}, curFrame, 1.55f, 1.55f, true, m_WinRect);
+        dataManager->m_Animations[TITLE_SCREEN]->GetPivots()[0].y }, curFrame, 1.55f, 1.55f, true, m_WinRect);
 
-    
+
 }
 
 void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 1
 {
-    if (dataManager == NULL) return;
 
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[SELECT_BGM]->PlayAudio();
         m_Start = false;
@@ -60,7 +60,7 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
         for (int j = 0; j <= 630; j += 35)
         {
             dataManager->m_Animations[SELECT_BACKGROUND]->AniPlay(hdc, { dataManager->m_Animations[SELECT_BACKGROUND]->GetPivots()[0].x + i,
-                dataManager->m_Animations[SELECT_BACKGROUND]->GetPivots()[0].y + j}, 0, 1.55f, 1.55f, true, m_WinRect);
+                dataManager->m_Animations[SELECT_BACKGROUND]->GetPivots()[0].y + j }, 0, 1.55f, 1.55f, true, m_WinRect);
         }
     }
 
@@ -75,7 +75,7 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
         for (int i = 0; i < 4; i++)
         {
             //string temp = name[i] + "_select";
-            dataManager->m_Animations[ name[i] + _SELECT]->AniPlay(hdc, { dataManager->m_Animations[ name[i] + _SELECT]->GetPivots()[0].x + xOffset[i],
+            dataManager->m_Animations[name[i] + _SELECT]->AniPlay(hdc, { dataManager->m_Animations[name[i] + _SELECT]->GetPivots()[0].x + xOffset[i],
                 dataManager->m_Animations[name[i] + _SELECT]->GetPivots()[0].y + 250 }, 0, 3.0f, 3.0f, true, m_WinRect);
         }
 
@@ -101,7 +101,7 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
     for (int i = 0; i < 4; i++)
     {
         dataManager->m_Animations[name[i] + TAG]->AniPlay(hdc, { dataManager->m_Animations[name[i] + TAG]->GetPivots()[0].x
-            + xOffset[i],dataManager->m_Animations[name[i] + TAG]->GetPivots()[0].y + 560}, 0, 3.0f, 3.0f, true, m_WinRect);
+            + xOffset[i],dataManager->m_Animations[name[i] + TAG]->GetPivots()[0].y + 560 }, 0, 3.0f, 3.0f, true, m_WinRect);
     }
 
     dataManager->m_Animations[PLAYER_SELECT_DECO]->AniPlay(hdc, { dataManager->m_Animations[PLAYER_SELECT_DECO]->GetPivots()[0].x + 50,dataManager->m_Animations[PLAYER_SELECT_DECO]->GetPivots()[0].y + 65 }, 0, 3.0f, 3.0f, true, m_WinRect);
@@ -113,10 +113,9 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
 
 void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 2
 {
-    if (dataManager == NULL) return;
-
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->LoadWaveDatas(hWnd, m_WinRect, m_Wave);
         dataManager->LoadPlayerDatas(hWnd, m_Player);
@@ -124,18 +123,17 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->m_Sounds[PLAYSCENE_BGM]->LoopAudio();
         m_Start = false;
     }
-    
+
     ShowBackStage(hdc, dataManager);
     CharactorUpdate(hdc, m_TimerFrame);
-    ShowUI(hdc,dataManager);
+    ShowUI(hdc, dataManager);
 }
 
-void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // SceneNum = 3
+void GameManager::EndingScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 3
 {
-    if (dataManager == NULL) return;
-
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[ENDING_SOUND]->LoopAudio();
         m_Start = false;
@@ -146,7 +144,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
 
     if (m_ShowLetter[0] && m_ShowLetter[1] && m_ShowLetter[2])
     {
-        ShowRanking(hdc,dataManager);
+        ShowRanking(hdc, dataManager);
     }
 
     else
@@ -158,7 +156,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
         {
             string temp = BLUE;
             temp.push_back(gameOver[i]);
-            dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 70 + 100*i,
+            dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 70 + 100 * i,
                 dataManager->m_Animations[temp]->GetPivots()[0].y + 110 }, 0, 5.0f, 5.0f, true, m_WinRect);
         }
 
@@ -171,28 +169,28 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
         }
 
         //SCORE
-        char score[5] = { 'S', 'C', 'O', 'R', 'E'};
+        char score[5] = { 'S', 'C', 'O', 'R', 'E' };
 
         for (int i = 0; i < 5; i++)
         {
             string temp = ORANGE;
             temp.push_back(score[i]);
-            dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 150 + 60*i,
+            dataManager->m_Animations[temp]->AniPlay(hdc, { dataManager->m_Animations[temp]->GetPivots()[0].x + 150 + 60 * i,
                 dataManager->m_Animations[temp]->GetPivots()[0].y + 260 }, 0, 3.5f, 3.5f, true, m_WinRect);
         }
 
-        dataManager->m_Animations[ORANGE_DASH]->AniPlay(hdc, {dataManager->m_Animations[ORANGE_DASH]->GetPivots()[0].x + 450,
+        dataManager->m_Animations[ORANGE_DASH]->AniPlay(hdc, { dataManager->m_Animations[ORANGE_DASH]->GetPivots()[0].x + 450,
                 dataManager->m_Animations[ORANGE_DASH]->GetPivots()[0].y + 260 }, 0, 3.5f, 3.5f, true, m_WinRect);
 
         if (m_Player != NULL)
-            ShowPlayerPoints(hdc, { 800,270 },dataManager, 3.5f, 3.5f, m_Player->GetPoints(), 60);
+            ShowPlayerPoints(hdc, { 800,270 }, dataManager, 3.5f, 3.5f, m_Player->GetPoints(), 60);
 
-        MakeName(hdc,dataManager);
+        MakeName(hdc, dataManager);
     }
 
 }
 
-void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
+void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>>& timerAni)
 {
     int temp = m_SelectTimer / 10;
 
@@ -209,19 +207,19 @@ void GameManager::ShowTimer(HDC hdc, vector<shared_ptr<Animation>> & timerAni)
     {
         timerAni[ones]->AniPlay(hdc, { 477,65 }, 0, 3.5f, 3.5f, true, m_WinRect);
     }
-    
+
 }
 
 void GameManager::Gravity(int g)
 {
-   if (m_Player->GetVel().m_Y <= 30 && m_Player->GetPos().m_Y <= m_Player->GetPos().m_Z)
-   {
-       if(m_Player->GetTakeGravity())
-            m_Player->SetVel(m_Player->GetVel() + Vector3(0,g,0));
-   } 
+    if (m_Player->GetVel().m_Y <= 30 && m_Player->GetPos().m_Y <= m_Player->GetPos().m_Z)
+    {
+        if (m_Player->GetTakeGravity())
+            m_Player->SetVel(m_Player->GetVel() + Vector3(0, g, 0));
+    }
 }
 
-void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
+void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager* dataManager)
 {
     if (m_SceneNum == 1)
     {
@@ -343,7 +341,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
 
                         if (!m_PlayerDynamite)
                         {
-                            m_Player->SetVel(Vector3(- m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
+                            m_Player->SetVel(Vector3(-m_Player->GetMoveSpeed() * 2, m_Player->GetVel().m_Y, m_Player->GetVel().m_Z));
 
                             if (!m_Player->GetJumping())
                                 m_Player->Run();
@@ -394,7 +392,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
             {
                 if (m_ComboFlag[4] && m_ComboFlag[5] && !m_PlayerDynamite)
                 {
-                    m_Player->HomeRun(hdc,m_WinRect,m_KeyFlag[5]);
+                    m_Player->HomeRun(hdc, m_WinRect, m_KeyFlag[5]);
                     m_Player->SetAttack(20);
 
                     if (m_Player->GetLookRight())
@@ -430,7 +428,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 {
                     if (m_Player->GetCurHP() > 5 || PlayerEternal)
                     {
-                        if(!PlayerEternal && !m_PlayerDynamite)
+                        if (!PlayerEternal && !m_PlayerDynamite)
                             m_Player->SetCurHP(m_Player->GetCurHP() - 5);
 
                         m_PlayerDynamite = true;
@@ -445,7 +443,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
         {
             m_Player->SetVel({ 0,0,0 });
             m_Player->Dead();
-            m_Player->SetDeadTimer(m_Player->GetDeadTimer()+1);
+            m_Player->SetDeadTimer(m_Player->GetDeadTimer() + 1);
 
             if (m_Player->GetDeadTimer() >= 50)
             {
@@ -460,7 +458,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
     }
 }
 
-void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataManager)
+void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager* dataManager)
 {
     if (m_SceneNum == 0)
     {
@@ -473,7 +471,7 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
     {
         if (wParam == VK_UP)
         {
-            if(m_SceneNum == 2)
+            if (m_SceneNum == 2)
                 m_ComboFlag[0] = true;
             m_KeyFlag[0] = false;
         }
@@ -515,7 +513,7 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
 
     else if (m_SceneNum == 3)
     {
-       // cout << "INPUTS" << endl;
+        // cout << "INPUTS" << endl;
 
         if (m_FirstPush)
         {
@@ -564,7 +562,7 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
                 }
                 else
                 {
-                    for(int i = 0; i < 4;i++)
+                    for (int i = 0; i < 4; i++)
                         dataManager->m_PlayerData.name[i] = m_Name[i];
                     dataManager->m_PlayerData.score = m_Player->GetPoints();
                     dataManager->MakeRanking(_T("PlayerRankings.txt"));
@@ -581,7 +579,7 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
     {
 
     }
-    
+
 }
 
 void GameManager::ShowBackStage(HDC hdc, DataManager* dataManager)
@@ -621,7 +619,7 @@ void GameManager::ShowBackStage(HDC hdc, DataManager* dataManager)
 
 }
 
-void GameManager::ShowUI(HDC hdc, DataManager * dataManager)
+void GameManager::ShowUI(HDC hdc, DataManager* dataManager)
 {
     // UI
     if (m_Player->GetCurHP() > m_Player->GetMaxHP() * 0.35f)
@@ -643,14 +641,14 @@ void GameManager::ShowUI(HDC hdc, DataManager * dataManager)
          dataManager->m_Animations[PLAYER_HPBAR_EMPTY]->GetPivots()[0].y + 80 }, 0, 3.0f, 3.0f, true, m_WinRect);
 
     ShowPlayerHP(hdc, dataManager->m_Animations[PLAYER_HPBAR_FULL], { dataManager->m_Animations[PLAYER_HPBAR_FULL]->GetPivots()[0].x + 105,
-       dataManager->m_Animations[PLAYER_HPBAR_FULL]->GetPivots()[0].y + 80 }, 3.0f, 3.0f,(float)(m_Player->GetMaxHP() - m_Player->GetCurHP())/ m_Player->GetMaxHP());
+       dataManager->m_Animations[PLAYER_HPBAR_FULL]->GetPivots()[0].y + 80 }, 3.0f, 3.0f, (float)(m_Player->GetMaxHP() - m_Player->GetCurHP()) / m_Player->GetMaxHP());
 
-    ShowPlayerPoints(hdc, { 225,55 },dataManager, 3.0f, 3.0f, m_Player->GetPoints(),25);
+    ShowPlayerPoints(hdc, { 225,55 }, dataManager, 3.0f, 3.0f, m_Player->GetPoints(), 25);
 
 
 }
 
-void GameManager::ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar , POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio)
+void GameManager::ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio)
 {
     int bx = hpBar->GetWidths()[0];
     int by = hpBar->GetHeights()[0];
@@ -659,18 +657,18 @@ void GameManager::ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar , POINT offs
     int posX = offset_location.x - hpBar->GetPivots()[0].x;
     int posY = offset_location.y - hpBar->GetPivots()[0].y;
 
-     HDC hMemDC;
-     HBITMAP holdBitmap;
+    HDC hMemDC;
+    HBITMAP holdBitmap;
 
-     hMemDC = CreateCompatibleDC(hdc);
-     holdBitmap = (HBITMAP)SelectObject(hMemDC, hpBar->GetResourceSprite()->GetSpriteImage());
+    hMemDC = CreateCompatibleDC(hdc);
+    holdBitmap = (HBITMAP)SelectObject(hMemDC, hpBar->GetResourceSprite()->GetSpriteImage());
 
-     TransparentBlt(hdc, posX, posY, (int)((1 - hpRatio) * bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart + hpRatio * bx, yStart,
-         (1 - hpRatio) * bx, by, RGB(hpBar->GetResourceSprite()->GetTransparentColor().m_X, hpBar->GetResourceSprite()->GetTransparentColor().m_Y,
-             hpBar->GetResourceSprite()->GetTransparentColor().m_Z));
+    TransparentBlt(hdc, posX, posY, (int)((1 - hpRatio) * bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart + hpRatio * bx, yStart,
+        (1 - hpRatio) * bx, by, RGB(hpBar->GetResourceSprite()->GetTransparentColor().m_X, hpBar->GetResourceSprite()->GetTransparentColor().m_Y,
+            hpBar->GetResourceSprite()->GetTransparentColor().m_Z));
 
-     SelectObject(hMemDC, holdBitmap);
-     DeleteDC(hMemDC);
+    SelectObject(hMemDC, holdBitmap);
+    DeleteDC(hMemDC);
 
 }
 
@@ -686,7 +684,7 @@ void GameManager::ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* 
         temp /= 10;
     }
 
-    for (int i = 4; i >=0; i--)
+    for (int i = 4; i >= 0; i--)
     {
         if (number[i] == 0) showNum--;
         else break;
@@ -709,9 +707,9 @@ void GameManager::ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* 
         hMemDC = CreateCompatibleDC(hdc);
         holdBitmap = (HBITMAP)SelectObject(hMemDC, dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetSpriteImage());
 
-        TransparentBlt(hdc, posX - distance *i, posY, (int)( bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
-             bx, by, RGB(dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_X, dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_Y,
-                 dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_Z));
+        TransparentBlt(hdc, posX - distance * i, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
+            bx, by, RGB(dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_X, dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_Y,
+                dataManager->m_Number_ani[number[i]]->GetResourceSprite()->GetTransparentColor().m_Z));
 
         SelectObject(hMemDC, holdBitmap);
         DeleteDC(hMemDC);
@@ -720,13 +718,13 @@ void GameManager::ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* 
 
 void GameManager::MakeName(HDC hdc, DataManager* dataManager)
 {
-     MoveLetter(hdc, m_NameCursor, m_FirstPush, dataManager);
-     ShowLetter(hdc, dataManager);
+    MoveLetter(hdc, m_NameCursor, m_FirstPush, dataManager);
+    ShowLetter(hdc, dataManager);
 }
 
-void GameManager::MoveLetter(HDC hdc, int nameCursor, bool firstPush, DataManager * dataManager)
+void GameManager::MoveLetter(HDC hdc, int nameCursor, bool firstPush, DataManager* dataManager)
 {
-    int xOffset[3] = {360,460,560};
+    int xOffset[3] = { 360,460,560 };
     int yOffset = 430;
 
     if (firstPush)
@@ -776,7 +774,7 @@ void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
             dataManager->m_Animations[temp]->GetPivots()[0].y + 100 }, 0, 2.5f, 2.5f, true, m_WinRect);
     }
 
-    for (int i = 4; i < 9;i++ ) //SCORE
+    for (int i = 4; i < 9; i++) //SCORE
     {
         string temp = PINK;
         temp.push_back(title[i]);
@@ -795,9 +793,9 @@ void GameManager::ShowRanking(HDC hdc, DataManager* dataManager)
     for (int i = 0; i < dataManager->m_RankingDatas.size(); i++)
     {
         dataManager->m_Number_ani[10 + i]->AniPlay(hdc, { dataManager->m_Number_ani[10 + i]->GetPivots()[0].x + 70,
-        dataManager->m_Number_ani[10 + i]->GetPivots()[0].y + 200 + 100*i }, 0, 3.5f, 3.5f, true, m_WinRect);
+        dataManager->m_Number_ani[10 + i]->GetPivots()[0].y + 200 + 100 * i }, 0, 3.5f, 3.5f, true, m_WinRect);
 
-        ShowPlayerPoints(hdc, { 570 , 210 + 100 * i },dataManager, 3.0f, 3.0f, dataManager->m_RankingDatas[i].score, 55);
+        ShowPlayerPoints(hdc, { 570 , 210 + 100 * i }, dataManager, 3.0f, 3.0f, dataManager->m_RankingDatas[i].score, 55);
 
         dataManager->m_Alpha_ani[dataManager->m_RankingDatas[i].name[0] - 'A']->AniPlay(hdc, { dataManager->m_Alpha_ani[dataManager->m_RankingDatas[i].name[0] - 'A']->GetPivots()[0].x + 720,
                 dataManager->m_Alpha_ani[dataManager->m_RankingDatas[i].name[0] - 'A']->GetPivots()[0].y + 195 + 100 * i }, 0, 4.0f, 4.0f, true, m_WinRect);
@@ -821,7 +819,7 @@ void GameManager::MonsterUpdate(HDC hdc) //몬스터 이동 밎 죽음 처리
 {
     if (m_Wave == NULL || m_Wave->LiveMonsters.empty()) return;
 
-    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end();) 
+    for (auto iter = m_Wave->LiveMonsters.begin(); iter != m_Wave->LiveMonsters.end();)
     {
         iter->get()->MonsterAI(hdc, m_WinRect, m_Player, 3);
         iter->get()->Update(true);
@@ -880,7 +878,8 @@ void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 b
                     if (m_Player->GetAlive())
                     {
                         if (!PlayerNoHitAni)
-                            m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
+                            m_Player->Damaged(hdc, m_WinRect,m_KeyFlag[5]);
+                            
                     }
 
                 }
@@ -909,7 +908,6 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
 void GameManager::RenderingCharactor(HDC hdc, int timer)
 {
     if (m_Player == NULL) return;
-    if (m_Wave->LiveMonsters.empty()) return;
 
     vector<shared_ptr<Charactor>> RenderingIndex;
 
@@ -922,7 +920,7 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
 
     sort(RenderingIndex.begin(), RenderingIndex.end(), RenderingOrder);
 
-    for (int i = 0; i< RenderingIndex.size();i++)
+    for (int i = 0; i < RenderingIndex.size(); i++)
     {
         RenderingIndex[i]->ShowCharactor(hdc, RenderingIndex[i]->GetAniSpeed(), timer, m_WinRect);
 
