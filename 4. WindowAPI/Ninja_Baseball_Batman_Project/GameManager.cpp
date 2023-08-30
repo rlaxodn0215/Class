@@ -121,9 +121,10 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->LoadWaveDatas(hWnd, m_WinRect, m_Wave);
         dataManager->LoadPlayerDatas(hWnd, m_Player);
         //cout << "load datas" << endl;
-        dataManager->m_Sounds[PLAYSCENE_BGM]->LoopAudio();
         m_Start = false;
     }
+
+    dataManager->m_Sounds[PLAYSCENE_BGM]->LoopAudio(1500);
     
     ShowBackStage(hdc, dataManager);
     CharactorUpdate(hdc, m_TimerFrame);
@@ -137,10 +138,10 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
     if (m_Start)
     {
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
-        dataManager->m_Sounds[ENDING_SOUND]->LoopAudio();
         m_Start = false;
-        //cout << "LOAD DATAS" << endl;
     }
+
+    dataManager->m_Sounds[ENDING_SOUND]->LoopAudio(1200);
 
     ShowBackStage(hdc, dataManager);
 

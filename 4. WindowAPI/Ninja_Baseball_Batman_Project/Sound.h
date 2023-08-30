@@ -19,6 +19,8 @@ private:
 
 	int m_ChanelNumber;
 
+	int m_Timer = 0;
+
 public:
 	Sound() {};
 	Sound(HWND hWnd,const TCHAR lpszWave[100], int channel);
@@ -30,6 +32,6 @@ public:
 
 	void PlayAudio();
 	void ResetAudio();
-	void LoopAudio();
+	void LoopAudio(int timer);
 };
 
