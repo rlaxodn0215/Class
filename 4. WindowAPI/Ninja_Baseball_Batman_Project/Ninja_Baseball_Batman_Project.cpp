@@ -24,11 +24,11 @@
 
 using namespace std;
 
-#ifdef UNICODE
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-#else
-#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
-#endif // UNICODE
+//#ifdef UNICODE
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+//#else
+//#pragma comment(linker, "entry:WinMainCRTStartup /subsystem:console")
+//#endif // UNICODE
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -44,7 +44,7 @@ bool PlayerEternal = false;
 bool PlayerNoHitAni = false;
 bool OnCollider = false;
 
-int MonsterSpawnTime = 100;
+int MonsterSpawnTime = 150;
 int MonsterHp = 50; // Max & Cur
 int MonsterAttack = 10;
 

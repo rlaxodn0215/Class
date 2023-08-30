@@ -409,6 +409,7 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 		m_CurAniFrameNum = 0;
 		m_AttackTiming = 6;
 		m_AttackTimer = 0;
+		m_CurSound->ResetAudio();
 		m_CurSound = m_Sounds[RYNO_HOMERUN_SOUND];
 		if (!m_CurSound)
 		{
@@ -757,7 +758,7 @@ void Baseball::Damaged(HDC hdc, RECT winRect)
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
 
-		if(m_CurHp<=0)
+		if(m_CurHp<=0 && m_CurSound != m_Sounds[BASEBALL_DEAD_SOUND])
 			m_CurSound = m_Sounds[BASEBALL_DEAD_SOUND];
 		else
 			m_CurSound = m_Sounds[BASEBALL_HIT_SOUND];
@@ -818,6 +819,8 @@ void Baseball::Dead()
 				m_CurAniShowOffset.push_back({ -1000,0 });
 			}
 		}
+		m_BodyCircleColliders.SetCenter({ -100,-100});
+		m_BodyCircleColliders.SetRadius(1);
 		m_AttackColliders.SetArea({-10,-10,-1,-2});
 	}
 }

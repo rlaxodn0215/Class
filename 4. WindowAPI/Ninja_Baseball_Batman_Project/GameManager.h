@@ -64,6 +64,8 @@ public:
 	void ShowUI(HDC hdc, DataManager* dataManager);
 	void ShowPlayerHP(HDC hdc, shared_ptr<Animation> hpBar, POINT offset_location, float imageRatioWidth, float imageRatioHeight, float hpRatio);
 	void ShowPlayerPoints(HDC hdc, POINT offset_location, DataManager* dataManager, float imageRatioWidth, float imageRatioHeight,const int points, int distance);
+	void MoveLetter(HDC hdc, int nameCursor, bool firstPush, DataManager* dataManager);
+	void ShowLetter(HDC hdc, DataManager* dataManager);
 	void ShowRanking(HDC hdc, DataManager* dataManager);
 	
 	void CharactorUpdate(HDC hdc, int Timer);

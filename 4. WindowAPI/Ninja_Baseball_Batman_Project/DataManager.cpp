@@ -374,6 +374,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
 void DataManager::MakeRanking(const TCHAR rankFileName[100])
 {
     m_RankingDatas.push_back(m_PlayerData);
+
     int num = 1;
 
     HANDLE hFile = CreateFile(rankFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
