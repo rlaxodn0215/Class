@@ -420,12 +420,12 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
 #endif
 
     int index = 0;
-    //while (chbuff[index++] != '\n');
     while (1)
     {
         PlayerData temp;
         char rank[2], score[6], name[4];
         GetSentence(index, chbuff, rank);
+        if (buff[index] == '\0' || buff[index] == '\n') break;
         GetSentence(index, chbuff, score);
         GetSentence(index, chbuff, name);
         int number = 0;

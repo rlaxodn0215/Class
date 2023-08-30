@@ -147,6 +147,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
     if (m_ShowLetter[0] && m_ShowLetter[1] && m_ShowLetter[2])
     {
         ShowRanking(hdc,dataManager);
+        m_ReadyForEnd = true;
     }
 
     else
@@ -577,9 +578,9 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
 
     }
 
-    else
+    if(m_ReadyForEnd)
     {
-
+        exit(1);
     }
     
 }

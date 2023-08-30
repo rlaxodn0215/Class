@@ -51,6 +51,7 @@ public:
 	int m_NameCursor = 0;				// 이름 정할 때 정하는 위치
 	int m_NameCount = 0;				// 알파벳 선택용 카운트		
 	char m_Name[4] = {'A','A','A','\0'};		// 저장할 이름
+	bool m_ReadyForEnd = false;
 
 	void Gravity(int g);
 	
