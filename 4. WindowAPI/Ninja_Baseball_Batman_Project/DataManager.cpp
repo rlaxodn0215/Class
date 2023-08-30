@@ -446,7 +446,8 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
 
     sort(m_RankingDatas.begin(), m_RankingDatas.end());
 
-    if (m_RankingDatas.size() > 5) m_RankingDatas.pop_back();
+    while (m_RankingDatas.size() > 5)
+        m_RankingDatas.pop_back();
 
     DWORD size;
     LARGE_INTEGER curPtr;
