@@ -21,10 +21,10 @@ GameManager::~GameManager()
 
 void GameManager::TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 0
 {
-    if (dataManager == NULL) return;
 
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->GetInstance()->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[TITLE_SOUND]->PlayAudio();
         m_Start = false;
@@ -113,10 +113,10 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
 
 void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 2
 {
-    if (dataManager == NULL) return;
 
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->LoadWaveDatas(hWnd, m_WinRect, m_Wave);
         dataManager->LoadPlayerDatas(hWnd, m_Player);
@@ -132,10 +132,10 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
 
 void GameManager::EndingScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 3
 {
-    if (dataManager == NULL) return;
 
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[ENDING_SOUND]->LoopAudio();
         m_Start = false;
@@ -260,7 +260,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager* dataManager)
         m_SelectTimer--;
     }
 
-    else if (m_SceneNum == 2 && m_Player !=NULL)
+    else if (m_SceneNum == 2)
     {
         //cout << "input" << endl;
         if (m_ComboFlag[0] || m_ComboFlag[1] || m_ComboFlag[2] ||

@@ -84,7 +84,7 @@ void Ryno::Idle()
 		m_CurAniShowOffset.clear();
 
 		if (m_isLookRight)
-			m_CurAni = m_Animations[RYNO_IDLE_REV];
+			m_CurAni = m_Animations[RYNO_IDLE];
 		else
 			m_CurAni = m_Animations[RYNO_IDLE_REV];
 
