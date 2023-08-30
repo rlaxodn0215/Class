@@ -201,7 +201,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetTimer(hWnd, TIMER, 20, Timer);
         break;
     case WM_KEYUP:
-        gameManager->GetInstance()->CheckKeyRelease(hWnd,wParam,dataManager);
+        if(gameManager !=NULL)
+            gameManager->GetInstance()->CheckKeyRelease(hWnd,wParam,dataManager);
         break;
     case WM_COMMAND:
         {
@@ -288,32 +289,69 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 void Initalize(HWND hWnd)
 {
     GetClientRect(hWnd, &winRect);
+
     gameManager = GameManager::GetInstance(); // static 함수로 선언되어 gameManager이 nullptr이 되지 않는다.
+    if (gameManager == NULL)
+    {
+        DWORD dwError = GetLastError();
+        MessageBox(NULL, _T("게임 매니저 객체 생성 실패"), _T("에러"), MB_OK);
+        exit(1);
+    }
+
     gameManager->GetInstance()->m_WinRect = winRect;
+
     dataManager = DataManager::GetInstance();
+    if (dataManager == NULL)
+    {
+        DWORD dwError = GetLastError();
+        MessageBox(NULL, _T("데이터 매니저 객체 생성 실패"), _T("에러"), MB_OK);
+        exit(1);
+    }
 }
 
 void EndGame(HWND hWnd)
 {
     KillTimer(hWnd, TIMER);
-    gameManager->Release();
-    dataManager->Release();
+
+    if(gameManager !=NULL)
+        gameManager->Release();
+    if (dataManager != NULL)
+        dataManager->Release();
 }
 
 VOID CALLBACK Timer(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 {
-    HDC temp = GetDC(hWnd);
-    gameManager->GetInstance()->CheckKeyInput(hWnd, temp, dataManager); //키 입력 선언
-        
-    if(gameManager->GetInstance()->m_Player !=NULL)
-        gameManager->GetInstance()->Gravity(2); // 중력 만들기
+    if (gameManager == NULL)
+    {
+        DWORD dwError = GetLastError();
+        MessageBox(NULL, _T("게임 매니저 초기화 에러"), _T("에러"), MB_OK);
+        return;
+    }
 
-    if (gameManager->GetInstance()->m_TimerFrame >= 10000)
-        gameManager->GetInstance()->m_TimerFrame = 0;
+    if (dataManager == NULL)
+    {
+        DWORD dwError = GetLastError();
+        MessageBox(NULL, _T("데이터 매니저 초기화 에러"), _T("에러"), MB_OK);
+        return;
+    }
+
+    GameManager* gameInstance = gameManager->GetInstance();
+    DataManager* dataInstance = dataManager->GetInstance();
+
+    HDC temp = GetDC(hWnd);
+
+    gameInstance->GetInstance()->CheckKeyInput(hWnd, temp, dataInstance); //키 입력 선언
+        
+    if(gameInstance->GetInstance()->m_Player !=NULL)
+        gameInstance->GetInstance()->Gravity(2); // 중력 만들기
+
+    if (gameInstance->GetInstance()->m_TimerFrame >= 10000)
+        gameInstance->GetInstance()->m_TimerFrame = 0;
     else
-        gameManager->GetInstance()->m_TimerFrame++; //타이머 작동
+        gameInstance->GetInstance()->m_TimerFrame++; //타이머 작동
 
     InvalidateRect(hWnd, NULL, FALSE); // 화면 갱신
+    ReleaseDC(hWnd, temp);
 }
 
 INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -329,21 +367,38 @@ INT_PTR CALLBACK Control(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
         if (hFile == NULL)
         {
-            MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+            MessageBox(NULL, _T("조작법 데이터 파일 로드 에러"), _T("에러"), MB_OK);
         }
 
         DWORD rbytes;
         size_t convertedChars = 0;
 
-        ReadFile(hFile, control, sizeof(control), &rbytes, NULL);
-
-        if (control[0] == 65279)
+        if (ReadFile(hFile, control, sizeof(control), &rbytes, NULL))
         {
-            SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-            ReadFile(hFile, control, sizeof(control), &rbytes, NULL);
+            if (control[0] == 0xFEFF)
+            {
+                _LARGE_INTEGER temp;
+                temp.QuadPart = 2;
+                if(SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+                    ReadFile(hFile, control, sizeof(control), &rbytes, NULL);
+                else
+                {
+                    MessageBox(NULL, _T("파일 커서 이동 에러"), _T("에러"), MB_OK);
+                    CloseHandle(hFile); // << :핸들 닫기
+                    return (INT_PTR)TRUE;
+                }
+            }
+        }
+
+        else
+        {
+            MessageBox(NULL, _T("파일 읽기 에러"), _T("에러"), MB_OK);
+            CloseHandle(hFile); // << :핸들 닫기
+            return (INT_PTR)TRUE;
         }
 
         SetDlgItemText(hDlg, IDC_CONTROL, control);
+        CloseHandle(hFile);
     }
     return (INT_PTR)TRUE;
     case WM_COMMAND:
@@ -373,6 +428,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         SetDlgItemInt(hDlg, IDC_EDIT_ATTACK, MonsterAttack, FALSE);
     }
     return (INT_PTR)TRUE;
+
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
@@ -390,13 +446,18 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             MonsterHp = GetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, NULL, FALSE);
             MonsterAttack = GetDlgItemInt(hDlg, IDC_EDIT_ATTACK, NULL, FALSE);
 
-            gameManager->GetInstance()->m_Wave->TimeInterval = MonsterSpawnTime;
+            GameManager* gm = gameManager->GetInstance();
 
-            for (auto iter : gameManager->GetInstance()->m_Wave->WaveMonsters)
+            if (gm && gm->m_Wave)
             {
-                iter->SetCurHP(MonsterHp);
-                iter->SetMaxHP(MonsterHp);
-                iter->SetAttack(MonsterAttack);
+                gm->m_Wave->TimeInterval = MonsterSpawnTime;
+
+                for (auto iter : gm->m_Wave->WaveMonsters)
+                {
+                    iter->SetCurHP(MonsterHp);
+                    iter->SetMaxHP(MonsterHp);
+                    iter->SetAttack(MonsterAttack);
+                }
             }
 
             EndDialog(hDlg, LOWORD(wParam));

@@ -7,8 +7,8 @@ extern bool OnCollider;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 0;
-    m_Scene = &GameManager::TitleScene;
+	m_SceneNum = 2;
+    m_Scene = &GameManager::PlayScene;
     ///
 	m_Player = NULL;
     m_Wave = NULL;
@@ -129,7 +129,7 @@ void GameManager::EndingScene(HWND hWnd, HDC hdc,  DataManager* dataManager) // 
     if (m_Start)
     {
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
-        dataManager->m_Sounds[ENDING]->LoopAudio();
+        dataManager->m_Sounds[ENDING_SOUND]->LoopAudio();
         m_Start = false;
         //cout << "LOAD DATAS" << endl;
     }

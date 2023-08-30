@@ -29,22 +29,35 @@ Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])
 
 	if (hFile == NULL)
 	{
-		MessageBox(NULL, _T("데이터 파일 로드 에러"), _T("에러"), MB_OK);
+		MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
 	}
-
 
 	TCHAR buff[1000] = {};
 	char chbuff[1000] = {};
 	size_t convertedChars = 0;
 
-	
-	ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-	//텍스트 직접 수정하면 안됨
-	if (buff[0] == 65279)
+	if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
 	{
-		SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-		ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+		if (buff[0] == 0xFEFF)
+		{
+			_LARGE_INTEGER temp;
+			temp.QuadPart = 2;
+			if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+				ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+			else
+			{
+				MessageBox(NULL, _T("Animation 데이터 파일 커서 이동 에러"), _T("에러"), MB_OK);
+				CloseHandle(hFile);
+				return;
+			}
+		}
+	}
+
+	else
+	{
+		MessageBox(NULL, _T("Animation 데이터 파일 읽기 에러"), _T("에러"), MB_OK);
+		CloseHandle(hFile);
+		return;
 	}
 
 #ifdef UNICODE

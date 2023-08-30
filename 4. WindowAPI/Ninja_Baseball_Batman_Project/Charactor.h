@@ -101,6 +101,7 @@ public:
 	void Dead() { if (m_CurHp <= 0) m_isAlive = false; }
 	void Update(bool moveOK);
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
+	bool NullCheck();
 	virtual void ShowColliders(HDC hdc) = 0;
 };
 
@@ -166,6 +167,8 @@ public:
 	void Attack(bool isright) override;
 	void HomeRun(HDC hdc, RECT winRect, bool& keydown) override;
 	void Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
+
+	void RynoDynamiteEffect(HDC hdc, RECT winRect, bool isRight);
 };
 
 class Monster : public Charactor

@@ -2,8 +2,12 @@
 
 extern int MonsterSpawnTime;
 
-DataManager::DataManager()
+DataManager::DataManager():m_Number_ani(NULL), m_Alpha_ani(NULL)
 {
+    m_Sprites.clear();
+    m_Animations.clear();
+    m_Sounds.clear();
+    m_RankingDatas.clear();
 }
 
 DataManager::~DataManager()
@@ -32,6 +36,7 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
     if (hFile == NULL)
     {
         MessageBox(NULL, _T("Sprite 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+        return;
     }
 
     DWORD rbytes;
@@ -39,12 +44,28 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
     char chbuff[2000] = {};
     size_t convertedChars = 0;
 
-    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-    if (buff[0] == 65279)
+    if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
     {
-        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+        if (buff[0] == 0xFEFF)
+        {
+            _LARGE_INTEGER temp;
+            temp.QuadPart = 2;
+            if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+                ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+            else
+            {
+                MessageBox(NULL, _T("Sprite 파일 커서 이동 에러"), _T("에러"), MB_OK);
+                CloseHandle(hFile);
+                return;
+            }
+        }
+    }
+
+    else
+    {
+        MessageBox(NULL, _T("Sprite 파일 읽기 에러"), _T("에러"), MB_OK);
+        CloseHandle(hFile);
+        return;
     }
 
 #ifdef UNICODE
@@ -67,6 +88,7 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
         index++;
     }
 
+    CloseHandle(hFile);
 }
 
 void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>> & temp, bool isReference)
@@ -76,6 +98,7 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
     if (hFile == NULL)
     {
         MessageBox(NULL, _T("Animation 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+        return;
     }
 
     DWORD rbytes;
@@ -83,12 +106,28 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
     char chbuff[3000] = {};
     size_t convertedChars = 0;
 
-    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-    if (buff[0] == 65279)
+    if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
     {
-        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+        if (buff[0] == 0xFEFF)
+        {
+            _LARGE_INTEGER temp;
+            temp.QuadPart = 2;
+            if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+                ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+            else
+            {
+                MessageBox(NULL, _T("Animation 파일 커서 이동 에러"), _T("에러"), MB_OK);
+                CloseHandle(hFile);
+                return;
+            }
+        }
+    }
+
+    else
+    {
+        MessageBox(NULL, _T("Animation 파일 읽기 에러"), _T("에러"), MB_OK);
+        CloseHandle(hFile);
+        return;
     }
 
 #ifdef UNICODE
@@ -120,6 +159,8 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
         index++;
     }
 
+    CloseHandle(hFile);
+
 }
 
 void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd, bool isReference)
@@ -128,7 +169,8 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
 
     if (hFile == NULL)
     {
-        MessageBox(NULL, _T("Sprite 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+        MessageBox(NULL, _T("Sound 데이터 파일 로드 에러"), _T("에러"), MB_OK);
+        return;
     }
 
     DWORD rbytes;
@@ -136,12 +178,28 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
     char chbuff[2000] = {};
     size_t convertedChars = 0;
 
-    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-    if (buff[0] == 65279)
+    if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
     {
-        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+        if (buff[0] == 0xFEFF)
+        {
+            _LARGE_INTEGER temp;
+            temp.QuadPart = 2;
+            if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+                ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+            else
+            {
+                MessageBox(NULL, _T("Sound 파일 커서 이동 에러"), _T("에러"), MB_OK);
+                CloseHandle(hFile);
+                return;
+            }
+        }
+    }
+
+    else
+    {
+        MessageBox(NULL, _T("Sound 파일 읽기 에러"), _T("에러"), MB_OK);
+        CloseHandle(hFile);
+        return;
     }
 
 #ifdef UNICODE
@@ -175,6 +233,7 @@ void DataManager::LoadSounds(const TCHAR dataFileName[100], map<string, shared_p
         index++;
     }
 
+    CloseHandle(hFile);
 }
 
 void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> & player)
@@ -185,7 +244,8 @@ void DataManager::LoadPlayerDatas(HWND hWnd, shared_ptr<Player> & player)
     map<string, shared_ptr<Sound>> temp1;
     LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), temp1, hWnd,true);
 
-    player = shared_ptr<Ryno>(new Ryno(100, Vector3(500, 600, 600), 100, 100, 0, 10, temp, temp1));
+    if(player ==NULL)
+        player = shared_ptr<Ryno>(new Ryno(100, Vector3(500, 600, 600), 100, 100, 0, 10, temp, temp1));
 }
 
 void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
@@ -196,51 +256,45 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
     m_Number_ani.clear();
     m_Alpha_ani.clear();
 
-    if (SceneNum == 0)          // Title Scene
+    switch (SceneNum)
+    {
+    case 0: // Title Scene
     {
         LoadSprites(_T("AniData/Datas/TitleScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"),m_Animations,false);
-        LoadSounds(_T("AniData/Datas/TitleScene_Sounds.txt"),m_Sounds,hWnd,false);
-        m_ChannelIndex = 1;
+        LoadAnimations(_T("AniData/Datas/TitleScene_Animations.txt"), m_Animations, false);
+        LoadSounds(_T("AniData/Datas/TitleScene_Sounds.txt"), m_Sounds, hWnd, false);
     }
+    break;
 
-    else if (SceneNum == 1)     // Select Scene
+    case 1: // Select Scene
     {
         LoadSprites(_T("AniData/Datas/SelectScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"),m_Animations,false);
-        LoadSounds(_T("AniData/Datas/SelectScene_Sounds.txt"),m_Sounds, hWnd, false);
-        m_ChannelIndex = 1;
-
+        LoadAnimations(_T("AniData/Datas/SelectScene_Animations.txt"), m_Animations, false);
+        LoadSounds(_T("AniData/Datas/SelectScene_Sounds.txt"), m_Sounds, hWnd, false);
         for (int i = 0; i < 10; i++)
-        {
             m_Number_ani.push_back(m_Animations["Num_" + to_string(i)]);
-        }
     }
+    break;
 
-    else if (SceneNum == 2)     // Play Scene
+    case 2: // Play Scene
     {
         LoadSprites(_T("AniData/Datas/PlayScene_Sprites.txt"));
-        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"),m_Animations,false);
-        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"),m_Animations,false);
-        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), m_Animations,false);
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Ryno.txt"), m_Animations, false);
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_etc.txt"), m_Animations, false);
+        LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"), m_Animations, false);
         LoadSounds(_T("AniData/Datas/PlayScene_Sounds.txt"), m_Sounds, hWnd, false);
-        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"),m_Sounds, hWnd, false);
-        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"),m_Sounds, hWnd,false);
-        m_ChannelIndex = 1;
-
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Ryno.txt"), m_Sounds, hWnd, false);
+        LoadSounds(_T("AniData/Datas/PlayScene_Sounds_Baseball.txt"), m_Sounds, hWnd, false);
         for (int i = 0; i < 10; i++)
-        {
             m_Number_ani.push_back(m_Animations["Pointnum_" + to_string(i)]);
-        }
     }
+    break;
 
-    else                       //Ending Scene
+    case 3: //Ending Scene
     {
         LoadSprites(_T("AniData/Datas/EndingScene_Sprites.txt"));
         LoadAnimations(_T("AniData/Datas/EndingScene_Animations.txt"), m_Animations, false);
         LoadSounds(_T("AniData/Datas/EndingScene_Sounds.txt"), m_Sounds, hWnd, false);
-
-
         for (int i = 0; i < 10; i++)
         {
             m_Number_ani.push_back(m_Animations["Orange_" + to_string(i)]);
@@ -257,14 +311,38 @@ void DataManager::LoadSceneDatas(int SceneNum, HWND hWnd)
             temp.push_back((char)(i + 65));
             m_Alpha_ani.push_back(m_Animations[temp]);
         }
-       
+
         m_Alpha_ani.push_back(m_Animations["Green_Underbar"]);
     }
+    break;
+
+    default:
+        MessageBox(NULL, _T("올바른 SceneNum을 입력하세요"), _T("에러"), MB_OK);
+        break;
+    }
+
+    m_ChannelIndex = 1;// 사운드 채널 초기화
 }
 
 void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave)
 {
+    if (wave != NULL)
+    {
+        MessageBox(NULL, _T("Wave가 이미 할당되었습니다."), _T("에러"), MB_OK);
+        return;
+    }
+
     wave = shared_ptr<Wave>(new Wave);
+
+    wave->WaveMonsters.clear();
+    wave->LiveMonsters.clear();
+
+    while(!wave->DeadMonsters.empty())
+    {
+        wave->DeadMonsters.pop();
+    }
+
+    wave->StageFinish = false;
     wave->MaxMonsterNum = 25;
     wave->TimeInterval = MonsterSpawnTime;
     wave->LimitArea = { 415, winRect.bottom };
@@ -278,9 +356,6 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
     {
         wave->SpawnArea.push_back({ 1150, 425 + 20 * i });
     }
-    
-    wave->StageFinish = false;
-    wave->LiveMonsters.clear();
 
     map<string, shared_ptr<Animation>> temp;
     LoadAnimations(_T("AniData/Datas/PlayScene_Animations_Baseball.txt"),temp,true);
@@ -292,7 +367,6 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
     {
         wave->WaveMonsters.push_back(shared_ptr<Baseball>(new Baseball(i,Vector3(0, 0, 0), 50, 50,5, 1, temp, temp1, 100)));
         wave->DeadMonsters.push(wave->WaveMonsters[i]);
-        //wave->LiveMonsters.push_back(wave->WaveMonsters[i]);
     }
 
 }
@@ -314,12 +388,28 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     char chbuff[100] = {};
     size_t convertedChars = 0;
 
-    ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
-
-    if (buff[0] == 65279)
+    if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
     {
-        SetFilePointer(hFile, 2, NULL, FILE_BEGIN);
-        ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+        if (buff[0] == 0xFEFF)
+        {
+            _LARGE_INTEGER temp;
+            temp.QuadPart = 2;
+            if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+                ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+            else
+            {
+                MessageBox(NULL, _T("Ranking 파일 커서 이동 에러"), _T("에러"), MB_OK);
+                CloseHandle(hFile);
+                return;
+            }
+        }
+    }
+
+    else
+    {
+        MessageBox(NULL, _T("Ranking 파일 읽기 에러"), _T("에러"), MB_OK);
+        CloseHandle(hFile);
+        return;
     }
 
 #ifdef UNICODE
@@ -362,27 +452,32 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     DWORD size;
     LARGE_INTEGER curPtr;
     curPtr.QuadPart = 0;
-    SetFilePointerEx(hFile,curPtr , NULL, FILE_BEGIN);
+    if(!SetFilePointerEx(hFile,curPtr , NULL, FILE_BEGIN))
+        MessageBox(NULL, _T("Ranking 파일 커서 이동 에러"), _T("에러"), MB_OK);
 
     int n = m_RankingDatas.size();
     for (int i = 0; i < n; i++)
     {
         TCHAR rank[10];
         _stprintf_s(rank, L"%d\t", i + 1);
-        WriteFile(hFile, rank, (DWORD)_tcslen(rank) * sizeof(TCHAR), &size, NULL);
+        if(!WriteFile(hFile, rank, (DWORD)_tcslen(rank) * sizeof(TCHAR), &size, NULL))
+            MessageBox(NULL, _T("Ranking 파일 rank 쓰기 에러"), _T("에러"), MB_OK);
 
         TCHAR score[50];
         _stprintf_s(score, L"%d\t", m_RankingDatas[i].score);
-        WriteFile(hFile, score, (DWORD)_tcslen(score) * sizeof(TCHAR), &size, NULL);
+        if(!WriteFile(hFile, score, (DWORD)_tcslen(score) * sizeof(TCHAR), &size, NULL))
+            MessageBox(NULL, _T("Ranking 파일 score 쓰기 에러"), _T("에러"), MB_OK);
 
         TCHAR uniName[50] = {};
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_RankingDatas[i].name, strlen(m_RankingDatas[i].name), uniName, 200);
-        WriteFile(hFile, uniName, (DWORD)_tcslen(uniName) * sizeof(TCHAR), &size, NULL);
+        if (!WriteFile(hFile, uniName, (DWORD)_tcslen(uniName) * sizeof(TCHAR), &size, NULL))
+            MessageBox(NULL, _T("Ranking 파일 name 쓰기 에러"), _T("에러"), MB_OK);
 
         //\n추가
         TCHAR enter[5] = {};
         _stprintf_s(enter, L"\n");
-        WriteFile(hFile, enter, (DWORD)_tcslen(enter) * sizeof(TCHAR), &size, NULL);
+        if (!WriteFile(hFile, enter, (DWORD)_tcslen(enter) * sizeof(TCHAR), &size, NULL))
+            MessageBox(NULL, _T("Ranking 파일 '\\n' 쓰기 에러"), _T("에러"), MB_OK);
     }
 
     CloseHandle(hFile);

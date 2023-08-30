@@ -1,7 +1,9 @@
 #pragma once
+#include"framework.h"
 #include<Windows.h>
 #include<mmsystem.h>
 #include<Digitalv.h>
+#include<iostream>
 
 #pragma comment(lib,"winmm.lib")
 
