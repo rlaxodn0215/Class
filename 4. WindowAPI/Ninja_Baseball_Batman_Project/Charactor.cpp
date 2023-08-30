@@ -1,7 +1,7 @@
 #include "Charactor.h"
 
-Charactor::Charactor(int ID, Vector3 pos, int maxhp,int curhp, int attack, int moveSpeed,
-	map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
+Charactor::Charactor(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed,
+	map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
 	: m_CharactorID(ID),
 	m_Position(pos),
 	m_MaxHp(maxhp),
@@ -20,7 +20,7 @@ void Charactor::Update(bool moveOK)
 		m_Position = m_Position + m_Velocity;
 }
 
-void Charactor::ShowCharactor(HDC hdc,int TimeDivRatio, int Timer, RECT winRect)
+void Charactor::ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect)
 {
 	if (!m_CurAni)
 	{
@@ -83,7 +83,7 @@ void Ryno::Idle()
 		m_Status = IDLE;
 		m_CurAniShowOffset.clear();
 
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_IDLE];
 		else
 			m_CurAni = m_Animations[RYNO_IDLE_REV];
@@ -98,7 +98,7 @@ void Ryno::Idle()
 
 		m_Position = { m_Position.m_X, m_Position.m_Z, m_Position.m_Z };
 
-		if(m_CurSound !=NULL)
+		if (m_CurSound != NULL)
 			m_CurSound->ResetAudio();
 
 		for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
@@ -107,8 +107,8 @@ void Ryno::Idle()
 				m_Position.m_Z - m_CurAni->GetHeights()[i] - 115 });
 		}
 
-		RECT collderPos = { Charactor::m_Position.m_X, Charactor::m_Position.m_Z-195,
-			Charactor::m_Position.m_X + 60, Charactor::m_Position.m_Z -35 };
+		RECT collderPos = { Charactor::m_Position.m_X, Charactor::m_Position.m_Z - 195,
+			Charactor::m_Position.m_X + 60, Charactor::m_Position.m_Z - 35 };
 		m_BodyColliders.SetArea(collderPos);
 		m_BodyColliders.SetPosZ(m_Position.m_Z);
 
@@ -121,12 +121,12 @@ void Ryno::Idle()
 
 void Ryno::Move()
 {
-	if (m_Status !=MOVE)
+	if (m_Status != MOVE)
 	{
 		m_Status = MOVE;
 		m_CurAniShowOffset.clear();
 
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_WALK];
 		else
 			m_CurAni = m_Animations[RYNO_WALK_REV];
@@ -150,12 +150,12 @@ void Ryno::Move()
 
 void Ryno::Run()
 {
-	if (m_Status !=RUN)
+	if (m_Status != RUN)
 	{
 		m_Status = RUN;
 		m_CurAniShowOffset.clear();
 
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_RUN];
 		else
 			m_CurAni = m_Animations[RYNO_RUN_REV];
@@ -177,7 +177,7 @@ void Ryno::Run()
 
 }
 
-void Ryno::Jump(bool & keydown, bool jumping)
+void Ryno::Jump(bool& keydown, bool jumping)
 {
 	if (m_Status != JUMP)
 	{
@@ -212,8 +212,8 @@ void Ryno::Jump(bool & keydown, bool jumping)
 		m_Jumping = true;
 	}
 
-	RECT collderPos = { Charactor::m_Position.m_X-10 , Charactor::m_Position.m_Y - 195,
-	Charactor::m_Position.m_X + 40, Charactor::m_Position.m_Y -35 };
+	RECT collderPos = { Charactor::m_Position.m_X - 10 , Charactor::m_Position.m_Y - 195,
+	Charactor::m_Position.m_X + 40, Charactor::m_Position.m_Y - 35 };
 	m_BodyColliders.SetArea(collderPos);
 	m_BodyColliders.SetPosZ(m_Position.m_Z);
 
@@ -241,7 +241,7 @@ void Ryno::Damaged(HDC hdc, RECT winRect, bool& keydown)
 
 		else
 		{
-			if (n) 
+			if (n)
 				m_CurAni = m_Animations[RYNO_DAMAGED_REV];
 			else
 				m_CurAni = m_Animations[RYNO_DAMAGED1_REV];
@@ -270,8 +270,8 @@ void Ryno::Damaged(HDC hdc, RECT winRect, bool& keydown)
 		m_CurSound->PlayAudio();
 		m_Velocity = { 0 ,0,0 };
 		m_Position = { m_Position.m_X, m_Position.m_Z, m_Position.m_Z };
-		
-		m_BodyColliders.SetArea({-8, -8, -8, -8});
+
+		m_BodyColliders.SetArea({ -8, -8, -8, -8 });
 		m_BodyColliders.SetPosZ(m_Position.m_Z);
 	}
 
@@ -291,7 +291,7 @@ void Ryno::Dead()
 		m_Status = DEAD;
 		m_CurAniShowOffset.clear();
 
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_DEAD];
 		else
 			m_CurAni = m_Animations[RYNO_DEAD_REV];
@@ -319,14 +319,14 @@ void Ryno::Dead()
 			for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 			{
 				m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
-					m_Position.m_Z - m_CurAni->GetHeights()[i] - 95});
+					m_Position.m_Z - m_CurAni->GetHeights()[i] - 95 });
 				m_CurAniShowOffset.push_back({ 0,0 });
 			}
 		}
-		m_BodyColliders.SetArea({0,0,0,0});
+		m_BodyColliders.SetArea({ 0,0,0,0 });
 	}
 
-	
+
 }
 
 void Ryno::Attack(bool isright)
@@ -334,7 +334,7 @@ void Ryno::Attack(bool isright)
 	if (m_Status != ATTACK)
 	{
 		m_Status = ATTACK;
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_ATTACK];
 		else
 			m_CurAni = m_Animations[RYNO_ATTACK_REV];
@@ -385,7 +385,7 @@ void Ryno::Attack(bool isright)
 		m_AttackColliders.SetArea(collderPos);
 		m_AttackColliders.SetPosZ(m_Position.m_Z);
 	}
-	
+
 }
 
 void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
@@ -394,7 +394,7 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 	{
 		m_Status = HOME_RUN;
 
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[RYNO_HOMERUN];
 		else
 			m_CurAni = m_Animations[RYNO_HOMERUN_REV];
@@ -423,10 +423,10 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 		m_Jumping = false;
 	}
 
-	m_Animations[RYNO_AREA_ATTACK]->AniPlay(hdc, { m_Position.m_X -150, m_Position.m_Y-195 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
+	m_Animations[RYNO_AREA_ATTACK]->AniPlay(hdc, { m_Position.m_X - 150, m_Position.m_Y - 195 }, 0, 3.0f, 3.0f, m_isLookRight, winRect);
 
 	m_Velocity.m_Y = 0;
-		
+
 	m_CurAniShowOffset.clear();
 	for (int i = 0; i < m_CurAni->GetFrameTotalCount(); i++)
 	{
@@ -434,7 +434,7 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 			m_Position.m_Z - m_CurAni->GetHeights()[i] - 115 });
 	}
 
-	RECT collderPos = { Charactor::m_Position.m_X - 180, Charactor::m_Position.m_Z-165,
+	RECT collderPos = { Charactor::m_Position.m_X - 180, Charactor::m_Position.m_Z - 165,
 		Charactor::m_Position.m_X + 230, Charactor::m_Position.m_Z - 35 };
 	m_AttackColliders.SetArea(collderPos);
 	m_AttackColliders.SetPosZ(m_Position.m_Z);
@@ -442,13 +442,13 @@ void Ryno::HomeRun(HDC hdc, RECT winRect, bool& keydown)
 	RECT collderPos1 = { Charactor::m_Position.m_X, Charactor::m_Position.m_Z - 135,
 			Charactor::m_Position.m_X + 60, Charactor::m_Position.m_Z - 35 };
 	m_BodyColliders.SetArea(collderPos1);
-	
+
 
 }
 
-void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±ò²ûÇÏ°Ô Á¤¸®
+void Ryno::Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) // ±ò²ûÇÏ°Ô Á¤¸®
 {
-	m_BodyColliders.SetArea({0,0,0,0});
+	m_BodyColliders.SetArea({ 0,0,0,0 });
 
 	if (m_PlayingDynamite == 0) //flying
 	{
@@ -485,7 +485,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 			m_Position.m_Y - m_CurAni->GetHeights()[0] - 115 });
 
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[1] / 2 + 12), // 42
-			m_Position.m_Y - m_CurAni->GetHeights()[1] -117}); //14
+			m_Position.m_Y - m_CurAni->GetHeights()[1] - 117 }); //14
 
 		m_Velocity.m_X = 0;
 		m_Velocity.m_Y = 0;
@@ -500,7 +500,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 		{
 			m_Animations[RYNO_DYNAMITE_BALL]->AniPlay(hdc, { m_Position.m_X - 70, m_Position.m_Y - 75 }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
 		}
-		
+
 		if (m_DynamiteTimer > 20)
 		{
 			m_PlayingDynamite = 1;
@@ -541,8 +541,8 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 		{
 			for (int i = 0; i < 8; i++)
 			{
-					m_Animations[RYNO_DYNAMITE_BALL]->AniPlay(hdc, { m_Position.m_X + 75 + 20*i,
-						m_Position.m_Y - 50 + 35*i }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
+				m_Animations[RYNO_DYNAMITE_BALL]->AniPlay(hdc, { m_Position.m_X + 75 + 20 * i,
+					m_Position.m_Y - 50 + 35 * i }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
 			}
 
 			m_DynamiteCollderPos = { Charactor::m_Position.m_X + 150, Charactor::m_Position.m_Z - 115,
@@ -554,8 +554,8 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 		{
 			for (int i = 0; i < 8; i++)
 			{
-					m_Animations[RYNO_DYNAMITE_BALL]->AniPlay(hdc, { m_Position.m_X - 55 - 20*i,
-						m_Position.m_Y - 60 + 35*i}, 0, 2.0f, 2.0f, m_isLookRight, winRect);
+				m_Animations[RYNO_DYNAMITE_BALL]->AniPlay(hdc, { m_Position.m_X - 55 - 20 * i,
+					m_Position.m_Y - 60 + 35 * i }, 0, 2.0f, 2.0f, m_isLookRight, winRect);
 			}
 
 			m_DynamiteCollderPos = { Charactor::m_Position.m_X - 270, Charactor::m_Position.m_Z - 115,
@@ -586,7 +586,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 		{
 			m_CurAniShowOffset.clear();
 
-			if(m_isLookRight)
+			if (m_isLookRight)
 				m_CurAni = m_Animations[RYNO_DYNAMITE];
 			else
 				m_CurAni = m_Animations[RYNO_DYNAMITE_REV];
@@ -633,7 +633,7 @@ void Ryno::Dynamite(HDC hdc,int timer, RECT winRect, bool & playerDynamite) // ±
 
 }
 
-void Ryno::RynoDynamiteEffect(HDC hdc,RECT winRect, bool isRight)
+void Ryno::RynoDynamiteEffect(HDC hdc, RECT winRect, bool isRight)
 {
 	if (!(m_Animations[RYNO_THUNDER] && m_Animations[RYNO_DYNAMITE_BALL] && m_Animations[RYNO_AREA_ATTACK]))
 	{
@@ -710,11 +710,11 @@ void Baseball::Move()
 		m_CurAniShowOffset.push_back({ m_Position.m_X - (m_CurAni->GetWidths()[i] / 2),
 			m_Position.m_Z - m_CurAni->GetHeights()[i] - 100 });
 	}
-	
-	if(m_isLookRight)
+
+	if (m_isLookRight)
 		m_BodyCircleColliders.SetCenter({ m_Position.m_X + 30, m_Position.m_Z - 110 });
 	else
-		m_BodyCircleColliders.SetCenter({ m_Position.m_X + 60, m_Position.m_Z -110 });
+		m_BodyCircleColliders.SetCenter({ m_Position.m_X + 60, m_Position.m_Z - 110 });
 
 	m_BodyCircleColliders.SetRadius(70);
 	m_BodyCircleColliders.SetPosZ(m_Position.m_Z);
@@ -758,7 +758,7 @@ void Baseball::Damaged(HDC hdc, RECT winRect)
 		m_CurAniSpeed = 10;
 		m_CurAniFrameNum = 0;
 
-		if(m_CurHp<=0 && m_CurSound != m_Sounds[BASEBALL_DEAD_SOUND])
+		if (m_CurHp <= 0 && m_CurSound != m_Sounds[BASEBALL_DEAD_SOUND])
 			m_CurSound = m_Sounds[BASEBALL_DEAD_SOUND];
 		else
 			m_CurSound = m_Sounds[BASEBALL_HIT_SOUND];
@@ -780,14 +780,14 @@ void Baseball::Damaged(HDC hdc, RECT winRect)
 		m_Animations[HIT_IMAGE]->AniPlay(hdc, { m_Position.m_X - 30, m_Position.m_Y - 140 }, 0, 1.0f, 1.0f, m_isLookRight, winRect);
 	else
 		m_Animations[HIT_IMAGE]->AniPlay(hdc, { m_Position.m_X + 60, m_Position.m_Y - 140 }, 0, 1.0f, 1.0f, m_isLookRight, winRect);
-	
+
 }
 
 void Baseball::Dead()
 {
 	if (m_Status != DEAD)
 	{
-		if(m_isLookRight)
+		if (m_isLookRight)
 			m_CurAni = m_Animations[BASEBALL_DEAD];
 		else
 			m_CurAni = m_Animations[BASEBALL_DEAD_REV];
@@ -804,7 +804,7 @@ void Baseball::Dead()
 		m_DeadTimer = 0;
 		m_CurAniShowOffset.clear();
 
-		if(m_CurSound != NULL)
+		if (m_CurSound != NULL)
 			m_CurSound->ResetAudio();
 		m_CurSound = m_Sounds[BASEBALL_DEAD_SOUND];
 
@@ -819,9 +819,9 @@ void Baseball::Dead()
 				m_CurAniShowOffset.push_back({ -1000,0 });
 			}
 		}
-		m_BodyCircleColliders.SetCenter({ -100,-100});
+		m_BodyCircleColliders.SetCenter({ -100,-100 });
 		m_BodyCircleColliders.SetRadius(1);
-		m_AttackColliders.SetArea({-10,-10,-1,-2});
+		m_AttackColliders.SetArea({ -10,-10,-1,-2 });
 	}
 }
 
@@ -860,7 +860,7 @@ void Baseball::Attack(HDC hdc, RECT winRect)
 		m_Status = ATTACK;
 	}
 
-	if(m_CurAniFrameNum==0)
+	if (m_CurAniFrameNum == 0)
 		m_AttackTimer = 0;
 
 	m_CurAniShowOffset.clear();
@@ -902,7 +902,7 @@ void Baseball::MonsterAI(HDC hdc, RECT winRect, shared_ptr<Player> player, int z
 		{
 			m_Velocity = { 0,0,0 };
 			m_DamagedTime++;
-			Damaged(hdc,winRect);
+			Damaged(hdc, winRect);
 			if (m_DamagedTime >= 25)
 			{
 				m_Status = NOTHING;
@@ -929,7 +929,7 @@ void Baseball::MonsterAI(HDC hdc, RECT winRect, shared_ptr<Player> player, int z
 
 				if (m_Position.m_Z > winRect.bottom)
 				{
-					m_Position = { m_Position.m_X,winRect. bottom, winRect.bottom };
+					m_Position = { m_Position.m_X,winRect.bottom, winRect.bottom };
 				}
 
 				m_Velocity.m_Y = -m_MoveSpeed;

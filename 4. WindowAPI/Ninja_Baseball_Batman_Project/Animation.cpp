@@ -61,13 +61,13 @@ Animation::Animation(shared_ptr<Sprite> resource, const TCHAR textFileName[100])
 	}
 
 #ifdef UNICODE
-		wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
+	wcstombs_s(&convertedChars, chbuff, sizeof(chbuff), buff, _TRUNCATE); // 유니코드를 멀티바이트로 변환
 #else
-		strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
+	strcpy_s(charStr, sizeof(charStr), tcharStr); // 이미 멀티바이트 문자열인 경우
 #endif
 
 	int i = 0;
-	m_FrameTotalCount = FindNum(i,chbuff);
+	m_FrameTotalCount = FindNum(i, chbuff);
 
 	for (int j = 0; j < m_FrameTotalCount; j++)
 	{
@@ -116,7 +116,7 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 	HBITMAP holdBitmap;
 
 	hMemDC = CreateCompatibleDC(hdc);
-	holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());	
+	holdBitmap = (HBITMAP)SelectObject(hMemDC, m_ResourceSprite->GetSpriteImage());
 
 	TransparentBlt(hdc, posX, posY, (int)(bx * imageRatioWidth), (int)(by * imageRatioHeight), hMemDC, xStart, yStart,
 		bx, by, RGB(m_ResourceSprite->GetTransparentColor().m_X, m_ResourceSprite->GetTransparentColor().m_Y,
@@ -124,5 +124,5 @@ void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float i
 
 	SelectObject(hMemDC, holdBitmap);
 	DeleteDC(hMemDC);
-	
+
 }
