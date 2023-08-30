@@ -25,6 +25,8 @@
 #define IDC_text11                      1008
 #define ID_text4                        1009
 #define ID_text5                        1010
+#define ID_text6                        1011
+#define IDC_ONCOLLIDER                  1012
 #define ID_CONTROL                      32773
 #define ID_SETTING                      32774
 #define IDC_STATIC                      -1

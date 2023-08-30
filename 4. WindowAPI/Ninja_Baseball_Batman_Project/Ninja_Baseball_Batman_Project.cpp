@@ -42,6 +42,7 @@ RECT winRect;                                   // 화면의 가로, 세로
 
 bool PlayerEternal = false;
 bool PlayerNoHitAni = false;
+bool OnCollider = false;
 
 int MonsterSpawnTime = 300;
 int MonsterHp = 50; // Max & Cur
@@ -366,6 +367,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
         CheckDlgButton(hDlg,IDC_CHECKPLAYERHP, PlayerEternal);
         CheckDlgButton(hDlg, IDC_CHECKPLAYERNOHIT, PlayerNoHitAni);
+        CheckDlgButton(hDlg, IDC_ONCOLLIDER, OnCollider);
         SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime*10, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, MonsterHp, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_ATTACK, MonsterAttack, FALSE);
@@ -379,6 +381,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case IDC_CHECKPLAYERNOHIT:
             PlayerNoHitAni = !PlayerNoHitAni;
+            break;
+        case IDC_ONCOLLIDER:
+            OnCollider = !OnCollider;
             break;
         case IDOK:
             MonsterSpawnTime = (GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE))/10;

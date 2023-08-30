@@ -2,6 +2,7 @@
 
 extern bool PlayerEternal;
 extern bool PlayerNoHitAni;
+extern bool OnCollider;
 
 GameManager::GameManager()
 {
@@ -939,9 +940,12 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
     {
         RenderingIndex[i]->ShowCharactor(hdc, RenderingIndex[i]->GetAniSpeed(), timer, m_WinRect);
 
-        RenderingIndex[i]->ShowColliders(hdc);
-        TCHAR temp[20];
-        _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
-        TextOut(hdc, RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, temp, _tcslen(temp));
+        if (OnCollider)
+        {
+            RenderingIndex[i]->ShowColliders(hdc);
+            TCHAR temp[20];
+            _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
+            TextOut(hdc, RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, temp, _tcslen(temp));
+        }
     }
 }

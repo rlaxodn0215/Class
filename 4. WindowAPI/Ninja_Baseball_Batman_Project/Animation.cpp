@@ -92,7 +92,6 @@ Animation::~Animation()
 
 void Animation::AniPlay(HDC hdc, POINT offset_location, int spriteIndex, float imageRatioWidth, float imageRatioHeight, bool lookRight, RECT winRect)
 {
-
 	int bx = m_Width[spriteIndex];
 	int by = m_Height[spriteIndex];
 	int xStart = m_Offset[spriteIndex].x;
