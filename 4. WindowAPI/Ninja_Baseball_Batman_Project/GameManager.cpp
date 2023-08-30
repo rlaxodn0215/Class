@@ -6,8 +6,8 @@ extern bool PlayerNoHitAni;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 2;
-    m_Scene = &GameManager::PlayScene;
+	m_SceneNum = 0;
+    m_Scene = &GameManager::TitleScene;
     ///
 	m_Player = NULL;
 }
