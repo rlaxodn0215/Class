@@ -43,10 +43,10 @@ void GameManager::TitleScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sc
 
 void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 1
 {
-    if (dataManager == NULL) return;
 
     if (m_Start)
     {
+        if (dataManager == NULL) return;
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->m_Sounds[SELECT_BGM]->PlayAudio();
         m_Start = false;
@@ -113,7 +113,6 @@ void GameManager::SelectScene(HWND hWnd, HDC hdc, DataManager* dataManager) // S
 
 void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 2
 {
-
     if (m_Start)
     {
         if (dataManager == NULL) return;
@@ -132,7 +131,6 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
 
 void GameManager::EndingScene(HWND hWnd, HDC hdc, DataManager* dataManager) // SceneNum = 3
 {
-
     if (m_Start)
     {
         if (dataManager == NULL) return;
@@ -881,7 +879,7 @@ void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 b
                     {
                         if (!PlayerNoHitAni)
                             m_Player->Damaged(hdc, m_WinRect,m_KeyFlag[5]);
-                            //m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
+                            
                     }
 
                 }
@@ -926,7 +924,7 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
     {
         RenderingIndex[i]->ShowCharactor(hdc, RenderingIndex[i]->GetAniSpeed(), timer, m_WinRect);
 
-        //if (OnCollider)
+        if (OnCollider)
         {
             RenderingIndex[i]->ShowColliders(hdc);
             TCHAR temp[20];

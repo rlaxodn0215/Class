@@ -421,7 +421,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
         CheckDlgButton(hDlg, IDC_CHECKPLAYERHP, PlayerEternal);
         CheckDlgButton(hDlg, IDC_CHECKPLAYERNOHIT, PlayerNoHitAni);
-        //CheckDlgButton(hDlg, IDC_ONCOLLIDER, OnCollider);
+        CheckDlgButton(hDlg, IDC_ONCOLLIDER, OnCollider);
         SetDlgItemInt(hDlg, IDC_EDIT_SPAWN, MonsterSpawnTime * 20, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_MONSTER_HP, MonsterHp, FALSE);
         SetDlgItemInt(hDlg, IDC_EDIT_ATTACK, MonsterAttack, FALSE);
@@ -437,8 +437,8 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         case IDC_CHECKPLAYERNOHIT:
             PlayerNoHitAni = !PlayerNoHitAni;
             break;
-       /* case IDC_ONCOLLIDER:
-            OnCollider = !OnCollider;*/
+        case IDC_ONCOLLIDER:
+            OnCollider = !OnCollider;
             break;
         case IDOK:
             MonsterSpawnTime = (GetDlgItemInt(hDlg, IDC_EDIT_SPAWN, NULL, FALSE)) / 20;
