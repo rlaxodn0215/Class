@@ -260,7 +260,7 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager* dataManager)
         m_SelectTimer--;
     }
 
-    else if (m_SceneNum == 2)
+    else if (m_SceneNum == 2 && m_Player !=NULL)
     {
         //cout << "input" << endl;
         if (m_ComboFlag[0] || m_ComboFlag[1] || m_ComboFlag[2] ||
@@ -880,7 +880,7 @@ void GameManager::TriggerCheck(HDC hdc) // 플레이어 attack 콜라이더와 몬스터의 b
                     if (m_Player->GetAlive())
                     {
                         if (!PlayerNoHitAni)
-                            m_Player->Damaged(hdc, m_WinRect);
+                            m_Player->Damaged(hdc, m_WinRect,m_KeyFlag[5]);
                             //m_Player->Damaged(hdc, m_WinRect, m_KeyFlag[5]);
                     }
 

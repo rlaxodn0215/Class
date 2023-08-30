@@ -7,6 +7,7 @@
 #include"Collider.h"
 #include"Vector3.h"
 #include<list>
+#include"Data_Names.h"
 
 using namespace std;
 
@@ -27,9 +28,11 @@ enum Status
 class Charactor
 {
 protected:
+	int m_CharactorID;
+
 	Status m_Status;
-	Vector3 m_Position = {0,0,0};
-	Vector3 m_Velocity = {0,0,0};
+	Vector3 m_Position = { 0,0,0 };
+	Vector3 m_Velocity = { 0,0,0 };
 	int m_CurHp;
 	int m_MaxHp;
 	int m_MoveSpeed;
@@ -57,8 +60,8 @@ public:
 	HBITMAP m_Bitmap;
 
 	Charactor() = default;
-	Charactor(Vector3 pos, int maxhp,int curhp, int moveSpeed,
-		map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds);
+	Charactor(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed,
+		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds);
 	~Charactor() = default;
 
 	Status GetStatus() { return m_Status; }
@@ -95,10 +98,10 @@ public:
 	int GetDelayTimer() { return m_DelayTimer; }
 	void SetDelayTimer(int num) { m_DelayTimer = num; }
 	map<string, shared_ptr<Sound>> GetSounds() { return m_Sounds; }
-
 	void Dead() { if (m_CurHp <= 0) m_isAlive = false; }
 	void Update(bool moveOK);
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
+	bool NullCheck();
 	virtual void ShowColliders(HDC hdc) = 0;
 };
 
@@ -106,19 +109,19 @@ class Player : public Charactor // 상태 패턴
 {
 protected:
 	int m_PlayingDynamite = 0; // 플레이어가 필살기를 쓸 때 순서 확인
-	int m_DynamiteTimer[3] = { 0,0,0 };
+	int m_DynamiteTimer = 0;
 	int m_Points = 0;			// 플레이어 점수
 	RECT m_DynamiteCollderPos = { 0,0,0,0 };
 public:
 	Player() = default;
-	Player(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>> & anis, map<string, shared_ptr<Sound>> & sounds)
-		: Charactor(pos, maxhp,curhp, moveSpeed, anis, sounds) {
+	Player(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed, map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
+		: Charactor(ID, pos, maxhp, curhp, attack, moveSpeed, anis, sounds) {
 		m_Status = NOTHING;
 	};
 
 	virtual ~Player() = default;
 	int GetPlayDynamite() { return m_PlayingDynamite; }
-	void SetPlayDynamite(int num) { m_PlayingDynamite=num; }
+	void SetPlayDynamite(int num) { m_PlayingDynamite = num; }
 	int GetPoints() { return m_Points; }
 	void SetPoints(int num) { m_Points = num; }
 
@@ -126,15 +129,15 @@ public:
 	virtual BoxCollider GetAttackCollider() = 0;
 
 	//플레이어 위치, 콜라이더 위치, 데미지 등등...
-	virtual void Idle()=0;
+	virtual void Idle() = 0;
 	virtual void Move() = 0;
 	virtual void Run() = 0;
-	virtual void Jump(bool& keydown, bool jumping)=0;
-	virtual void Damaged(HDC hdc, RECT winRect)=0;
-	virtual void Dead()=0;
-	virtual void Attack(bool isright)=0;
-	virtual void HomeRun(HDC hdc, RECT winRect, bool& keydown)=0;
-	virtual void Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite)=0;
+	virtual void Jump(bool& keydown, bool jumping) = 0;
+	virtual void Damaged(HDC hdc, RECT winRect, bool& keydown) = 0;
+	virtual void Dead() = 0;
+	virtual void Attack(bool isright) = 0;
+	virtual void HomeRun(HDC hdc, RECT winRect, bool& keydown) = 0;
+	virtual void Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) = 0;
 
 	void ShowColliders(HDC hdc) override;
 
@@ -145,12 +148,14 @@ class Ryno :public Player
 private:
 	BoxCollider m_BodyColliders;
 	BoxCollider m_AttackColliders;
-	
+
 public:
 	Ryno() = default;
-	Ryno(Vector3 pos, int maxhp, int curhp, int moveSpeed, 
+	Ryno(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed,
 		map<string, shared_ptr<Animation>>& anis, map<string, shared_ptr<Sound>>& sounds)
-		: Player(pos, maxhp,curhp, moveSpeed, anis, sounds) { Idle();};
+		: Player(ID, pos, maxhp, curhp, attack, moveSpeed, anis, sounds) {
+		Idle();
+	};
 
 	BoxCollider GetBodyCollider() { return m_BodyColliders; }
 	BoxCollider GetAttackCollider() { return m_AttackColliders; }
@@ -159,11 +164,13 @@ public:
 	void Move() override;
 	void Run() override;
 	void Jump(bool& keydown, bool jumping) override;
-	void Damaged(HDC hdc, RECT winRect) override;
+	void Damaged(HDC hdc, RECT winRect, bool& keydown) override;
 	void Dead() override;
 	void Attack(bool isright) override;
 	void HomeRun(HDC hdc, RECT winRect, bool& keydown) override;
 	void Dynamite(HDC hdc, int timer, RECT winRect, bool& playerDynamite) override;
+
+	void RynoDynamiteEffect(HDC hdc, RECT winRect, bool isRight);
 };
 
 class Monster : public Charactor
@@ -174,11 +181,11 @@ protected:
 
 public:
 	Monster() = default;
-	Monster(Vector3 position, int maxhp,int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds) :Charactor(position, maxhp,curhp, moveSpeed, anis, sounds) {
+	Monster(int ID, Vector3 position, int maxhp, int curhp, int attack, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds) :Charactor(ID, position, maxhp, curhp, attack, moveSpeed, anis, sounds) {
 		m_isLookRight = false; m_isAlive = false;
 	};
-	
+
 	int GetDeadPoints() { return m_DeadPoints; }
 
 	virtual CircleCollider GetBodyCircleCollider() = 0;
@@ -186,10 +193,10 @@ public:
 	virtual BoxCollider GetAttackCollider() = 0;
 
 	virtual ~Monster() = default;
-	virtual void Move()=0;
-	virtual void Damaged(HDC hdc, RECT winRect)=0;
-	virtual void Dead()=0;
-	virtual void Attack(HDC hdc, RECT winRect)=0;
+	virtual void Move() = 0;
+	virtual void Damaged(HDC hdc, RECT winRect) = 0;
+	virtual void Dead() = 0;
+	virtual void Attack(HDC hdc, RECT winRect) = 0;
 	virtual void ShowColliders(HDC hdc) = 0;
 	virtual void MonsterAI(HDC hdc, RECT winRect, shared_ptr<Player> player, int z_offest) = 0;
 };
@@ -201,12 +208,12 @@ private:
 	BoxCollider m_AttackColliders;
 
 public:
-	Baseball()=default;
-	Baseball(Vector3 pos, int maxhp, int curhp, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
-		map<string, shared_ptr<Sound>>& sounds, int deadPoint) : Monster(pos, maxhp, curhp, moveSpeed, anis, sounds) {
+	Baseball() = default;
+	Baseball(int ID, Vector3 pos, int maxhp, int curhp, int attack, int moveSpeed, map<string, shared_ptr<Animation>>& anis,
+		map<string, shared_ptr<Sound>>& sounds, int deadPoint) : Monster(ID, pos, maxhp, curhp, attack, moveSpeed, anis, sounds) {
 		Move(); m_DeadPoints = deadPoint;
 	};
-	~Baseball()=default;
+	~Baseball() = default;
 
 	CircleCollider GetBodyCircleCollider() { return m_BodyCircleColliders; }
 	BoxCollider GetBodyCollider() { return m_AttackColliders; }
