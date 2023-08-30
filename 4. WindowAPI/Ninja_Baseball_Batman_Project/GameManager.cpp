@@ -7,8 +7,8 @@ extern bool OnCollider;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 2;
-    m_Scene = &GameManager::PlayScene;
+	m_SceneNum = 0;
+    m_Scene = &GameManager::TitleScene;
     ///
 	m_Player = NULL;
     m_Wave = NULL;
@@ -909,7 +909,6 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
 void GameManager::RenderingCharactor(HDC hdc, int timer)
 {
     if (m_Player == NULL) return;
-    if (m_Wave->LiveMonsters.empty()) return;
 
     vector<shared_ptr<Charactor>> RenderingIndex;
 

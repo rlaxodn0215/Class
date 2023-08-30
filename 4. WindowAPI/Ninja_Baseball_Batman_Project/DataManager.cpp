@@ -343,7 +343,7 @@ void DataManager::LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave> & wave
     }
 
     wave->StageFinish = false;
-    wave->MaxMonsterNum = 25;
+    wave->MaxMonsterNum = 100;
     wave->TimeInterval = MonsterSpawnTime;
     wave->LimitArea = { 415, winRect.bottom };
 
@@ -393,9 +393,9 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
     {
         if (buff[0] == 0xFEFF)
         {
-            _LARGE_INTEGER temp;
-            temp.QuadPart = 2;
-            if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
+            _LARGE_INTEGER tempNum;
+            tempNum.QuadPart = 2;
+            if (SetFilePointerEx(hFile, tempNum, NULL, FILE_BEGIN))
                 ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
             else
             {
@@ -426,9 +426,7 @@ void DataManager::MakeRanking(const TCHAR rankFileName[100])
         PlayerData temp;
         char rank[2], score[6], name[4];
         GetSentence(index, chbuff, rank);
-        //if (buff[index] == '\0') break;
         GetSentence(index, chbuff, score);
-        //if (buff[index] == '\0') break;
         GetSentence(index, chbuff, name);
         int number = 0;
         int i = 0;
