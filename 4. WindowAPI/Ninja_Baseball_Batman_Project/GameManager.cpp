@@ -120,7 +120,6 @@ void GameManager::PlayScene(HWND hWnd, HDC hdc, DataManager* dataManager) // Sce
         dataManager->LoadSceneDatas(m_SceneNum, hWnd);
         dataManager->LoadWaveDatas(hWnd, m_WinRect, m_Wave);
         dataManager->LoadPlayerDatas(hWnd, m_Player);
-        //cout << "load datas" << endl;
         m_Start = false;
     }
 
