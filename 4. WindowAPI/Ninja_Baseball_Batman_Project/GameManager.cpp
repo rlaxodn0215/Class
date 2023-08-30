@@ -7,8 +7,8 @@ extern bool OnCollider;
 GameManager::GameManager()
 {
     ///
-	m_SceneNum = 2;
-    m_Scene = &GameManager::PlayScene;
+	m_SceneNum = 1;
+    m_Scene = &GameManager::SelectScene;
     ///
 	m_Player = NULL;
     m_Wave = NULL;
@@ -454,7 +454,6 @@ void GameManager::CheckKeyInput(HWND hWnd, HDC hdc, DataManager * dataManager)
                 m_SceneNum++;
                 m_Scene = &GameManager::EndingScene;
                 m_Start = true;
-                //cout << "MOVE NEXT SCENE" << endl;
             }
 
         }
@@ -465,9 +464,9 @@ void GameManager::CheckKeyRelease(HWND hWnd, WPARAM wParam, DataManager * dataMa
 {
     if (m_SceneNum == 0)
     {
+        m_Start = true;
         m_SceneNum++;
         m_Scene = &GameManager::SelectScene;
-        m_Start = true;
     }
 
     else if (m_SceneNum == 1 || m_SceneNum == 2)
