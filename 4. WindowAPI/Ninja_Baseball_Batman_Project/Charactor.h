@@ -99,9 +99,9 @@ public:
 	void SetDelayTimer(int num) { m_DelayTimer = num; }
 	map<string, shared_ptr<Sound>> GetSounds() { return m_Sounds; }
 	void Dead() { if (m_CurHp <= 0) m_isAlive = false; }
+
 	void Update(bool moveOK);
 	void ShowCharactor(HDC hdc, int TimeDivRatio, int Timer, RECT winRect);
-	bool NullCheck();
 	virtual void ShowColliders(HDC hdc) = 0;
 };
 

@@ -25,11 +25,11 @@ public:
 	Sound() {};
 	Sound(HWND hWnd,const TCHAR lpszWave[100], int channel);
 	~Sound();
-	DWORD LoadWAV(HWND hWnd,const TCHAR lpszWave[100]);
 
 	MCI_PLAY_PARMS GetMciPlayParms() { return mciPlayParms; }
 	MCI_STATUS_PARMS GetMciStatus() { return mciStatus; }
 
+	DWORD LoadWAV(HWND hWnd,const TCHAR lpszWave[100]);
 	void PlayAudio();
 	void ResetAudio();
 	void LoopAudio(int timer);

@@ -134,6 +134,7 @@
     <ClCompile Include="4주차 4번.cpp" />
     <ClCompile Include="5주차 1번.cpp" />
     <ClCompile Include="5주차 2번.cpp" />
+    <ClCompile Include="6주차 1번.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
