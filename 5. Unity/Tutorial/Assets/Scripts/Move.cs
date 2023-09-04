@@ -17,7 +17,14 @@ public class Move : MonoBehaviour
     void Update()
     {
         //Move_1();
-        Move_2();
+        //Move_2();
+        Move_Control();
+    }
+
+    void Move_Control()
+    {
+        float move = Input.GetAxis("Vertical");
+        transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed * move);
     }
 
 
