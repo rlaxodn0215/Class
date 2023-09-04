@@ -8,7 +8,6 @@ public class Rotate : MonoBehaviour
     void Start()
     {
         transform.eulerAngles = new Vector3(0.0f, 45.0f, 0.0f); // 오일러 각 -> 집벌락 발생
-
     }
 
     // Update is called once per frame
