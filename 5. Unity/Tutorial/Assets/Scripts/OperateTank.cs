@@ -68,15 +68,40 @@ public class OperateTank : MonoBehaviour
         Turret(turretVertical, turretHorizontal);
     }
 
-    void Turret(float Vertical, float Horizontal)
+    void Turret(float Vertical, float Horizontal) //Jimbal Lock ?? 
     {
+        float fixAngle = AngleFix(Head.transform.GetChild(0).localEulerAngles.z);
+
+        Debug.Log(fixAngle);
+
         Head.transform.Rotate(Vector3.up, turretRotateSpeed * Time.deltaTime * Horizontal);
-        Head.transform.GetChild(0).Rotate(Vector3.up, turretRotateSpeed * Time.deltaTime * Vertical);
+
+        if (fixAngle <- angleLimit)
+        {
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                Head.transform.GetChild(0).Rotate(Vector3.forward, turretRotateSpeed * Time.deltaTime * Vertical);
+            }
+        }
+
+        else if (fixAngle > angleLimit)
+        {
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                Head.transform.GetChild(0).Rotate(Vector3.forward, turretRotateSpeed * Time.deltaTime * Vertical);
+            }
+        }
+
+        else
+        {
+            Head.transform.GetChild(0).Rotate(Vector3.forward, turretRotateSpeed * Time.deltaTime * Vertical);
+        }
+        
     }
 
     void Move(float moveVertical, float moveHorizontal)
     {
-        float fixAngle = AngleFix(frontWheels[0].localRotation.eulerAngles.y, angleLimit);
+        float fixAngle = AngleFix(frontWheels[0].localRotation.eulerAngles.y);
 
         WheelRotate(moveVertical);
         WheelTurn(moveHorizontal, fixAngle, angleLimit);
@@ -89,7 +114,7 @@ public class OperateTank : MonoBehaviour
     }
 
 
-    float AngleFix(float angle, float limit)
+    float AngleFix(float angle)
     {
         float ans = angle;
         if (ans >= 180) ans -= 360;
@@ -100,7 +125,28 @@ public class OperateTank : MonoBehaviour
     {
         foreach (Transform frontwheel in frontWheels)
         {
-            frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+            if (angle > limit)
+            {
+                if (Input.GetKey(KeyCode.A))
+                {
+                    frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+                }
+                //frontwheel.rotation = Quaternion.Euler(new Vector3(0, limit, 0));
+            }
+
+            else if (angle < -limit)
+            {
+                if (Input.GetKey(KeyCode.D))
+                {
+                    frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+                }
+                //frontwheel.rotation = Quaternion.Euler(new Vector3(0, -limit, 0));
+            }
+
+            else
+            {
+                frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+            }
         }
     }
 

@@ -79,7 +79,28 @@ public class OperateCar : MonoBehaviour
     {
         foreach(Transform frontwheel in frontWheels)
         {
-            frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+            if (angle > limit)
+            {
+                if (Input.GetKey(KeyCode.A))
+                {
+                    frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+                }
+                //frontwheel.rotation = Quaternion.Euler(new Vector3(0, limit, 0));
+            }
+
+            else if (angle < -limit)
+            {
+                if(Input.GetKey(KeyCode.D))
+                {
+                    frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+                }
+                //frontwheel.rotation = Quaternion.Euler(new Vector3(0, -limit, 0));
+            }
+
+            else
+            {
+                frontwheel.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+            }
         }
     }
 
