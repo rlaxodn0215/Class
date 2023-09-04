@@ -37,16 +37,25 @@ public class OperateCar : MonoBehaviour
 
     void CarControl()
     {
-        float moveVertical = Input.GetAxis("Vertical");
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        Move(moveVertical, moveHorizontal);
+        float moveHorizontal = 0.0f;
+        float moveVertical = 0.0f;
 
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+        {
+            moveHorizontal = Input.GetAxis("Horizontal");
+        }
+
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
+        {
+            moveVertical = Input.GetAxis("Vertical");
+        }
+
+        Move(moveVertical, moveHorizontal);
     }
 
     void Move(float moveVertical, float moveHorizontal)
     {
         float fixAngle = AngleFix(frontWheels[0].localRotation.eulerAngles.y, angleLimit);
-        //Debug.Log(fixAngle);
 
         WheelRotate(moveVertical);
         WheelTurn(moveHorizontal,fixAngle,angleLimit);
