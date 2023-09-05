@@ -40,6 +40,7 @@ public class OperateCar : MonoBehaviour
         float moveHorizontal = 0.0f;
         float moveVertical = 0.0f;
 
+        // Hand Control
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
             moveHorizontal = Input.GetAxis("Horizontal");
