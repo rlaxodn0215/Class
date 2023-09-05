@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OperateCar : MonoBehaviour
+public class CarControl : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
 
@@ -24,7 +24,7 @@ public class OperateCar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CarControl();
+        ControlingCar();
     }
 
     void Initalize()
@@ -35,7 +35,7 @@ public class OperateCar : MonoBehaviour
         }
     }
 
-    void CarControl()
+    void ControlingCar()
     {
         float moveHorizontal = 0.0f;
         float moveVertical = 0.0f;
