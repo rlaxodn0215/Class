@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{94ac4351-7aaf-4086-9535-c83feabd4c47}</ProjectGuid>
-    <RootNamespace>알고리즘스터디</RootNamespace>
+    <ProjectGuid>{8e2de75a-7c5c-4045-a6d9-2531c2e5c9d3}</ProjectGuid>
+    <RootNamespace>AlgorithStudy</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,16 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="2주차 1번.cpp" />
-    <ClCompile Include="2주차 3번.cpp" />
-    <ClCompile Include="2주차 4번.cpp" />
-    <ClCompile Include="4주차 3번.cpp" />
-    <ClCompile Include="4주차 4번.cpp" />
-    <ClCompile Include="5주차 1번.cpp" />
-    <ClCompile Include="5주차 2번.cpp" />
-    <ClCompile Include="6주차 1번.cpp" />
-    <ClCompile Include="6주차 2번.cpp" />
-    <ClCompile Include="6주차 3번.cpp" />
+    <ClCompile Include="7주차 4번.cpp" />
+    <ClCompile Include="Algorith_Study.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
