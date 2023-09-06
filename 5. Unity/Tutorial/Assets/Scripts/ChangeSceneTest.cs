@@ -23,16 +23,16 @@ public class ChangeSceneTest : MonoBehaviour
 
         if (Input.GetMouseButton(1))
         {
-            if (GameManager.Instance.changeScene == 0)
+            if (GameManagerTest.Instance.changeScene == 0)
             {
-                GameManager.Instance.ChangeScene("End");
-                GameManager.Instance.changeScene++;
+                GameManagerTest.Instance.ChangeScene("End");
+                GameManagerTest.Instance.changeScene++;
             }
 
-            else if (GameManager.Instance.changeScene == 1)
+            else if (GameManagerTest.Instance.changeScene == 1)
             {
-                GameManager.Instance.ChangeScene("Collision(2023_09_06)");
-                GameManager.Instance.changeScene++;
+                GameManagerTest.Instance.ChangeScene("Collision(2023_09_06)");
+                GameManagerTest.Instance.changeScene++;
             }
         }
     }
@@ -41,16 +41,16 @@ public class ChangeSceneTest : MonoBehaviour
         if (GUI.Button(new Rect(100, 200, 200, 30), "¾À º¯°æ"))
         {
 
-           if (GameManager.Instance.changeScene == 0)
+           if (GameManagerTest.Instance.changeScene == 0)
            {
-               GameManager.Instance.ChangeScene("End");
-               GameManager.Instance.changeScene++;
+                GameManagerTest.Instance.ChangeScene("End");
+                GameManagerTest.Instance.changeScene++;
            }
 
-           else if (GameManager.Instance.changeScene == 1)
+           else if (GameManagerTest.Instance.changeScene == 1)
            {
-               GameManager.Instance.ChangeScene("Collision(2023_09_06)");
-               GameManager.Instance.changeScene++;
+                GameManagerTest.Instance.ChangeScene("Collision(2023_09_06)");
+                GameManagerTest.Instance.changeScene++;
            }
             
         }

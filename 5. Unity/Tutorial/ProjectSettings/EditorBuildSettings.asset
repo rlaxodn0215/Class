@@ -6,12 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/RaceProject/TitleScene.unity
-    guid: 3a55e41dc2099a34b849a9c0d746712e
-  - enabled: 1
-    path: Assets/Scenes/RaceProject/PlayScene.unity
+    path: Assets/Scenes/RaceProject/MainScene.unity
     guid: 55357f48a3e2b4643b0983826b854f64
   - enabled: 1
-    path: Assets/Scenes/RaceProject/EndingScene.unity
+    path: Assets/Scenes/RaceProject/UIs/TitleUI.unity
+    guid: 3a55e41dc2099a34b849a9c0d746712e
+  - enabled: 1
+    path: Assets/Scenes/RaceProject/UIs/PlayUI.unity
+    guid: f94f768ef5a7c9647b13f19730bc673b
+  - enabled: 1
+    path: Assets/Scenes/RaceProject/UIs/EndUI.unity
     guid: 0cd84b04899fd894a8db2b353469921b
   m_configObjects: {}
