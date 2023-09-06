@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Study/GameManager/Start.unity
+    guid: daa14c38047252a4683d05470653c136
+  - enabled: 1
+    path: Assets/Scenes/Study/GameManager/End.unity
+    guid: 4de017dd8bd6aca4291ff9bd9a1e6d65
+  - enabled: 1
+    path: Assets/Scenes/Study/Collision(2023_09_06).unity
+    guid: e16c753c1efa2a54db4f806ab9944a4e
   m_configObjects: {}

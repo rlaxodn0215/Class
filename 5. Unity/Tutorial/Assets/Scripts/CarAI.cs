@@ -9,9 +9,9 @@ public class CarAI : MonoBehaviour
 
     public GameObject Lidar;
 
-    private Ray[] rays = new Ray[2];
-    private RaycastHit[] rayHits = new RaycastHit[2];
-    private float[] distances = new float[2];
+    private Ray[] rays = new Ray[4];
+    private RaycastHit[] rayHits = new RaycastHit[4];
+    private float[] distances = new float[4];
 
     public float moveSpeed = 20.0f;
     public float rotateSpeed = 45.0f;
@@ -32,22 +32,23 @@ public class CarAI : MonoBehaviour
 
     void MakeRays()
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 4; i++)
         {
             rays[i].origin = Lidar.transform.position;
         }
 
         rays[0].direction = Lidar.transform.right + Lidar.transform.forward; // left, forward
         rays[1].direction = Lidar.transform.right - Lidar.transform.forward; // right, forward
+        rays[2].direction = Lidar.transform.forward; // left
+        rays[3].direction = - Lidar.transform.forward; // right
 
     }
 
     void RayHits()
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 4; i++)
         {
             Physics.Raycast(rays[i].origin, rays[i].direction, out rayHits[i], lidarDistance);
-            //예외 조건 필요
             distances[i] = Vector3.Distance(rays[i].origin, rayHits[i].point);
         }
 
@@ -57,7 +58,7 @@ public class CarAI : MonoBehaviour
     private void OnDrawGizmos() // 씬 창에만 보여짐
     {
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 4; i++)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(rays[i].origin, rays[i].direction * lidarDistance + rays[i].origin);
@@ -77,16 +78,19 @@ public class CarAI : MonoBehaviour
         float moveHorizontal = 0.0f;
         float moveVertical = 1.0f;
 
-        if (distances[0] - distances[1] > E)
+        if (distances[0] - distances[1] > E  && distances[2] - distances[3] > E)
         {
             moveHorizontal = -1.0f;
         }
 
-        else if(distances[0] - distances[1] < -E)
+        else if(distances[0] - distances[1] < -E && distances[2] - distances[3] < -E)
         {
             moveHorizontal = 1.0f;
         }
 
+        //Debug.Log(distances[0]);
+        //Debug.Log(distances[1]);
+        //Debug.Log(distances[0] - distances[1]);
         //Debug.Log(moveHorizontal);
 
         Move(moveVertical, moveHorizontal);
