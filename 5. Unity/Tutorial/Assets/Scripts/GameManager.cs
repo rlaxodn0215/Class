@@ -13,19 +13,22 @@ public class GameManager : SingletonTemplate<GameManager>
     const string PLAY_UI = "PlayUI";
     const string END_UI = "EndUI";
 
+    public const int PlayerNum = 4;
+
     public Status curStatus = Status.TITLE;
 
-
     public GameObject Charactors;
-    private List<Transform> Cars = new List<Transform>();
+    public List<Transform> Cars = new List<Transform>();
 
     public float timer = 2.99f;
     public int Loop = 3;
 
-    public int[] Ranks = new int[3];
-    public float[] Times = new float[3];
+    public GameObject CheckSensors;
+    private Transform[] Sensors = new Transform[10];
 
-    public GameObject GoalTrigger;
+    public string[] Names = new string[PlayerNum];
+    public float[] Times = new float[PlayerNum];
+    public int[] PassNum = new int[PlayerNum]; // 0. Player / 1,2,3 -> Car
 
     public bool GamePlaying = false;
     public bool waiting = true;
@@ -48,7 +51,9 @@ public class GameManager : SingletonTemplate<GameManager>
         for(int i = 0; i < Charactors.transform.childCount; i++)
         {
             Cars.Add(Charactors.transform.GetChild(i));
+            PassNum[i] = 0;
         }
+
     }
 
     public void LoadUI()
@@ -90,6 +95,8 @@ public class GameManager : SingletonTemplate<GameManager>
     {
         Charactors.SetActive(false);
     }
+
+    
 
     public void CheckFinish()
     {
