@@ -13,16 +13,19 @@ public class CarControl : MonoBehaviour
 
     [SerializeField]
     private List<Transform> frontWheels = new List<Transform>();
-    
+
+    Rigidbody rigidbody;
+
 
     // Start is called before the first frame update
     void Start()
     {
         Initalize();
+        rigidbody = gameObject.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         ControlingCar();
     }
@@ -64,8 +67,17 @@ public class CarControl : MonoBehaviour
         Vector3 temp = new Vector3(Mathf.Cos(fixAngle * Mathf.Deg2Rad), 0, -Mathf.Sin(fixAngle * Mathf.Deg2Rad));
         Vector3 way = (Vector3.right + temp).normalized;
 
-        transform.Translate(way * moveSpeed * Time.deltaTime * moveVertical);
-        transform.Rotate(Vector3.up, Time.deltaTime* fixAngle * moveVertical);
+        //transform.Translate(way * moveSpeed * Time.deltaTime * moveVertical);
+        //transform.Rotate(Vector3.up, Time.deltaTime * fixAngle * moveVertical);
+
+        // rotation
+        Quaternion deltaRot = Quaternion.Euler(new Vector3(0, moveVertical, 0) * fixAngle * Time.deltaTime);
+        rigidbody.MoveRotation(rigidbody.rotation * deltaRot);
+
+        //movement
+        Vector3 move = transform.right * moveVertical;
+        Vector3 newPos = rigidbody.position + move * moveSpeed * Time.deltaTime;
+        rigidbody.MovePosition(newPos);
     }
 
 

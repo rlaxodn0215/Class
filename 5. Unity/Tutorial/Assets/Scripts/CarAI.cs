@@ -17,9 +17,12 @@ public class CarAI : MonoBehaviour
     public float rotateSpeed = 45.0f;
     private float E = 1.0f;
 
+    Rigidbody rigidbody;
+
     // Start is called before the first frame update
     void Start()
     {
+        rigidbody = gameObject.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -27,6 +30,11 @@ public class CarAI : MonoBehaviour
     {
         MakeRays();
         RayHits();
+        
+    }
+
+    private void FixedUpdate()
+    {
         ControlingCar();
     }
 
@@ -98,8 +106,18 @@ public class CarAI : MonoBehaviour
 
     void Move(float moveVertical, float moveHorizontal)
     {
-        transform.Translate(Vector3.right * moveSpeed * Time.deltaTime * moveVertical);
-        transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
+
+        // rotation
+        Quaternion deltaRot = Quaternion.Euler(new Vector3(0, moveHorizontal, 0) * rotateSpeed * Time.deltaTime);
+        rigidbody.MoveRotation(rigidbody.rotation * deltaRot);
+
+        //movement
+        Vector3 move = transform.right * moveVertical;
+        Vector3 newPos = rigidbody.position + move * moveSpeed * Time.deltaTime;
+        rigidbody.MovePosition(newPos);
+
+        //transform.Translate(Vector3.right * moveSpeed * Time.deltaTime * moveVertical);
+        //transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
     }
 
 
