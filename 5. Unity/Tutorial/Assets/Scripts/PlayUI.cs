@@ -39,6 +39,14 @@ public class PlayUI : MonoBehaviour
             StartCounting.text = string.Format("{0:N0}", (int)GameManager.Instance.timer + 1);
         }
 
+        else if (GameManager.Instance.showWarningCount)
+        {
+            StartCounting.gameObject.SetActive(true);
+            StartCounting.text = string.Format("{0:N0}", (int)GameManager.Instance.bornTimer + 1);
+            StartCounting.color = Color.red;
+            Timer.text = string.Format("{0:N2}", GameManager.Instance.timer);
+        }
+
         else
         {
             StartCounting.gameObject.SetActive(false);
@@ -89,9 +97,7 @@ public class PlayUI : MonoBehaviour
     void ShowRank()
     {
         Rank[ShowRankNum].text = string.Format("{0}. " + Names[curRanking-1] + " {1:N2}", curRanking, CarTimes[curRanking-1]);
-        //Debug.Log(Rank[ShowRankNum].IsActive());
         Rank[ShowRankNum].gameObject.SetActive(true);
-        //Debug.Log(Rank[ShowRankNum].IsActive());
         ShowRankNum++;
     }
 

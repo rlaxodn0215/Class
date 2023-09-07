@@ -21,10 +21,14 @@ public class GameManager : SingletonTemplate<GameManager>
     public List<Transform> Cars = new List<Transform>();
 
     public float timer = 2.99f;
+
+    public float bornTimer = 7.99f;
+    public bool showWarningCount = false;
+
     public int Loop = 3;
 
-    public GameObject CheckSensors;
-    private Transform[] Sensors = new Transform[10];
+    public GameObject SpawnPoint;
+    private Transform[] Points = new Transform[10];
 
     public int Rank = 0;
     public string[] Names = new string[playerNum];
@@ -38,13 +42,57 @@ public class GameManager : SingletonTemplate<GameManager>
     {
         LoadUI();
         LoadCharactors();
+        LoadSensor();
     }
 
     private void Update()
     {
         MakeTimer();
-        CheckRank();
         CheckFinish();
+    }
+
+
+    void LoadSensor()
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            Points[i] = SpawnPoint.transform.GetChild(i);
+        }
+    }
+
+    void ReBorn()
+    {
+
+        if(!(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) ||
+            Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
+        {
+            bornTimer -= Time.deltaTime;
+            if(bornTimer<=2.99f)
+            {
+                //Debug.Log("warning");
+                showWarningCount = true;
+                if(bornTimer<=0)
+                {
+                    // ºÎÈ°
+                    Cars[0].transform.position = Points[PassNum["Player"]].position;
+                    Cars[0].transform.localRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+                    showWarningCount = false;
+                    bornTimer = 7.99f;
+                }
+
+            }
+
+            else
+            {
+                showWarningCount = false;
+            }
+        }
+
+        else
+        {
+            showWarningCount = false;
+            bornTimer = 7.99f;
+        }
     }
 
     private void LoadCharactors()
@@ -67,6 +115,7 @@ public class GameManager : SingletonTemplate<GameManager>
 
             case Status.PLAY:
                 Cars[0].GetChild(3).gameObject.SetActive(true);
+                Cars[0].GetChild(5).gameObject.SetActive(true);
                 GamePlaying = true;
                 SceneManager.UnloadSceneAsync(TITLE_UI);
                 SceneManager.LoadScene(PLAY_UI, LoadSceneMode.Additive);
@@ -97,8 +146,6 @@ public class GameManager : SingletonTemplate<GameManager>
         Charactors.SetActive(false);
     }
 
-    
-
     public void CheckFinish()
     {
         if(Loop<=0 && GamePlaying)
@@ -108,10 +155,6 @@ public class GameManager : SingletonTemplate<GameManager>
         }
     }
 
-    public void CheckRank()
-    {
-
-    }
 
     public void MakeTimer()
     {
@@ -131,6 +174,7 @@ public class GameManager : SingletonTemplate<GameManager>
             else
             {
                 timer += Time.deltaTime;
+                ReBorn();
             }
 
             

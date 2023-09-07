@@ -66,17 +66,17 @@ public class CarControl : MonoBehaviour
         Vector3 temp = new Vector3(Mathf.Cos(fixAngle * Mathf.Deg2Rad), 0, -Mathf.Sin(fixAngle * Mathf.Deg2Rad));
         Vector3 way = (Vector3.right + temp).normalized;
 
-        transform.Translate(way * moveSpeed * Time.deltaTime * moveVertical);
-        transform.Rotate(Vector3.up, Time.deltaTime * fixAngle * moveVertical);
+        //transform.Translate(way * moveSpeed * Time.deltaTime * moveVertical);
+        //transform.Rotate(Vector3.up, Time.deltaTime * fixAngle * moveVertical);
 
-        //// rotation
-        //Quaternion deltaRot = Quaternion.Euler(new Vector3(0, moveVertical, 0) * fixAngle * Time.deltaTime);
-        //rigidbody.MoveRotation(rigidbody.rotation * deltaRot);
+        // rotation
+        Quaternion deltaRot = Quaternion.Euler(new Vector3(0, moveVertical, 0) * fixAngle * Time.deltaTime);
+        rigidbody.MoveRotation(rigidbody.rotation * deltaRot);
 
-        ////movement
-        //Vector3 move = transform.right * moveVertical;
-        //Vector3 newPos = rigidbody.position + move * moveSpeed * Time.deltaTime;
-        //rigidbody.MovePosition(newPos);
+        //movement
+        Vector3 move = transform.right * moveVertical;
+        Vector3 newPos = rigidbody.position + move * moveSpeed * Time.deltaTime;
+        rigidbody.MovePosition(newPos);
     }
 
 

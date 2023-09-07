@@ -8,6 +8,7 @@ public class GoalTrigger : MonoBehaviour
     bool firstStart = true;
     private void OnTriggerEnter(Collider other)
     {
+
         if (firstStart)
         {
             num++;
@@ -24,7 +25,7 @@ public class GoalTrigger : MonoBehaviour
             GameManager.Instance.Names[num] = other.attachedRigidbody.name;
             GameManager.Instance.CarTimes[num] = GameManager.Instance.timer;
 
-            if ((++GameManager.Instance.PassNum[other.attachedRigidbody.name]) >= 10)
+            if (other.attachedRigidbody.name == "Player" && (++GameManager.Instance.PassNum[other.attachedRigidbody.name]) >= 10)
             {
                 GameManager.Instance.Loop--;
                 GameManager.Instance.PassNum[other.attachedRigidbody.name] = 0;
@@ -37,7 +38,6 @@ public class GoalTrigger : MonoBehaviour
             {
                 num = 0;
             }
-
         }
     }
 }
