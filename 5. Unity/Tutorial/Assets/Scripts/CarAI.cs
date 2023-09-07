@@ -19,12 +19,19 @@ public class CarAI : MonoBehaviour
 
     Rigidbody rigidbody;
 
+    public GameObject Wheels;
 
-
+    [SerializeField]
+    private List<Transform> frontWheels = new List<Transform>();
 
     // Start is called before the first frame update
     void Start()
     {
+        for (int i = 0; i < 2; i++)
+        {
+            frontWheels.Add(Wheels.transform.GetChild(i));
+        }
+
         rigidbody = gameObject.GetComponent<Rigidbody>();
     }
 
@@ -110,6 +117,8 @@ public class CarAI : MonoBehaviour
     void Move(float moveVertical, float moveHorizontal)
     {
 
+        WheelRotate(moveVertical);
+
         // rotation
         Quaternion deltaRot = Quaternion.Euler(new Vector3(0, moveHorizontal, 0) * rotateSpeed * Time.deltaTime);
         rigidbody.MoveRotation(rigidbody.rotation * deltaRot);
@@ -123,7 +132,20 @@ public class CarAI : MonoBehaviour
         //transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime * moveHorizontal);
     }
 
+    void WheelRotate(float move)
+    {
+        float moving = moveSpeed * Time.deltaTime * move;
 
+        for (int i = 0; i < 2; i++)
+        {
+            Wheels.transform.GetChild(i).transform.GetChild(0).Rotate(Vector3.down, Mathf.Rad2Deg * 2 * moving);
+        }
+
+        for (int i = 2; i < 4; i++)
+        {
+            Wheels.transform.GetChild(i).Rotate(Vector3.down, Mathf.Rad2Deg * 2 * moving);
+        }
+    }
 
 }
 

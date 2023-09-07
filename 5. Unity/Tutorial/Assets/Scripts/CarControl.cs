@@ -16,7 +16,6 @@ public class CarControl : MonoBehaviour
 
     Rigidbody rigidbody;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -121,10 +120,9 @@ public class CarControl : MonoBehaviour
     {
         float moving = moveSpeed * Time.deltaTime * move;
 
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 2; i++)
         {
-            for(int j =0;j<1;j++)
-                Wheels.transform.GetChild(i).transform.GetChild(j).Rotate(Vector3.down, Mathf.Rad2Deg * 2 * moving);
+            Wheels.transform.GetChild(i).transform.GetChild(0).Rotate(Vector3.down, Mathf.Rad2Deg * 2 * moving);
         }
 
         for(int i = 2; i<4;i++)

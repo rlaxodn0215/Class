@@ -8,28 +8,17 @@ public class Sensor : MonoBehaviour
     //string passed = "";
     private void OnTriggerEnter(Collider other)
     {
-        
+        GameManager.Instance.Rank = num + 1;
+        GameManager.Instance.Names[num] = other.attachedRigidbody.name;
+        GameManager.Instance.CarTimes[num] = GameManager.Instance.timer;
+        GameManager.Instance.PassNum[other.attachedRigidbody.name]++;
 
+        Debug.Log("Rank: " + (num + 1) + ", Name: " + GameManager.Instance.Names[num] + ", Time: " + GameManager.Instance.CarTimes[num]);
 
-
-        //if (passed != other.attachedRigidbody.name)
-        //{
-
-            //Debug.Log(other.attachedRigidbody.name);
-            //passed = other.attachedRigidbody.name;
-            GameManager.Instance.Names[num] = other.attachedRigidbody.name;
-            GameManager.Instance.Times[num] = GameManager.Instance.timer;
-            //GameManager.Instance.CheckSensors[other.attachedRigidbody.name]++;
-
-            //Debug.Log("Rank: " + (num + 1) + ", Name: " + GameManager.Instance.Names[num] + ", Time: " + GameManager.Instance.Times[num]);
-
-            //num++;
-            //if (num >= 4)
-            //{
-            //    num = 0;
-            //}
-
-        //}
-
+        num++;
+        if (num >= 4)
+        {
+            num = 0;
+        }
     }
 }

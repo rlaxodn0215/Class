@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class GameManager : SingletonTemplate<GameManager>
 {
     public enum Status { TITLE, PLAY, END};
@@ -13,7 +12,8 @@ public class GameManager : SingletonTemplate<GameManager>
     const string PLAY_UI = "PlayUI";
     const string END_UI = "EndUI";
 
-    public const int PlayerNum = 4;
+    const int playerNum = 4;
+    public int PlayerNum { get { return playerNum; } }
 
     public Status curStatus = Status.TITLE;
 
@@ -26,9 +26,10 @@ public class GameManager : SingletonTemplate<GameManager>
     public GameObject CheckSensors;
     private Transform[] Sensors = new Transform[10];
 
-    public string[] Names = new string[PlayerNum];
-    public float[] Times = new float[PlayerNum];
-    public int[] PassNum = new int[PlayerNum]; // 0. Player / 1,2,3 -> Car
+    public int Rank = 0;
+    public string[] Names = new string[playerNum];
+    public float[] CarTimes = new float[playerNum];
+    public Dictionary<string, int> PassNum = new Dictionary<string, int>(playerNum);
 
     public bool GamePlaying = false;
     public bool waiting = true;
@@ -51,7 +52,7 @@ public class GameManager : SingletonTemplate<GameManager>
         for(int i = 0; i < Charactors.transform.childCount; i++)
         {
             Cars.Add(Charactors.transform.GetChild(i));
-            PassNum[i] = 0;
+            PassNum[Charactors.transform.GetChild(i).name] = 0;
         }
 
     }
