@@ -80,7 +80,8 @@ public class PlayUI : MonoBehaviour
 
         else
         {
-            FirstTimeIndex = 0;
+            if(FirstTimeIndex>= GameManager.Instance.PlayerNum)
+                FirstTimeIndex = 0;
         }
 
     }
@@ -88,7 +89,9 @@ public class PlayUI : MonoBehaviour
     void ShowRank()
     {
         Rank[ShowRankNum].text = string.Format("{0}. " + Names[curRanking-1] + " {1:N2}", curRanking, CarTimes[curRanking-1]);
+        //Debug.Log(Rank[ShowRankNum].IsActive());
         Rank[ShowRankNum].gameObject.SetActive(true);
+        //Debug.Log(Rank[ShowRankNum].IsActive());
         ShowRankNum++;
     }
 
