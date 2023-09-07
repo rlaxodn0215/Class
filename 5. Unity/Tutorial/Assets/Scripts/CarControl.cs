@@ -9,12 +9,17 @@ public class CarControl : MonoBehaviour
     public float angleLimit = 35.0f;
     public float rotateSpeed = 45.0f;
 
+    float moveHorizontal = 0.0f;
+    public float moveVertical = 0.0f;
+
     public GameObject Wheels;
 
     [SerializeField]
     private List<Transform> frontWheels = new List<Transform>();
 
     Rigidbody rigidbody;
+
+    private float SpeedControl = 1.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -39,8 +44,7 @@ public class CarControl : MonoBehaviour
 
     void ControlingCar()
     {
-        float moveHorizontal = 0.0f;
-        float moveVertical = 0.0f;
+        moveHorizontal = 0.0f;
 
         // Hand Control
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
@@ -48,10 +52,43 @@ public class CarControl : MonoBehaviour
             moveHorizontal = Input.GetAxis("Horizontal");
         }
 
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.W))
         {
-            moveVertical = Input.GetAxis("Vertical");
+            moveVertical += SpeedControl*Time.deltaTime;
+            if (moveVertical > 1.0f)
+            {
+                moveVertical = 1.0f;
+            }
         }
+
+        if(Input.GetKey(KeyCode.S))
+        {
+            moveVertical -= SpeedControl * Time.deltaTime;
+            if(moveVertical < -1.0f)
+            {
+                moveVertical = -1.0f;
+            }
+        }
+
+        else
+        {
+            if(moveVertical < 0.02f)
+            {
+                moveVertical += SpeedControl / 10 * Time.deltaTime;
+            }
+
+            else if(moveVertical > 0.02f)
+            {
+                moveVertical -= SpeedControl / 10 * Time.deltaTime;
+            }
+
+            else
+            {
+                moveVertical = 0.0f;
+            }
+        }
+
+         //Debug.Log(moveVertical);
 
         Move(moveVertical, moveHorizontal);
     }

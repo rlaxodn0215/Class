@@ -75,6 +75,7 @@ public class GameManager : SingletonTemplate<GameManager>
                 {
                     // ∫Œ»∞
                     Cars[0].transform.position = Points[PassNum["Player"]].position;
+                    Cars[0].GetComponent<CarControl>().moveVertical = 0.0f;
                     Cars[0].transform.localRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
                     showWarningCount = false;
                     bornTimer = 7.99f;

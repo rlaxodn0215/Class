@@ -82,6 +82,8 @@ public class PlayUI : MonoBehaviour
                 }
 
                 Rank[--ShowRankNum].gameObject.SetActive(false);
+                if (curRanking <= FirstTimeIndex)
+                    FirstTimeIndex = 0;
                 FirstTimeIndex++;
             }
         }

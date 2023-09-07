@@ -34,6 +34,10 @@ public class EndUI : MonoBehaviour
         {
             names[i].text = GameManager.Instance.Names[i];
             times[i].text = string.Format("{0:N2}", GameManager.Instance.CarTimes[i]);
+            if(GameManager.Instance.Names[i]=="Player")
+            {
+                break;
+            }
         }
     }
 }
