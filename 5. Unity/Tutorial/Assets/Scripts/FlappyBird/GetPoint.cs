@@ -6,7 +6,7 @@ public class GetPoint : MonoBehaviour
 { 
     private void OnTriggerExit(Collider other)
     {
-        FlappyBirdManager.Instance.GetPoint();
+        FlappyBirdManager.Instance.Points++;
         Debug.Log("GetPoint");
     }
 }

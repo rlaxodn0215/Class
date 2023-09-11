@@ -23,7 +23,13 @@ public class FlappyBird : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && !FlappyBirdManager.Instance.gameOver)
         {
-            rigidbody.velocity = new Vector3(0.0f,jumpPower,0.0f);
+            if(transform.position.y <= 4.5f)
+                rigidbody.velocity = new Vector3(0.0f, jumpPower, 0.0f);
+        }
+
+        if(transform.position.y < -5.5f )
+        {
+            FlappyBirdManager.Instance.GameOver();
         }
 
     }

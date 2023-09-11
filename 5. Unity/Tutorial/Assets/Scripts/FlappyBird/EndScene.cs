@@ -14,9 +14,4 @@ public class EndScene : MonoBehaviour
             score.text = string.Format("{0}", FlappyBirdManager.Instance.Points);
     }
 
-    public void ReStart()
-    {
-        SceneManager.LoadScene("Flappy(2023_09_11)");
-    }
-
 }

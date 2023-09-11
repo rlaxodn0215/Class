@@ -8,6 +8,7 @@ TagManager:
   - Wall
   - Road
   - Car
+  - Spawner
   layers:
   - Default
   - TransparentFX

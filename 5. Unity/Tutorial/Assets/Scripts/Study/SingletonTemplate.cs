@@ -25,8 +25,19 @@ public class SingletonTemplate<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public virtual void Awake()
     {
+        if(instance==null)
+        {
+            instance = this as T;
+            DontDestroyOnLoad(this.gameObject);
+        }
+
+        else
+        {
+            Destroy(gameObject);
+        }
+
         if (transform.parent != null && transform.root != null) // 매니저가 자식으로 묶여있을 때
         {
             DontDestroyOnLoad(this.transform.root.gameObject);
