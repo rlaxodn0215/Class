@@ -6,6 +6,7 @@ public class FlappyBird : MonoBehaviour
 {
     public float jumpPower = 5.0f;
     public float rotationAngle = 20.0f;
+    public float maxRotationAngle = 65.0f;
     Rigidbody rigidbody;
 
     private Transform charactor;
@@ -29,6 +30,13 @@ public class FlappyBird : MonoBehaviour
 
     private void FixedUpdate()
     {
-       charactor.Rotate(Vector3.left, rotationAngle * rigidbody.velocity.y*Time.deltaTime);
+        charactor.Rotate(Vector3.left, rotationAngle * rigidbody.velocity.y * Time.deltaTime);
+    }
+
+    float AngleFix(float angle)
+    {
+        float ans = angle;
+        if (ans >= 180) ans -= 360;
+        return ans;
     }
 }

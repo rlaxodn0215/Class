@@ -9,7 +9,7 @@ public class FlappyBirdManager : SingletonTemplate<FlappyBirdManager>
     public GameObject player;
     public int Points = 0;
     public Text showPoints;
-    public bool gameOver { get; private set; }
+    public bool gameOver { get; set; }
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +30,7 @@ public class FlappyBirdManager : SingletonTemplate<FlappyBirdManager>
 
     void ShowPoints()
     {
-        if(!gameOver)
+        if(!gameOver && showPoints != null)
         showPoints.text = string.Format("{0}", Points);
     }
 

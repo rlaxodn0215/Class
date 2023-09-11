@@ -711,6 +711,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpPower: 5
   rotationAngle: 15
+  maxRotationAngle: 45
 --- !u!1001 &1459153399
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -785,7 +786,7 @@ GameObject:
   - component: {fileID: 1471506408}
   - component: {fileID: 1471506407}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: FlappyBirdManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
