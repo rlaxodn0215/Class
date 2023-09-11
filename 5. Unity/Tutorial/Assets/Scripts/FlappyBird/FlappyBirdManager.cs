@@ -37,6 +37,7 @@ public class FlappyBirdManager : SingletonTemplate<FlappyBirdManager>
     public void GameOver()
     {
         gameOver = true;
+        player.GetComponent<BoxCollider>().isTrigger = true;
         Invoke("EndScene", 2.0f);
     }
 
