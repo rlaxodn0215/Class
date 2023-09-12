@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player2D : MonoBehaviour
 {
     private Rigidbody2D rigidbody;
-    float maxSpeed = 500f;
+    float maxSpeed = 800f;
     new SpriteRenderer renderer;
 
     // Start is called before the first frame update
