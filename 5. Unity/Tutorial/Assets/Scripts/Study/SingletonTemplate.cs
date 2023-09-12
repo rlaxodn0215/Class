@@ -27,7 +27,7 @@ public class SingletonTemplate<T> : MonoBehaviour where T : MonoBehaviour
 
     public virtual void Awake()
     {
-        if(instance==null)
+        if(instance == null)
         {
             instance = this as T;
             DontDestroyOnLoad(this.gameObject);

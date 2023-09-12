@@ -28,7 +28,6 @@ namespace Game_2D
             Move_2(x, y);
             Shoot();
 
-
         }
 
         void Shoot()
@@ -67,6 +66,19 @@ namespace Game_2D
             {
                 GameManager_2D.Instance.AddCoinScore();
             }
+
+            else if(collision.gameObject.tag == "Enemy_Bullet")
+            {
+                GetComponent<SpriteRenderer>().color = Color.red;
+                Invoke("ColorReturn", 0.2f);
+                Destroy(collision.gameObject);
+            }
+        }
+
+
+        void ColorReturn()
+        {
+            GetComponent<SpriteRenderer>().color = Color.white;
         }
 
         //void Move_1(float x, float y)

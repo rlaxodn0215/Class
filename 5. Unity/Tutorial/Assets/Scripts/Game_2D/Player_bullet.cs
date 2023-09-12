@@ -7,12 +7,12 @@ namespace Game_2D
     public class Player_bullet : MonoBehaviour
     {
         Rigidbody2D rigidbody;
-        private float bulletSpeed = 700f;
+        private float bulletSpeed = 1300f;
         private void Start()
         {
             rigidbody = GetComponent<Rigidbody2D>();
 
-            Invoke("Die", 3);
+            Invoke("Die", 4);
         }
         // Update is called once per frame
         void Update()
