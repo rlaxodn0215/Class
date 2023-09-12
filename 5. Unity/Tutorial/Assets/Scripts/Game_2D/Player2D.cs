@@ -7,7 +7,7 @@ namespace Game_2D
     public class Player2D : MonoBehaviour
     {
         private Rigidbody2D rigidbody;
-        float maxSpeed = 800f;
+        float maxSpeed = 1000f;
         new SpriteRenderer renderer;
         public GameObject Player_bullet;
 
@@ -24,7 +24,6 @@ namespace Game_2D
             float x = Input.GetAxis("Horizontal");
             float y = Input.GetAxis("Vertical");
 
-            Flip_2D(x);
             Move_2(x, y);
             Shoot();
 
@@ -38,16 +37,16 @@ namespace Game_2D
             }
         }
 
-        void Flip_2D(float x)
-        {
-            if (Mathf.Abs(x) > 0)
-            {
-                if (x >= 0)
-                    renderer.flipX = false;
-                else
-                    renderer.flipX = true;
-            }
-        }
+        //void Flip_2D(float x)
+        //{
+        //    if (Mathf.Abs(x) > 0)
+        //    {
+        //        if (x >= 0)
+        //            renderer.flipX = false;
+        //        else
+        //            renderer.flipX = true;
+        //    }
+        //}
 
 
         void Move_2(float x, float y)
