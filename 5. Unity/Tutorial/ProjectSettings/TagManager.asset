@@ -9,6 +9,9 @@ TagManager:
   - Road
   - Car
   - Spawner
+  - Enemy
+  - Player_Bullet
+  - Coin
   layers:
   - Default
   - TransparentFX
