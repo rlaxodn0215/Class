@@ -21,6 +21,7 @@ namespace Game_2D
         {
             if (collision.gameObject.tag == "Player")
             {
+                GameManager_2D.Instance.AddCoinScore();
                 gameObject.SetActive(false);
             }
         }

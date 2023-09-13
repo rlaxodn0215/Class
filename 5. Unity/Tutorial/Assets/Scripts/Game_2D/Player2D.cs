@@ -8,22 +8,25 @@ namespace Game_2D
     public class Player2D : MonoBehaviour
     {
         private Rigidbody2D rigidbody;
-        float maxSpeed = 500f;
+        float maxSpeed = 800f;
         new SpriteRenderer renderer;
         public GameObject Player_bullet;
+        public GameObject Player_Dynamite;
 
+        [SerializeField]
+        private int Hp = 100;
+
+        private float skill = 1.0f;
+        private float skillTime = 0.5f;
+        
         public Image imgHpbar = null;
+        public Image skillImage = null;
 
         // Start is called before the first frame update
         void Start()
         {
             rigidbody = GetComponent<Rigidbody2D>();
             renderer = GetComponent<SpriteRenderer>();
-        }
-
-        void ShowHpBar(int hp)
-        {
-            imgHpbar.fillAmount = (float)hp / 100.0f;
         }
 
         // Update is called once per frame
@@ -34,7 +37,12 @@ namespace Game_2D
 
             Move_2(x, y);
             Shoot();
+            ShowHpBar(Hp);
+        }
 
+        void ShowHpBar(int hp)
+        {
+            imgHpbar.fillAmount = (float)hp / 100.0f;
         }
 
         void Shoot()
@@ -43,7 +51,38 @@ namespace Game_2D
             {
                 Instantiate(Player_bullet, transform.position, Quaternion.identity);
             }
+
+            else if(Input.GetKey(KeyCode.Space))
+            {
+                if(skill > 0.0f)
+                {
+                    skill -= skillTime * Time.deltaTime;
+                }
+            }
+
+
+            else if(Input.GetKeyUp(KeyCode.Space))
+            {
+                if(skill<=0.01f)
+                {
+                    //Debug.Log("필살기 사용");
+                    Instantiate(Player_Dynamite, transform.position, Quaternion.identity);
+                    skill = 1.0f;
+                }
+            }
+
+            else
+            {
+                if (skill < 1.0f)
+                {
+                    skill += skillTime * Time.deltaTime;
+                }
+            }
+
+            skillImage.fillAmount = skill;
         }
+
+
 
         //void Flip_2D(float x)
         //{
@@ -69,15 +108,11 @@ namespace Game_2D
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.tag == "Coin")
-            {
-                GameManager_2D.Instance.AddCoinScore();
-            }
-
-            else if(collision.gameObject.tag == "Enemy_Bullet")
+            if(collision.gameObject.tag == "Enemy_Bullet")
             {
                 GetComponent<SpriteRenderer>().color = Color.red;
                 Invoke("ColorReturn", 0.2f);
+                Hp -= 5;
                 Destroy(collision.gameObject);
             }
         }

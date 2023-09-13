@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game_2D
 {
@@ -8,10 +9,16 @@ namespace Game_2D
     {
         public GameObject Enemy_bullet;
         private Rigidbody2D rigidbody;
-        float maxSpeed = 200f;
+        float maxSpeed = 350f;
         bool Damaged = false;
         private Animator animator;
         public GameObject effect;
+        public Image imgHpbar = null;
+
+        [SerializeField]
+        private int Hp = 20;
+
+        private bool dead = false;
 
         // Start is called before the first frame update
         void Start()
@@ -26,6 +33,12 @@ namespace Game_2D
         void Update()
         {
             EnemyMove(Damaged);
+            ShowHpBar(Hp);
+        }
+
+        void ShowHpBar(int hp)
+        {
+            imgHpbar.fillAmount = (float)hp / 20.0f;
         }
 
         void EnemyMove(bool damaged)
@@ -47,9 +60,11 @@ namespace Game_2D
             }
         }
 
+        // GameManager_2D.Instance.AddKillScore();
+
         void Die()
         {
-            DestroyImmediate(gameObject);
+            Destroy(gameObject, 0.2f);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -60,6 +75,31 @@ namespace Game_2D
                 GetComponent<SpriteRenderer>().color = Color.red;
                 Instantiate(effect, collision.transform.position, Quaternion.identity);
                 Destroy(collision.gameObject,0.0f);
+                Hp -= 4;
+                if(Hp<=0 && !dead)
+                {
+                    dead = true;
+                    GameManager_2D.Instance.AddKillScore();
+                    Die();
+                }
+                Damaged = true;
+                Invoke("ColorReturn", 0.2f);
+            }
+        }
+
+        private void OnTriggerStay2D(Collider2D collision)
+        {
+            if (collision.gameObject.tag == "Player_Dynamite")
+            {
+                animator.SetBool("Damaged", true);
+                GetComponent<SpriteRenderer>().color = Color.red;
+                Hp -= 4;
+                if (Hp <= 0 && !dead)
+                {
+                    dead = true;
+                    GameManager_2D.Instance.AddKillScore();
+                    Die();
+                }
                 Damaged = true;
                 Invoke("ColorReturn", 0.2f);
             }

@@ -28,11 +28,13 @@ namespace Game_2D
             if(popupObj.activeSelf)
             {
                 popupObj.SetActive(false);
+                Time.timeScale = 1;
             }
 
             else
             {
                 popupObj.SetActive(true);
+                Time.timeScale = 0;
             }
         }
     }

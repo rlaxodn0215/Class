@@ -7,7 +7,7 @@ namespace Game_2D
     public class Enemy_bullet : MonoBehaviour
     {
         Rigidbody2D rigidbody;
-        private float bulletSpeed = 500f;
+        private float bulletSpeed = 800f;
         private void Start()
         {
             rigidbody = GetComponent<Rigidbody2D>();

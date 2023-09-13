@@ -13,6 +13,7 @@ TagManager:
   - Player_Bullet
   - Coin
   - Enemy_Bullet
+  - Player_Dynamite
   layers:
   - Default
   - TransparentFX

@@ -10,6 +10,7 @@ namespace Game_2D
         public Text titletext = null;
         public InputField inputText = null;
         public Toggle toggleBGM = null;
+        public GameObject[] Backgrounds;
 
         public GameObject radioGroupObj=null;
         Toggle[] toggleRadio;
@@ -31,11 +32,15 @@ namespace Game_2D
         {
             Debug.Log("OnClickOK()");
             titletext.text = "OnClickOK()";
+            gameObject.SetActive(false);
+            Time.timeScale = 1;
+
         }
 
         void OnClickCancel()
         {
             gameObject.SetActive(false);
+            Time.timeScale = 1;
         }
 
        void onTextChanged()
@@ -63,14 +68,25 @@ namespace Game_2D
 
         public void onToggleRadio()
         {
-            if(toggleRadio[0].isOn)
+            if (toggleRadio[0].isOn)
             {
-                Debug.Log("1번 선택");
+                Backgrounds[0].GetComponent<SpriteRenderer>().color = Color.green;
+                Backgrounds[1].GetComponent<SpriteRenderer>().color = Color.green;
+                //Debug.Log("1번 선택");
             }
 
-            else if(toggleRadio[1].isOn)
+            else if (toggleRadio[1].isOn)
             {
-                Debug.Log("2번 선택");
+                Backgrounds[0].GetComponent<SpriteRenderer>().color = Color.red;
+                Backgrounds[1].GetComponent<SpriteRenderer>().color = Color.red;
+                //Debug.Log("2번 선택");
+            }
+
+            else if (toggleRadio[2].isOn)
+            {
+                Backgrounds[0].GetComponent<SpriteRenderer>().color = Color.blue;
+                Backgrounds[1].GetComponent<SpriteRenderer>().color = Color.blue;
+                //Debug.Log("3번 선택");
             }
         }
 
