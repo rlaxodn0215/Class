@@ -8,9 +8,10 @@ namespace Game_2D
     {
         public GameObject Enemy_bullet;
         private Rigidbody2D rigidbody;
-        float maxSpeed = 350f;
+        float maxSpeed = 200f;
         bool Damaged = false;
         private Animator animator;
+        public GameObject effect;
 
         // Start is called before the first frame update
         void Start()
@@ -57,7 +58,8 @@ namespace Game_2D
             {
                 animator.SetBool("Damaged", true);
                 GetComponent<SpriteRenderer>().color = Color.red;
-                Destroy(collision.gameObject);
+                Instantiate(effect, collision.transform.position, Quaternion.identity);
+                Destroy(collision.gameObject,0.0f);
                 Damaged = true;
                 Invoke("ColorReturn", 0.2f);
             }

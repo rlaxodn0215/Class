@@ -1,21 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game_2D
 {
     public class Player2D : MonoBehaviour
     {
         private Rigidbody2D rigidbody;
-        float maxSpeed = 1000f;
+        float maxSpeed = 500f;
         new SpriteRenderer renderer;
         public GameObject Player_bullet;
+
+        public Image imgHpbar = null;
 
         // Start is called before the first frame update
         void Start()
         {
             rigidbody = GetComponent<Rigidbody2D>();
             renderer = GetComponent<SpriteRenderer>();
+        }
+
+        void ShowHpBar(int hp)
+        {
+            imgHpbar.fillAmount = (float)hp / 100.0f;
         }
 
         // Update is called once per frame

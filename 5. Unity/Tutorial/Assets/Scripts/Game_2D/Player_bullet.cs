@@ -7,7 +7,7 @@ namespace Game_2D
     public class Player_bullet : MonoBehaviour
     {
         Rigidbody2D rigidbody;
-        private float bulletSpeed = 1300f;
+        private float bulletSpeed = 1000f;
         private void Start()
         {
             rigidbody = GetComponent<Rigidbody2D>();
@@ -29,7 +29,7 @@ namespace Game_2D
 
         void Die()
         {
-            DestroyImmediate(gameObject);
+            Destroy(gameObject,0.0f);
         }
     }
 }
