@@ -2,27 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Collum : MonoBehaviour
+namespace Game_3D
 {
-    public int Hp = 100;
-    private Color color;
 
-    private void Start()
+    public class Collum : MonoBehaviour
     {
-        //color = GetComponent<Material>().color;
-    }
+        public int Hp = 100;
+        private Color color;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.tag == "EnemySword")
+        private void Start()
         {
-           // Hp -= GameManager_3D.Instance.EnemySwordDamage;
-            //color.g-=
+            //color = GetComponent<Material>().color;
+        }
 
-            if(Hp<=0)
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.tag == "EnemySword")
             {
-                DestroyImmediate(gameObject);
-                GameManager_3D.Instance.CollumDead();
+                // Hp -= GameManager_3D.Instance.EnemySwordDamage;
+                //color.g-=
+
+                if (Hp <= 0)
+                {
+                    DestroyImmediate(gameObject);
+                    GameManager_3D.Instance.CollumDead();
+                }
             }
         }
     }

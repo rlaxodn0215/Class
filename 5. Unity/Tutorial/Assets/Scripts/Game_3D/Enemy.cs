@@ -6,17 +6,17 @@ namespace Game_3D
 {
     public class Enemy : MonoBehaviour
     {
-        Animation spartanKing;
-
-        private int Hp = 50;
-        private float runSpeed = 10.0f;
-        private float SightRange = 20.0f;
-        public float AttackRange = 10.5f;
+        public int ID;
+        public int Hp = 50;
+        public float runSpeed = 10.0f;
+        public float SightRange = 30.0f;
+        public float AttackRange = 5.5f;
         public GameObject objSword = null;
-        private Transform colLocation = null;
-
-        private bool ArriveCol = false;
         public bool Alive = true;
+
+        private Transform colLocation = null;
+        private bool ArriveCol = false;
+        Animation spartanKing;
 
         // Start is called before the first frame update
         void Start()
@@ -111,13 +111,17 @@ namespace Game_3D
                     Alive = false;
                     spartanKing.wrapMode = WrapMode.Once;
                     spartanKing.CrossFade("diehard", 0.3f);
-                    Destroy(gameObject, 2.5f);
-                    GameManager_3D.Instance.EnemyDead();
+                    Invoke("EnemyDie", 3.5f);
+                    
                 }
             }
         }
 
-
+        void EnemyDie()
+        {
+            gameObject.SetActive(false);
+            GameManager_3D.Instance.EnemyDead(ID);
+        }
 
 
     }

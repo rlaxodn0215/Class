@@ -12,7 +12,7 @@ namespace Game_3D
         public AnimationClip RUN;
         public AnimationClip ATTACK;
 
-        CharacterController pcControl;
+        //CharacterController pcControl;
         public float runSpeed = 10.0f;
         Vector3 velocity;
         public float rotationSpeed = 60.0f;
@@ -24,7 +24,7 @@ namespace Game_3D
         void Start()
         {
             spartanKing = gameObject.GetComponentInChildren<Animation>();
-            pcControl = gameObject.GetComponent<CharacterController>();
+            //pcControl = gameObject.GetComponent<CharacterController>();
             objSword.SetActive(false);
         }
 
@@ -129,7 +129,7 @@ namespace Game_3D
                 spartanKing.CrossFade("idle", 0.3f);
             }
 
-            pcControl.Move(direction *runSpeed* Time.deltaTime + Physics.gravity * Time.deltaTime);
+           // pcControl.Move(direction *runSpeed* Time.deltaTime + Physics.gravity * Time.deltaTime);
             //Debug.Log(velocity * Time.deltaTime + Physics.gravity * Time.deltaTime);
             //pcControl.SimpleMove(velocity);
         }
@@ -171,7 +171,7 @@ namespace Game_3D
 
             //pcControl.Move(velocity * Time.deltaTime + Physics.gravity * Time.deltaTime);
             //Debug.Log(velocity * Time.deltaTime + Physics.gravity * Time.deltaTime);
-            pcControl.SimpleMove(velocity);
+            //pcControl.SimpleMove(velocity);
         }
 
         void AnimationPlay_4()
