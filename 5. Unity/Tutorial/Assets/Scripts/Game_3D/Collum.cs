@@ -19,12 +19,12 @@ namespace Game_3D
         {
             if (other.tag == "EnemySword")
             {
-                // Hp -= GameManager_3D.Instance.EnemySwordDamage;
-                //color.g-=
+                Hp -= GameManager_3D.Instance.EnemySwordDamage;
+               //Debug.Log(GetComponent<Material>().color.g);
 
                 if (Hp <= 0)
                 {
-                    DestroyImmediate(gameObject);
+                    Destroy(gameObject);
                     GameManager_3D.Instance.CollumDead();
                 }
             }

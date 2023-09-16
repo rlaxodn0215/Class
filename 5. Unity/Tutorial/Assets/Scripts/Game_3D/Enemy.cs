@@ -7,7 +7,7 @@ namespace Game_3D
     public class Enemy : MonoBehaviour
     {
         public int ID;
-        public int Hp = 50;
+        public int Hp = 10;
         public float runSpeed = 10.0f;
         public float SightRange = 30.0f;
         public float AttackRange = 5.5f;
