@@ -15,10 +15,11 @@ namespace Mechanic
         public GameObject Weapon;
 
         private List<GameObject> weapons = new List<GameObject>();
-        
 
         private bool isSword = false;
         private bool isBow = false;
+
+        private bool readyForShoot = false;
 
         CharacterController pcController;
         Animator animator;
@@ -42,59 +43,107 @@ namespace Mechanic
             InputControl();
         }
 
+
         void InputControl()
         {
             if(Input.GetKeyDown(KeyCode.Alpha1))
             {
-                
-                if (isSword)
+                if (animator.GetCurrentAnimatorStateInfo(2).IsName("Empty"))
                 {
-                    animator.SetTrigger("UnLoadSword");
-                }
+                    if (isSword)
+                    {
+                        animator.SetTrigger("UnLoadSword");
+                    }
 
-                else if(isBow)
-                {
-                    animator.SetTrigger("ChangeToSword");
-                }
+                    else if (isBow)
+                    {
+                        animator.SetTrigger("ChangeToSword");
+                    }
 
-                else
-                {
-                    animator.SetTrigger("LoadSword");
-                    
+                    else
+                    {
+                        animator.SetTrigger("LoadSword");
+
+                    }
                 }
             }
 
             else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                if (isBow)
+                if (animator.GetCurrentAnimatorStateInfo(2).IsName("Empty"))
                 {
-                    animator.SetTrigger("UnLoadBow");
-                }
+                    if (isBow)
+                    {
+                        animator.SetTrigger("UnLoadBow");
+                    }
 
-                else if(isSword)
-                {
-                    animator.SetTrigger("ChangeToBow");
-                }
+                    else if (isSword)
+                    {
+                        animator.SetTrigger("ChangeToBow");
+                    }
 
-                else
-                {
-                    animator.SetTrigger("LoadBow");
+                    else
+                    {
+                        animator.SetTrigger("LoadBow");
+                    }
                 }
             }
 
-            else if(Input.GetMouseButtonDown(0))
+            if(Input.GetMouseButton(0))
             {
-                if(isSword)
+                if (animator.GetCurrentAnimatorStateInfo(1).IsName("Empty"))
                 {
-                    animator.SetTrigger("AttackSword");
+                    if (isSword)
+                    {
+                        animator.SetBool("AttackSword", true) ;
+                    }
+
+                    else if(isBow)
+                    {
+                        animator.SetBool("DrawArrow", true);
+                        //Debug.Log("Drawing...");
+
+                        if (animator.GetCurrentAnimatorStateInfo(2).IsName("Draw Arrow")
+                            && animator.GetCurrentAnimatorStateInfo(2).normalizedTime >= 0.95f)
+                        {
+                            //Debug.Log("Ready For Shoot");
+                            readyForShoot = true;
+                        }
+                    }
+
+                    else
+                    {
+                        animator.SetBool("AttackPunch",true);
+                    }
+                }
+
+            }
+
+            if(Input.GetMouseButtonUp(0))
+            {
+                if (isSword)
+                {
+                    animator.SetBool("AttackSword", false);
+                }
+
+                else if (isBow)
+                {
+                    if (readyForShoot)
+                    {
+                        animator.SetTrigger("ShootArrow");
+                        Debug.Log("Shoot!!");
+                        readyForShoot = false;
+                    }
+
+                    animator.SetBool("DrawArrow", false);
                 }
 
                 else
                 {
-                    animator.SetTrigger("AttackPunch");
+                    animator.SetBool("AttackPunch",false);
                 }
             }
-            
+
 
         }
 
@@ -131,10 +180,15 @@ namespace Mechanic
             float v = Input.GetAxis("Vertical");
             float h = Input.GetAxis("Horizontal");
 
-            transform.Translate(Vector3.forward * v * runSpeed * Time.deltaTime);
-            transform.Rotate(Vector3.up * h * rotateSpeed * Time.deltaTime);
+            if(v>=0)
+                transform.Translate(Vector3.forward * v * runSpeed * Time.deltaTime);
+            else
+                transform.Translate(Vector3.forward * v/2 * runSpeed * Time.deltaTime);
+
+            transform.Rotate(Vector3.up, h*rotateSpeed * Time.deltaTime);
 
             animator.SetFloat("Speed", v * runSpeed);
+
         }
     }
 }
