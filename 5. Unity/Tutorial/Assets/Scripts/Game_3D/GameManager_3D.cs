@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game_3D
 {
@@ -17,11 +18,16 @@ namespace Game_3D
         public int PlayerPoint = 0;
         public int MaxEnemyNum = 10;
         public float Timer = 0.0f;
+        int colNum = 5;
 
         private float SpawnTimer = 0.0f;
         private float SpawnInterval = 3.0f;
         public int PlayerSwordDamage { get; private set; }
         public int EnemySwordDamage { get; private set; }
+
+        public Text timer;
+        public Text score;
+        public GameObject gameOver;
 
         // Start is called before the first frame update
         void Start()
@@ -49,6 +55,8 @@ namespace Game_3D
         {
             Timeing();
             SpawnEnemys();
+            ShowTimer();
+            ShowScore();
         }
 
         void SpawnEnemys()
@@ -75,7 +83,6 @@ namespace Game_3D
             if (other.tag == "Enemy")
             {
                 PlayerPoint += 100;
-
             }
 
             else if (other.tag == "Player")
@@ -99,7 +106,28 @@ namespace Game_3D
 
         public void CollumDead()
         {
-
+            colNum--;
+            if(colNum<=0)
+            {
+                GameOver();
+            }
         }
+
+        void ShowTimer()
+        {
+            timer.text = string.Format("{0:N2}", Timer);
+        }
+
+        void ShowScore()
+        {
+            score.text = string.Format("Score : {0}", PlayerPoint);
+        }
+
+        public void GameOver()
+        {
+            gameOver.SetActive(true);
+        }
+
+
     }
 }

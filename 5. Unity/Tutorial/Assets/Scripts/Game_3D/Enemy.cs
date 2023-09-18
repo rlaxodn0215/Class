@@ -112,6 +112,7 @@ namespace Game_3D
                     spartanKing.wrapMode = WrapMode.Once;
                     spartanKing.CrossFade("diehard", 0.3f);
                     Invoke("EnemyDie", 3.5f);
+                    GameManager_3D.Instance.PlayerPoint += 100;
                     
                 }
             }

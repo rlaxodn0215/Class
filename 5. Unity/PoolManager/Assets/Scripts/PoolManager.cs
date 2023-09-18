@@ -54,14 +54,15 @@ public class PoolManager : Singleton<PoolManager>
         gb.transform.position = ObjRoot.position;
         gb.transform.rotation = ObjRoot.rotation;
 
+        ///////////////////////////////////////
         Object obj = gb.GetComponent<Object>();
         obj.SetID(id);
         obj.SetCallback(AddID);
-
+        //////////////////////////////////////
+        
         gb.SetActive(false);
 
         ObjIDs.Enqueue(id);
-
 
         Debug.Log("[PoolManager] Created Object ID : " + id);
 
