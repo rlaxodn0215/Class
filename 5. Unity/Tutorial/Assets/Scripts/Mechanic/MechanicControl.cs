@@ -24,6 +24,28 @@ namespace Mechanic
         void Update()
         {
             CharactorControll_Slerp();
+
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                animator.SetTrigger("Pose1");
+            }
+
+            //else if (Input.GetKeyUp(KeyCode.Space))
+            //{
+            //    animator.SetTrigger("Pose1");
+            //}
+        }
+
+        void Input_Animation()
+        { 
+            if(Input.GetMouseButtonDown(0))
+            {
+                //animator.SetBool()
+                animator.GetCurrentAnimatorStateInfo(1).IsName("UpperBody.Attack");
+                if (animator.GetCurrentAnimatorStateInfo(1).normalizedTime >= 0.9f) ;
+            }
+
+
         }
 
         void CharactorControll_Slerp()
