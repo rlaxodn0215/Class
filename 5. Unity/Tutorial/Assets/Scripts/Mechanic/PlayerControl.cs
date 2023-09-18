@@ -95,7 +95,7 @@ namespace Mechanic
                 {
                     if (isSword)
                     {
-                        animator.SetBool("AttackSword", true) ;
+                        animator.SetTrigger("AttackSword") ;
                     }
 
                     else if(isBow)
@@ -113,7 +113,7 @@ namespace Mechanic
 
                     else
                     {
-                        animator.SetBool("AttackPunch",true);
+                         animator.SetTrigger("AttackPunch");
                     }
                 }
 
