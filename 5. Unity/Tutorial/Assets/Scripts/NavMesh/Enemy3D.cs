@@ -69,10 +69,10 @@ namespace MazeGame
                 if (targetAngle <= ViewAngle * 0.5f && !Physics.Raycast(SightPos, targetDir, ViewRadius, ObstacleMask))
                 {
                     LoadSword();
-                    FollowDest(targetPos);
+                    FollowDest(player.transform.position);
                     Debug.DrawLine(SightPos, targetPos, Color.red);
 
-                    Debug.Log(animator.GetCurrentAnimatorStateInfo(1).IsName("Empty"));
+                    //Debug.Log(animator.GetCurrentAnimatorStateInfo(1).IsName("Empty"));
 
                     if(Vector3.Distance(targetPos,transform.position)<=attackRange 
                         && animator.GetCurrentAnimatorStateInfo(1).IsName("Empty"))

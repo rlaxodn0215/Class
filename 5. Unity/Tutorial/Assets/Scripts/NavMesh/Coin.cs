@@ -10,12 +10,13 @@ namespace MazeGame
         {
             if (other.tag == "Player")
             {
-                MazeGameManager.Instance.PlayerPoints++;
+                MazeGameManager.Instance.PlayerPoints+=100;
                 MazeGameManager.Instance.SpawnCoin();
+                MazeGameManager.Instance.ShowScore();
                 gameObject.SetActive(false);
             }
 
-            else 
+            else if(other.tag == "Enemy")
             {
                 MazeGameManager.Instance.SpawnCoin();
                 gameObject.SetActive(false);

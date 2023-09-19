@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MazeGame
 {
@@ -9,6 +10,8 @@ namespace MazeGame
         public GameObject Player;
         public GameObject Arrow;
         public GameObject CoinSpawners;
+        public Text score;
+        public GameObject damagedImage;
         public int PlayerPoints = 0;
 
         private List<GameObject> spawnPoints = new List<GameObject>();
@@ -18,6 +21,7 @@ namespace MazeGame
         {
             CoinPointInit();
             SpawnCoin();
+            ShowScore();
         }
 
         void CoinPointInit()
@@ -35,9 +39,14 @@ namespace MazeGame
             PointingCoin();
         }
 
+        public void ShowScore()
+        {
+            score.text = string.Format("Score : {0}", PlayerPoints);
+        }
+
         public void SpawnCoin()
         {
-            GameObject temp = spawnPoints[Random.Range(0, spawnPoints.Count - 1)];
+            GameObject temp = spawnPoints[Random.Range(0, spawnPoints.Count)];
             temp.SetActive(true);
             coinPoint = temp.transform.position;
         }
@@ -56,6 +65,18 @@ namespace MazeGame
             //Debug.Log(angle);
 
             Arrow.transform.localRotation = Quaternion.Euler(new Vector3(-90, angle,0));
+        }
+
+        public void Damaged()
+        {
+            damagedImage.SetActive(true);
+            StartCoroutine(Healing());
+        }
+
+        IEnumerator Healing()
+        {
+            yield return new WaitForSeconds(2.5f);
+            damagedImage.SetActive(false);
         }
 
 

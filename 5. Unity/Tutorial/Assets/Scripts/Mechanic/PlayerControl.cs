@@ -190,5 +190,30 @@ namespace Mechanic
             animator.SetFloat("Speed", v * runSpeed);
 
         }
+
+        //private void OnControllerColliderHit(ControllerColliderHit hit)
+        //{
+        //    if(hit.collider.tag == "EnemySword")
+        //    {
+        //        MazeGame.MazeGameManager.Instance.Damaged();
+        //    }
+        //}
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.tag == "EnemySword")
+            {
+                MazeGame.MazeGameManager.Instance.Damaged();
+                Debug.Log("Damaged");
+            }
+        }
+
+        //private void OnCollisionEnter(Collision collision)
+        //{
+        //    if (collision.gameObject.tag == "EnemySword")
+        //    {
+        //        MazeGame.MazeGameManager.Instance.Damaged();
+        //    }
+        //}
     }
 }
