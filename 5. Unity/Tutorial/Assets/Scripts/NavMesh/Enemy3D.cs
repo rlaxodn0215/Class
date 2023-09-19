@@ -14,6 +14,7 @@ namespace MazeGame
 
         [Range(0f, 360f)] [SerializeField] float ViewAngle = 0f;
         [SerializeField] float ViewRadius = 1f;
+        [SerializeField] float attackRange = 1f;
         [SerializeField] LayerMask TargetMask;
         [SerializeField] LayerMask ObstacleMask;
 
@@ -32,16 +33,10 @@ namespace MazeGame
         // Update is called once per frame
         void Update()
         {
-            SearchCoin();
-            //SpotPlayer();
+            EnemyControl();
         }
 
-        void SearchCoin()
-        {
-            FollowDest(MazeGameManager.Instance.coinPoint);
-        }
-
-        void SpotPlayer()
+        void EnemyControl()
         {
             Vector3 SightPos = transform.position + Vector3.up * 2.5f;
             float lookingAngle = transform.eulerAngles.y;  //캐릭터가 바라보는 방향의 각도
@@ -60,6 +55,7 @@ namespace MazeGame
             {
                 UnLoadSword();
                 agent.destination = transform.position;
+                SearchCoin();
                 animator.SetFloat("Speed", agent.velocity.magnitude);
                 return;
             }
@@ -75,10 +71,25 @@ namespace MazeGame
                     LoadSword();
                     FollowDest(targetPos);
                     Debug.DrawLine(SightPos, targetPos, Color.red);
+
+                    if(Vector3.Distance(targetPos,transform.position)<=attackRange)
+                    {
+                        AttackSword();
+                    }
+
+                    else
+                    {
+                        StopAttackSword();
+                    }
                 }
 
             }
 
+        }
+
+        void SearchCoin()
+        {
+            FollowDest(MazeGameManager.Instance.coinPoint);
         }
 
         Vector3 AngleToDir(float angle)
@@ -126,7 +137,18 @@ namespace MazeGame
 
         void AttackSword()
         {
+            if (isSword)
+            {
+                animator.SetBool("AttackSword",true);
+            }
+        }
 
+        void StopAttackSword()
+        {
+            if (isSword)
+            {
+                animator.SetBool("AttackSword", false);
+            }
         }
 
         void FollowDest(Vector3 dest)
