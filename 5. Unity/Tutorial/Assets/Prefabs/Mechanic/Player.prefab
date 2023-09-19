@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 6909440503903604441}
   - component: {fileID: 6909440503903604423}
   - component: {fileID: 6909440503903604422}
+  - component: {fileID: 4613887328731984765}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -123,6 +124,19 @@ MonoBehaviour:
   UnSword: {fileID: 6909440502596203964}
   UnBow: {fileID: 6909440504443435890}
   Weapon: {fileID: 6909440504223835140}
+--- !u!114 &4613887328731984765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6909440503903604443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af4ba4fa4d0fa004eb2c97e5d998f9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
 --- !u!1 &6909440504223835140
 GameObject:
   m_ObjectHideFlags: 0

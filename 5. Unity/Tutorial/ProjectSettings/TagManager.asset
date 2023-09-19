@@ -17,6 +17,7 @@ TagManager:
   - Sword
   - Collum
   - EnemySword
+  - Floor
   layers:
   - Default
   - TransparentFX
@@ -30,8 +31,8 @@ TagManager:
   - Capsule
   - MiniMap
   - Collum
-  - 
-  - 
+  - Player
+  - Wall
   - 
   - 
   - 
