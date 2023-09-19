@@ -54,9 +54,9 @@ namespace MazeGame
             if (Targets.Length == 0)
             {
                 UnLoadSword();
-                agent.destination = transform.position;
                 SearchCoin();
                 animator.SetFloat("Speed", agent.velocity.magnitude);
+                StopAttackSword();
                 return;
             }
 
@@ -72,7 +72,10 @@ namespace MazeGame
                     FollowDest(targetPos);
                     Debug.DrawLine(SightPos, targetPos, Color.red);
 
-                    if(Vector3.Distance(targetPos,transform.position)<=attackRange)
+                    Debug.Log(animator.GetCurrentAnimatorStateInfo(1).IsName("Empty"));
+
+                    if(Vector3.Distance(targetPos,transform.position)<=attackRange 
+                        && animator.GetCurrentAnimatorStateInfo(1).IsName("Empty"))
                     {
                         AttackSword();
                     }
@@ -81,6 +84,14 @@ namespace MazeGame
                     {
                         StopAttackSword();
                     }
+                }
+
+                else
+                {
+                    SearchCoin();
+                    animator.SetFloat("Speed", agent.velocity.magnitude);
+                    StopAttackSword();
+                    return;
                 }
 
             }
@@ -100,55 +111,56 @@ namespace MazeGame
 
         void LoadSword()
         {
-            if (!isSword)
+            if (animator.GetCurrentAnimatorStateInfo(2).IsName("Empty"))
             {
-                animator.SetTrigger("LoadSword");
-                isSword = true;
-            }
-
-            if (animator.GetCurrentAnimatorStateInfo(1).IsName("Withdrawing Sword Enemy"))
-            {
-                if (animator.GetCurrentAnimatorStateInfo(1).normalizedTime >= 0.4f)
+                if (!isSword)
                 {
-                    UnSword.SetActive(false);
-                    Sword.SetActive(true);
+                    animator.SetTrigger("LoadSword");
+                    StartCoroutine(WeaponEnables("Withdrawing Sword Enemy", 0.4f));
+                    isSword = true;
                 }
             }
         }
 
         void UnLoadSword()
         {
-            if (isSword)
+            if (animator.GetCurrentAnimatorStateInfo(2).IsName("Empty"))
             {
-                animator.SetTrigger("UnLoadSword");
-                isSword = false;
-            }
-
-            if (animator.GetCurrentAnimatorStateInfo(1).IsName("Sheathing Sword Enemy"))
-            {
-                if (animator.GetCurrentAnimatorStateInfo(1).normalizedTime >= 0.8f)
+                if (isSword)
                 {
-                    UnSword.SetActive(true);
-                    Sword.SetActive(false);
+                    animator.SetTrigger("UnLoadSword");
+                    StartCoroutine(WeaponEnables("Sheathing Sword Enemy", 0.8f));
+                    isSword = false;
                 }
             }
+        }
 
+        IEnumerator WeaponEnables(string aniName, float time)
+        {
+            while(true)
+            {
+                if (animator.GetCurrentAnimatorStateInfo(1).IsName(aniName))
+                {
+                    if (animator.GetCurrentAnimatorStateInfo(1).normalizedTime >= time)
+                    {
+                        UnSword.SetActive(!UnSword.activeSelf);
+                        Sword.SetActive(!Sword.activeSelf);
+                        break;
+                    }
+                }
+
+                yield return null;
+            }
         }
 
         void AttackSword()
         {
-            if (isSword)
-            {
-                animator.SetBool("AttackSword",true);
-            }
+           animator.SetBool("AttackSword", true);
         }
 
         void StopAttackSword()
         {
-            if (isSword)
-            {
-                animator.SetBool("AttackSword", false);
-            }
+            animator.SetBool("AttackSword", false);
         }
 
         void FollowDest(Vector3 dest)

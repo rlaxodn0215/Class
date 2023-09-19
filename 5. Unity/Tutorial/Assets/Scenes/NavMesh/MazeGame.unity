@@ -874,11 +874,11 @@ PrefabInstance:
       objectReference: {fileID: 700010584}
     - target: {fileID: 4613887328731984765, guid: 06548c0e65eca5947ab806f25f2648be, type: 3}
       propertyPath: ViewAngle
-      value: 180
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 4613887328731984765, guid: 06548c0e65eca5947ab806f25f2648be, type: 3}
       propertyPath: ViewRadius
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4613887328731984765, guid: 06548c0e65eca5947ab806f25f2648be, type: 3}
       propertyPath: attackRange
