@@ -14,6 +14,11 @@ namespace Mechanic
 
         public GameObject Weapon;
 
+        public GameObject Sounds;
+
+        [SerializeField]
+        private Dictionary<string, GameObject> sound = new Dictionary<string, GameObject>();
+
         private List<GameObject> weapons = new List<GameObject>();
 
         private bool isSword = false;
@@ -30,6 +35,16 @@ namespace Mechanic
             pcController = GetComponent<CharacterController>();
             animator = GetComponent<Animator>();
 
+            for(int i = 0; i < Sounds.transform.childCount; i++)
+            {
+                sound[Sounds.transform.GetChild(i).name] = Sounds.transform.GetChild(i).gameObject;
+            }
+
+            //audioSource = GetComponent<AudioSource>();
+
+            ////Resources 폴더 안에 있어야 한다
+            //audioClip = Resources.Load(string.Format("TestSound/foot/{0}", "army")) as AudioClip;
+
             for(int i = 0; i < Weapon.transform.childCount; i++)
             {
                 weapons.Add(Weapon.transform.GetChild(i).gameObject);
@@ -42,7 +57,6 @@ namespace Mechanic
             MoveControl();
             InputControl();
         }
-
 
         void InputControl()
         {
@@ -183,13 +197,36 @@ namespace Mechanic
             if(v>=0)
                 transform.Translate(Vector3.forward * v * runSpeed * Time.deltaTime);
             else
-                transform.Translate(Vector3.forward * v/2 * runSpeed * Time.deltaTime);
+                transform.Translate(Vector3.forward * v/1.5f * runSpeed * Time.deltaTime);
+
+            if(Mathf.Abs(v)>=0.02f)
+            {
+                //PlaySound(audioClip);
+            }
+
+            else
+            {
+                //StopSound();
+            }
 
             transform.Rotate(Vector3.up, h*rotateSpeed * Time.deltaTime);
 
             animator.SetFloat("Speed", v * runSpeed);
 
         }
+
+        //void PlaySound(AudioClip clip)
+        //{
+        //    //pitch로 Sound와 동작 맞추기
+        //    if (audioSource.isPlaying) return;
+        //    audioSource.PlayOneShot(clip);
+        //    //audioSource.Play(2);
+        //}
+
+        //void StopSound()
+        //{
+        //    audioSource.Stop();
+        //}
 
         //private void OnControllerColliderHit(ControllerColliderHit hit)
         //{

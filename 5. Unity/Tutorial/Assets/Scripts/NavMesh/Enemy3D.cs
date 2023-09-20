@@ -23,11 +23,27 @@ namespace MazeGame
 
         private bool isSword = false;
 
+        public GameObject Sounds;
+        [SerializeField]
+        private Dictionary<string, GameObject> sound = new Dictionary<string, GameObject>();
+
+        //private AudioClip audioClip = null;
+        //private AudioSource audioSource = null;
+
         // Start is called before the first frame update
         void Start()
         {
             agent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
+
+            for (int i = 0; i < Sounds.transform.childCount; i++)
+            {
+                sound[Sounds.transform.GetChild(i).name] = Sounds.transform.GetChild(i).gameObject;
+            }
+            //audioSource = GetComponent<AudioSource>();
+
+            ////Resources 폴더 안에 있어야 한다
+            //audioClip = Resources.Load(string.Format("TestSound/foot/{0}", "army")) as AudioClip;
         }
 
         // Update is called once per frame
@@ -143,6 +159,17 @@ namespace MazeGame
                 {
                     if (animator.GetCurrentAnimatorStateInfo(1).normalizedTime >= time)
                     {
+                        //PlaySound(aniName + "_Sound");
+                        if(aniName == "Withdrawing Sword Enemy")
+                        {
+                            PlaySound("LoadSword_Sound");
+                        }
+
+                        else if(aniName == "Sheathing Sword Enemy")
+                        {
+                            PlaySound("UnLoadSword_Sound");
+                        }
+
                         UnSword.SetActive(!UnSword.activeSelf);
                         Sword.SetActive(!Sword.activeSelf);
                         break;
@@ -152,6 +179,32 @@ namespace MazeGame
                 yield return null;
             }
         }
+
+        void PlaySound(string name)
+        {
+            sound[name].SetActive(true);
+            if (sound[name].GetComponent<AudioSource>().isPlaying) return;
+            sound[name].GetComponent<AudioSource>().Play();
+        }
+
+        void StopSound(string name)
+        {
+            sound[name].GetComponent<AudioSource>().Stop();
+            sound[name].SetActive(false);
+        }
+
+        //void PlaySound(AudioClip clip)
+        //{
+        //    //pitch로 Sound와 동작 맞추기
+        //    if (audioSource.isPlaying) return;
+        //    audioSource.PlayOneShot(clip);
+        //    //audioSource.Play(2);
+        //}
+
+        //void StopSound()
+        //{
+        //    audioSource.Stop();
+        //}
 
         void AttackSword()
         {
@@ -167,6 +220,7 @@ namespace MazeGame
         {
             agent.destination = dest;
             animator.SetFloat("Speed", agent.velocity.magnitude);
+            PlaySound("Walk_Sound");
         }
 
     }
