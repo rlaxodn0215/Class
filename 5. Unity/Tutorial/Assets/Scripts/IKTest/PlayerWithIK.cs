@@ -10,6 +10,13 @@ public class PlayerWithIK : MonoBehaviour
     [Range(0, 1)]
     public float rotWeight = 1;
 
+    //[Range(0, 359)]
+    //public float xRot = 0.0f;
+    //[Range(0, 359)]
+    //public float yRot = 0.0f;
+    //[Range(0, 359)]
+    //public float zRot = 0.0f;
+
     public enum PlayerState { GROUND, WALL }
 
     public float moveSpeed = 7.0f;
@@ -17,13 +24,13 @@ public class PlayerWithIK : MonoBehaviour
     public PlayerState playerState = PlayerState.GROUND;
 
     public GameObject IKs;
-    private Dictionary<string, GameObject> ik = new Dictionary<string, GameObject>();
-    private Dictionary<string, Vector3> ikFirstPos = new Dictionary<string, Vector3>();
-    private float climbTimer = 0.0f;
+    protected Dictionary<string, GameObject> ik = new Dictionary<string, GameObject>();
+    protected Dictionary<string, Vector3> ikFirstPos = new Dictionary<string, Vector3>();
+    protected float climbTimer = 0.0f;
 
-    private Animator animator;
-    private Rigidbody rigidbody;
-    private float climbMagnitude = 0.2f;
+    protected Animator animator;
+    protected Rigidbody rigidbody;
+    protected float climbMagnitude = 0.2f;
 
     // Start is called before the first frame update
     void Start()
@@ -76,7 +83,7 @@ public class PlayerWithIK : MonoBehaviour
     {
         animator.SetFloat("Speed", 0.0f);
         float v = Input.GetAxis("Vertical");
-        transform.Translate(Vector3.up * v * moveSpeed/2 * Time.deltaTime);
+        transform.Translate(Vector3.up * v * moveSpeed/13 * Time.deltaTime);
         MoveAni(v);
     }
 
@@ -109,65 +116,18 @@ public class PlayerWithIK : MonoBehaviour
     IEnumerator Alternating(string name, bool startAtUp, float Magnitude)
     {
        climbTimer += Time.deltaTime;
+        //Debug.Log(climbTimer);
 
-        if(startAtUp)
-            ik[name].transform.localPosition = ikFirstPos[name] + new Vector3(0, Magnitude * Mathf.Cos(climbTimer), 0.3f);
+        if (startAtUp)
+        {
+            ik[name].transform.localPosition = ikFirstPos[name] + new Vector3(0, Magnitude * Mathf.Cos(1.5f * climbTimer), 0.05f);
+        }
         else
-            ik[name].transform.localPosition = ikFirstPos[name] + new Vector3(0, Magnitude * Mathf.Sin(climbTimer), 0.3f);
+        {
+            ik[name].transform.localPosition = ikFirstPos[name] + new Vector3(0, Magnitude * Mathf.Sin(1.5f * climbTimer), 0.05f);
+        }
 
         yield return null;
-    }
-
-    private void OnAnimatorIK(int layerIndex)
-    {
-        if (animator)
-        {
-
-            if (IKs != null)
-            {
-                ////√÷¿˚»≠
-                //for(int i = 0; i < 4; i++)
-                //{
-
-                //}
-
-                // Right Hand
-                animator.SetIKPositionWeight(AvatarIKGoal.RightHand, posWeight);
-                animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotWeight);
-
-                animator.SetIKPosition(AvatarIKGoal.RightHand, ik["RightHand"].transform.position);
-
-                Quaternion RightHandRotation = Quaternion.LookRotation(ik["RightHand"].transform.position - transform.position);
-                animator.SetIKRotation(AvatarIKGoal.RightHand, RightHandRotation);
-
-                //Left Hand
-                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, posWeight);
-                animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotWeight);
-
-                animator.SetIKPosition(AvatarIKGoal.LeftHand, ik["LeftHand"].transform.position);
-
-                Quaternion LeftHandRotation = Quaternion.LookRotation(ik["LeftHand"].transform.position - transform.position);
-                animator.SetIKRotation(AvatarIKGoal.LeftHand, LeftHandRotation);
-
-                //Right Foot
-                animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, posWeight);
-                animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, rotWeight);
-
-                animator.SetIKPosition(AvatarIKGoal.RightFoot, ik["RightFoot"].transform.position);
-
-                Quaternion RightFootRotation = Quaternion.LookRotation(ik["RightFoot"].transform.position - transform.position);
-                animator.SetIKRotation(AvatarIKGoal.RightFoot, RightFootRotation);
-
-                //Left Foot
-                animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, posWeight);
-                animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, rotWeight);
-
-                animator.SetIKPosition(AvatarIKGoal.LeftFoot, ik["LeftFoot"].transform.position);
-
-                Quaternion LeftFootRotation = Quaternion.LookRotation(ik["LeftFoot"].transform.position - transform.position);
-                animator.SetIKRotation(AvatarIKGoal.LeftFoot, LeftFootRotation);
-            }
-        }
     }
 
 
@@ -177,15 +137,21 @@ public class PlayerWithIK : MonoBehaviour
         {
             Debug.Log("Contact Wall");
             playerState = PlayerState.WALL;
-            rigidbody.useGravity = false;
+
+            if (rigidbody != null)
+                rigidbody.useGravity = false;
+            GetComponent<IKAnimator>().enabled = true;
         }
 
         else
         {
             Debug.Log("Contact Ground");
             playerState = PlayerState.GROUND;
-            rigidbody.useGravity = true;
+
+            if(rigidbody !=null)
+                rigidbody.useGravity = true;
             climbTimer = 0.0f;
+            GetComponent<IKAnimator>().enabled = false;
         }
     }
 
