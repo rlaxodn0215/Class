@@ -153,7 +153,8 @@ namespace MazeGame
 
         IEnumerator WeaponEnables(string aniName, float time)
         {
-            while(true)
+
+            while (true)
             {
                 if (animator.GetCurrentAnimatorStateInfo(1).IsName(aniName))
                 {
@@ -167,7 +168,7 @@ namespace MazeGame
 
                         else if(aniName == "Sheathing Sword Enemy")
                         {
-                            PlaySound("UnLoadSword_Sound");
+                            StopSound("LoadSword_Sound");
                         }
 
                         UnSword.SetActive(!UnSword.activeSelf);
@@ -185,6 +186,7 @@ namespace MazeGame
             sound[name].SetActive(true);
             if (sound[name].GetComponent<AudioSource>().isPlaying) return;
             sound[name].GetComponent<AudioSource>().Play();
+            //sound[name].GetComponent<AudioSource>().PlayScheduled(time);
         }
 
         void StopSound(string name)

@@ -201,18 +201,32 @@ namespace Mechanic
 
             if(Mathf.Abs(v)>=0.02f)
             {
-                //PlaySound(audioClip);
+                PlaySound("Walk_Sound");
             }
 
             else
             {
-                //StopSound();
+                StopSound("Walk_Sound");
             }
 
             transform.Rotate(Vector3.up, h*rotateSpeed * Time.deltaTime);
 
             animator.SetFloat("Speed", v * runSpeed);
 
+        }
+
+        void PlaySound(string name)
+        {
+            sound[name].SetActive(true);
+            if (sound[name].GetComponent<AudioSource>().isPlaying) return;
+            sound[name].GetComponent<AudioSource>().Play();
+            //sound[name].GetComponent<AudioSource>().PlayScheduled(time);
+        }
+
+        void StopSound(string name)
+        {
+            sound[name].GetComponent<AudioSource>().Stop();
+            sound[name].SetActive(false);
         }
 
         //void PlaySound(AudioClip clip)
@@ -241,6 +255,7 @@ namespace Mechanic
             if (other.tag == "EnemySword")
             {
                 MazeGame.MazeGameManager.Instance.Damaged();
+                PlaySound("Damaged_Sound");
                 Debug.Log("Damaged");
             }
         }
