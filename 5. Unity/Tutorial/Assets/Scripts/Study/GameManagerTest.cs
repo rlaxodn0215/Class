@@ -47,5 +47,4 @@ public class GameManagerTest : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-
 }

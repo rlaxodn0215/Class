@@ -6,12 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/FlappyBird/Flappy(2023_09_11).unity
-    guid: d4108f7ede8fc8a458d7748f70b9670b
+    path: Assets/Scenes/Loading/Loading.unity
+    guid: 70ce18dab832ea84fb6bec5711c20785
   - enabled: 1
-    path: Assets/Scenes/FlappyBird/TitleScene.unity
-    guid: ae38c9a5ab9acb74cbae8e90c9fba51b
-  - enabled: 1
-    path: Assets/Scenes/FlappyBird/EndScene.unity
-    guid: 3dc41d13e66f394489053b8c8c9d3405
+    path: Assets/Scenes/NavMesh/MazeGame.unity
+    guid: b907a95af7e50d447ba1fd79f3fc6cb2
   m_configObjects: {}
