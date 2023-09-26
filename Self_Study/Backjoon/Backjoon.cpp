@@ -3,96 +3,174 @@
 #include<stack>
 #include<queue>
 #include<algorithm>
+#include<string>
 
 using namespace std;
 
-vector<int> solution(vector<string> maps);
+stack<char> EndCal(string& Q);
+string Ans(stack<char>& tempQ);
 
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 
-    vector<string> map = { "X591X","X1X5X","X231X", "1XXX1" };
-
-    vector<int> sol = solution(map);
-
-    for (int i = 0; i < sol.size(); i++)
-    {
-        cout << sol[i] << endl;
-    }
+	string question = "3+2*4-9/3";
+	stack<char> tempQuestion = EndCal(question);
+	
+	cout << Ans(tempQuestion) << endl;
 
 	return 0;
 }
 
-vector<int> solution(vector<string> maps)
+stack<char> EndCal(string & Q)
 {
-    vector<int> answer;
+	stack<char> sign;
+	stack<char> temp;
 
-    const int m = 4;
-    const int n = 5;
+	for (int i = 0; i < Q.size(); i++)
+	{
+		if (Q[i] >= '0' && Q[i] <= '9')
+		{
+			temp.push(Q[i]);
+		}
 
-    int dx[4] = { -1,0,1,0 };
-    int dy[4] = { 0,-1,0,1 };
+		else
+		{
+			if (sign.empty())
+			{
+				sign.push(Q[i]);
+			}
 
-    bool visited[m][n];
-    fill(&visited[0][0], &visited[m - 1][n], false);
+			else
+			{
+				switch (Q[i])
+				{
+				case '+':
+					while (!sign.empty())
+					{
+						temp.push(sign.top());
+						sign.pop();
+					}
+					sign.push(Q[i]);
+					break;
+				case '-':
+					while (!sign.empty())
+					{
+						temp.push(sign.top());
+						sign.pop();
+					}
+					sign.push(Q[i]);
+					break;
+				case '*':
+					sign.push(Q[i]);
+					break;
+				case '/':
+					sign.push(Q[i]);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
 
-    for (int i = 0; i < m; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            if (maps[i][j] != 'X' && !visited[i][j])
-            {
-                int num = 0;
+	while (!sign.empty())
+	{
+		temp.push(sign.top());
+		sign.pop();
+	}
 
-                queue<pair<int, int>> temp;
-                temp.push({ i,j });
-                visited[i][j] = true;
-
-                while (!temp.empty())
-                {
-                    pair<int, int> point = temp.front();
-                    temp.pop();
-                    num += maps[point.first][point.second] - 48;
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        int nx = point.second + dx[i];
-                        int ny = point.first + dy[i];
-
-                        if (ny < 0 || ny >= m || nx < 0 || ny >= n)
-                            continue;
-                        if (maps[ny][nx] == 'X')
-                        {
-                            visited[ny][nx] = true;
-                            continue;
-                        }
-
-                        if (!visited[ny][nx])
-                        {
-                            visited[ny][nx] = true;
-                            temp.push({ ny,nx });
-                        }
-                    }
-
-                }
-
-                if (num != 0) 
-                    answer.push_back(num);
-            }
-        }
-    }
-
-    if (answer.empty())
-    {
-        answer.push_back(-1);
-        return answer;
-    }
-
-    else
-    {
-        //sort(answer.begin(), answer.end(),less<int>());
-        return answer;
-    }
+	return temp;
 }
+
+string Ans(stack<char> & tempQ)
+{
+	stack<char> sign;
+	stack<int> num;
+	string temp = "";
+	int hasNum = 0;
+
+	while(!tempQ.empty())
+	{
+		char q = tempQ.top();
+		tempQ.pop();
+
+		if (q >= '0' && q <= '9')
+		{
+			num.push(q - '0');
+
+			if (num.size() == hasNum + 2)
+			{
+				char s = sign.top();
+				sign.pop();
+
+				int numOne = num.top();
+				num.pop();
+				int numTwo = num.top();
+				num.pop();
+
+				int sum;
+				switch (s)
+				{
+				case '+':
+					sum = numOne + numTwo;
+					break;
+				case '-':
+					sum = numOne - numTwo;
+					break;
+				case '*':
+					sum = numOne * numTwo;
+					break;
+				case '/':
+					if (numTwo == 0) return "Impossible";
+					sum = numOne / numTwo;
+					break;
+				default:
+					break;
+				}
+				num.push(sum);
+				hasNum++;
+			}
+		}
+
+		else
+		{
+			sign.push(q);
+		}
+
+	}
+
+	while (num.size()>1)
+	{
+		int temp1 = num.top();
+		num.pop();
+		int temp2 = num.top();
+		num.pop();
+		int number;
+		switch (sign.top())
+		{
+		case '+':
+			number = temp1 + temp2;
+			break;
+		case '-':
+			number = temp1 - temp2;
+			break;
+		case '*':
+			number = temp1 * temp2;
+			break;
+		case '/':
+			if (temp2 == 0) return "Impossible";
+			number = temp1/temp2;
+			break;
+		default:
+			break;
+		}
+		sign.pop();
+		num.push(number);
+	}
+
+	return to_string(num.top());
+}
+
+
