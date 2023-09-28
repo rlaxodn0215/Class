@@ -1,14 +1,12 @@
-﻿// GameCoding.cpp : 애플리케이션에 대한 진입점을 정의합니다.
-//
-#include "pch.h"
+﻿#include "pch.h"
 #include "framework.h"
 #include "GameCoding.h"
-#include"Game.h"
+#include "Game.h"
 
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
-HINSTANCE hInst;                                // 현재 인스턴스입니다.
+HINSTANCE hInst;
 HWND hWnd;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
@@ -21,18 +19,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-
-    // TODO: 여기에 코드를 입력합니다.
-    
     // 1) 윈도우 창 정보 등록
     MyRegisterClass(hInstance);
 
     // 2) 윈도우 창 생성
-    // 애플리케이션 초기화를 수행합니다:
     if (!InitInstance (hInstance, nCmdShow))
-    {
         return FALSE;
-    }
 
     Game game;
     game.Init(hWnd);
@@ -44,10 +36,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
         }
-
         else
         {
             game.Update();
@@ -57,6 +48,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     return (int) msg.wParam;
 }
+
+
 
 //
 //  함수: MyRegisterClass()
@@ -98,7 +91,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   RECT windowRect = { 0,0,GWinSizeX,GWinSizeY };
+   RECT windowRect = {0, 0, GWinSizeX, GWinSizeY};
    ::AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, false);
 
    hWnd = CreateWindowW(L"GameCoding", L"Client", WS_OVERLAPPEDWINDOW,
@@ -159,4 +152,3 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
-
