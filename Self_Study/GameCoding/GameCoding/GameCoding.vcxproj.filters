@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameCoding.h">
-      <Filter>소스 파일\01. Main</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>소스 파일\99. Headers</Filter>
     </ClInclude>
@@ -50,6 +47,9 @@
     <ClInclude Include="Game.h">
       <Filter>소스 파일\01. Main</Filter>
     </ClInclude>
+    <ClInclude Include="GameCoding.h">
+      <Filter>소스 파일\01. Main</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameCoding.rc">
@@ -65,13 +65,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameCoding.cpp">
-      <Filter>소스 파일\01. Main</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일\99. Headers</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
+      <Filter>소스 파일\01. Main</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCoding.cpp">
       <Filter>소스 파일\01. Main</Filter>
     </ClCompile>
   </ItemGroup>
