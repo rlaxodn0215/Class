@@ -4,173 +4,81 @@
 #include<queue>
 #include<algorithm>
 #include<string>
+#include<map>
 
 using namespace std;
 
-stack<char> EndCal(string& Q);
-string Ans(stack<char>& tempQ);
+vector<int> Sum(vector<int>& nums, int target);
 
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 
-	string question = "3+2*4-9/3";
-	stack<char> tempQuestion = EndCal(question);
-	
-	cout << Ans(tempQuestion) << endl;
+	vector<int> nums0 = { 7,2,15,11 };
+	int target0 = 9;
+	vector<int> nums1 = { 3,2,1,5,4 };
+	int target1 = 11;
+	vector<int> nums2 = { 2,5,4,3,1 };
+	int target2 = 10;
+
+	vector<int> ans0 = Sum(nums0, target0);
+	vector<int> ans1 = Sum(nums1, target1);
+	vector<int> ans2 = Sum(nums2, target2);
+
+	for (int i = 0; i < ans0.size(); i++)
+	{
+		cout << ans0[i] << " ";
+	}
+
+	cout << "\n";
+
+	for (int i = 0; i < ans1.size(); i++)
+	{
+		cout << ans1[i] << " ";
+	}
+
+	cout << "\n";
+
+	for (int i = 0; i < ans2.size(); i++)
+	{
+		cout << ans2[i] << " ";
+	}
+
+	cout << "\n";
 
 	return 0;
 }
 
-stack<char> EndCal(string & Q)
+vector<int> Sum(vector<int>& nums, int target)
 {
-	stack<char> sign;
-	stack<char> temp;
+	vector<vector<int>> num;
 
-	for (int i = 0; i < Q.size(); i++)
+	map<int, int> temp;
+	
+	for (int i = 0; i < nums.size(); i++)
 	{
-		if (Q[i] >= '0' && Q[i] <= '9')
-		{
-			temp.push(Q[i]);
-		}
+		temp[target - nums[i]] = i;
+	}
 
-		else
+	for (int i = 0; i < nums.size(); i++)
+	{
+		if (temp[nums[i]] && temp[nums[i]] !=i)
 		{
-			if (sign.empty())
-			{
-				sign.push(Q[i]);
-			}
-
-			else
-			{
-				switch (Q[i])
-				{
-				case '+':
-					while (!sign.empty())
-					{
-						temp.push(sign.top());
-						sign.pop();
-					}
-					sign.push(Q[i]);
-					break;
-				case '-':
-					while (!sign.empty())
-					{
-						temp.push(sign.top());
-						sign.pop();
-					}
-					sign.push(Q[i]);
-					break;
-				case '*':
-					sign.push(Q[i]);
-					break;
-				case '/':
-					sign.push(Q[i]);
-					break;
-				default:
-					break;
-				}
-			}
+			vector<int> ans = {i,temp[nums[i]]};
+			num.push_back(ans);
 		}
 	}
 
-	while (!sign.empty())
+	sort(num.begin(), num.end());
+
+	if (num.empty())
 	{
-		temp.push(sign.top());
-		sign.pop();
+		vector<int> none = { -1 };
+		return none;
 	}
 
-	return temp;
-}
-
-string Ans(stack<char> & tempQ)
-{
-	stack<char> sign;
-	stack<int> num;
-	string temp = "";
-	int hasNum = 0;
-
-	while(!tempQ.empty())
-	{
-		char q = tempQ.top();
-		tempQ.pop();
-
-		if (q >= '0' && q <= '9')
-		{
-			num.push(q - '0');
-
-			if (num.size() == hasNum + 2)
-			{
-				char s = sign.top();
-				sign.pop();
-
-				int numOne = num.top();
-				num.pop();
-				int numTwo = num.top();
-				num.pop();
-
-				int sum;
-				switch (s)
-				{
-				case '+':
-					sum = numOne + numTwo;
-					break;
-				case '-':
-					sum = numOne - numTwo;
-					break;
-				case '*':
-					sum = numOne * numTwo;
-					break;
-				case '/':
-					if (numTwo == 0) return "Impossible";
-					sum = numOne / numTwo;
-					break;
-				default:
-					break;
-				}
-				num.push(sum);
-				hasNum++;
-			}
-		}
-
-		else
-		{
-			sign.push(q);
-		}
-
-	}
-
-	while (num.size()>1)
-	{
-		int temp1 = num.top();
-		num.pop();
-		int temp2 = num.top();
-		num.pop();
-		int number;
-		switch (sign.top())
-		{
-		case '+':
-			number = temp1 + temp2;
-			break;
-		case '-':
-			number = temp1 - temp2;
-			break;
-		case '*':
-			number = temp1 * temp2;
-			break;
-		case '/':
-			if (temp2 == 0) return "Impossible";
-			number = temp1/temp2;
-			break;
-		default:
-			break;
-		}
-		sign.pop();
-		num.push(number);
-	}
-
-	return to_string(num.top());
+	return num[0];
 }
 
 
