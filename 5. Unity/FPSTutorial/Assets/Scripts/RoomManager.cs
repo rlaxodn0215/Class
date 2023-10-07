@@ -7,7 +7,7 @@ using Photon.Realtime;
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     public GameObject Player;
-    [Space]
+
     public Transform spawnPoint;
 
     // Start is called before the first frame update

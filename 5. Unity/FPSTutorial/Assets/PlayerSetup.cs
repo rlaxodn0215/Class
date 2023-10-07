@@ -8,9 +8,12 @@ public class PlayerSetup : MonoBehaviour
 
     public GameObject camera;
 
+    public GameObject UIs;
+
     public void IsLocalPlayer()
     {
         movement.enabled = true;
         camera.SetActive(true);
+        UIs.SetActive(true);
     }
 }

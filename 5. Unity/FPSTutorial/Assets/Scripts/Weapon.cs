@@ -34,9 +34,9 @@ public class Weapon : MonoBehaviour
 
         RaycastHit hit;
 
-        Color color = new Color(1, 0, 0);
+        //Color color = new Color(1, 0, 0);
 
-        Debug.DrawRay(transform.position, transform.forward,color);
+        //Debug.DrawRay(transform.position, transform.forward,color);
 
         if(Physics.Raycast(ray.origin,ray.direction, out hit, 100f))
         {
