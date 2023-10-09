@@ -371,6 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMove: {fileID: 5595724570063661248}
   camera: {fileID: 5595724569876641434}
+  UIs: {fileID: 5934023596308024251}
 --- !u!114 &5595724570063661248
 MonoBehaviour:
   m_ObjectHideFlags: 0
