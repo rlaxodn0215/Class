@@ -509,23 +509,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &1616594039 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 152185117000061437, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
-  m_PrefabInstance: {fileID: 152185117362952721}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1616594042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1616594039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb81076d67b4a444eb8528a7e0b38f9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1899152313
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +525,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1899152314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -690,6 +673,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1136508381, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
+      propertyPath: lockCursor
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 152185117062262172, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -700,7 +687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 152185117062262172, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.022
       objectReference: {fileID: 0}
     - target: {fileID: 152185117062262172, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -737,6 +724,10 @@ PrefabInstance:
     - target: {fileID: 152185117062262173, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
       propertyPath: m_Name
       value: Player2
+      objectReference: {fileID: 0}
+    - target: {fileID: 152185117062262173, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26aa9bbf4801b6846b2730f3b4f5b4b0, type: 3}

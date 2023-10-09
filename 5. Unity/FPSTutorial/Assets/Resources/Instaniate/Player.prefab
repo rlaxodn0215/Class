@@ -305,7 +305,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 4
   sprintSpeed: 14
-  maxVelocityChange: 100
+  maxVelocityChange: 0
   airControl: 0.5
   jumpHeight: 10
 --- !u!54 &5911039585063123725
