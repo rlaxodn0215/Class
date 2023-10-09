@@ -7,13 +7,11 @@ using Photon.Realtime;
 public class Weapon : MonoBehaviour
 {
     public int damage;
-
     public Camera camera;
+    public GameObject partical;
 
     public float fireRate;
-
     private float nextFire;
-
     // Update is called once per frame
     void Update()
     {
@@ -42,7 +40,7 @@ public class Weapon : MonoBehaviour
         {
 
             // ¸ÂÀº À§Ä¡¿¡ ÃÑÅº ÈçÀû ¼ÒÈ¯
-            //PhotonNetwork.Instantiate("prefabName", hit.point, Quaternion.identity);
+            PhotonNetwork.Instantiate("Prefabs/" + partical.name, hit.point, Quaternion.identity);
 
             if (hit.transform.gameObject.GetComponent<Health>())
             {
