@@ -4,12 +4,13 @@ using UnityEngine;
 
 namespace Player.Aeterna
 {
-    public class DimensionIO : Player.Ability
+    public class DimensionIO : Player.Aeterna.Aeterna, Player.Ability
     {
-        public override void Execution()
+        public bool IsPossible { get; set; }
+
+        public void Execution()
         {
-
+            Debug.Log("DimensionIO");
         }
-
     }
 }

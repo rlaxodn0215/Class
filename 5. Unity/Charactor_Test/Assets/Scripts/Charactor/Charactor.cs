@@ -14,21 +14,18 @@ namespace Player
 
     public class Charactor : MonoBehaviour
     {
-        [SerializeField]
-        protected int Hp;
-        [SerializeField]
-        protected string PlayerName;
-        [SerializeField]
-        protected PlayerStatus Status;
+        public int Hp;
+        public string PlayerName;
+        public PlayerStatus Status;
 
-        protected Animator animator;
-        protected Rigidbody rigidbody;
+        public Animator animator;
+        public Rigidbody rigidbody;
 
         // <스킬 슬롯, 해당 스킬>
         protected Dictionary<string, Ability> Skills;
 
-        //플레이어 이동, 컨트롤
-        //키 입력 -> 해당 스킬 슬롯 실행
+        // 플레이어 이동, 컨트롤
+        // 키 입력 -> 해당 스킬 슬롯 실행
         // 마우스로 시점 이동은 따로 스크립트
 
         private void Start()

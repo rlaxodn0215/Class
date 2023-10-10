@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace Player.Aeterna
 {
-    public class DimensionOpen : Player.Ability
+    public class DimensionOpen : Player.Aeterna.Aeterna, Player.Ability
     {
-        public override void Execution()
+        public bool IsPossible { get; set; }
+        public void Execution()
         {
-
+            Debug.Log("DimensionOpen");
         }
     }
 }

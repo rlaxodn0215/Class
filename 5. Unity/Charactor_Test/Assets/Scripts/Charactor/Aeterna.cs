@@ -21,7 +21,9 @@ namespace Player.Aeterna
 
         void SkillInput()
         {
-            //Skills
+            Skills["Basic_Attack"] = new DimensionSword();
+            Skills["Skill_1"] = new DimensionOpen();
+            Skills["Skill_2"] = new DimensionIO();
         }
     }
 }

@@ -123,6 +123,41 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &488950451 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3674180035626209937, guid: 33ecd14eaec6afa479f0f0998ecac98a, type: 3}
+  m_PrefabInstance: {fileID: 3674180035309328418}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &488950453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488950451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e622913e5114a5349b3b231a055f812f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Hp: 0
+  PlayerName: 
+  Status: 0
+--- !u!114 &488950454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488950451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6adc068654586d04fa0ba755f79a70d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Hp: 100
+  PlayerName: rlaxodn
+  Status: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
