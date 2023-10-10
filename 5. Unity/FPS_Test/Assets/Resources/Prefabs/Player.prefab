@@ -674,7 +674,7 @@ MonoBehaviour:
   damage: 5
   camera: {fileID: 5595724569876641432}
   partical: {fileID: 4310655745806165172, guid: f7987832386b17a47a36026b298f7956, type: 3}
-  fireRate: 10
+  fireRate: 30
 --- !u!4 &5342035124563929224 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d8106601491b14f428ede69d067ab203, type: 3}
