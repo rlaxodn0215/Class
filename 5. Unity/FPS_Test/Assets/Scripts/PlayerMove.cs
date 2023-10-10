@@ -5,11 +5,13 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     public float moveSpeed = 5.0f;
-
     public float jumpHeight = 30f;
 
     private Rigidbody rigidbody;
-    private bool grounded = false;
+
+    private Vector3 input;
+    private bool jumping;
+    private bool grounded;
 
     // Start is called before the first frame update
     void Start()
@@ -22,22 +24,38 @@ public class PlayerMove : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        grounded = true;
+    }
+
     // Update is called once per frame
     void Update()
     {
+        input = transform.TransformVector(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
+        input.Normalize();
+        jumping = Input.GetKey(KeyCode.Space);
     }
 
     void FixedUpdate()
     {
         PlayerControl();
+        Jump();
     }
 
     void PlayerControl()
     {
-        Vector3 input = transform.TransformVector(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
-        input.Normalize();
-
         rigidbody.MovePosition(rigidbody.transform.position + input * moveSpeed * Time.deltaTime);
+    }
+
+    void Jump()
+    {
+        if (jumping && grounded)
+        {
+            rigidbody.velocity = new Vector3(rigidbody.velocity.x, jumpHeight, rigidbody.velocity.z);
+            grounded = false;
+        }
 
     }
+
 }
