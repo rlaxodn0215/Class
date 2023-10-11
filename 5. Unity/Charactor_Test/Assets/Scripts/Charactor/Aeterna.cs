@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 namespace Player
 {
@@ -44,6 +44,37 @@ namespace Player
             jumpHeight = AeternaData.jumpHeight;
         }
 
+
+        void OnSkill_1()
+        {
+            if (skillButton == 1) skillButton = -1;
+            if (skillTimer[1] <= 0.0f)
+            {
+                if (skillButton == 1) skillButton = -1;
+                else skillButton = 1;
+            }
+        }
+
+        void OnSkill_2()
+        {
+            if (skillButton == 2) skillButton = -1;
+            if (skillTimer[2] <= 0.0f)
+            {
+                if (skillButton == 2) skillButton = -1;
+                else skillButton = 2;
+            }
+        }
+
+        void OnSkill_3()
+        {
+
+        }
+
+        void OnSkill_4()
+        {
+
+        }
+
         protected override void PlayerSkillInput()
         {
             // 입력된 스킬 슬롯 에 따라 해당 스킬 사용
@@ -65,22 +96,9 @@ namespace Player
 
                 else
                 {
-                    Skills["Basic_Attack"].Execution();
+                    if(skillButton == -1)
+                        Skills["Basic_Attack"].Execution();
                 }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Q) && skillTimer[1] <= 0.0f)
-            {
-                if (skillButton == 1) skillButton = -1;
-                else skillButton = 1;
-                Debug.Log("Change to Skill_1");
-            }
-
-            else if (Input.GetKeyDown(KeyCode.E) && skillTimer[2] <= 0.0f)
-            {
-                if (skillButton == 2) skillButton = -1;
-                else skillButton = 2;
-                Debug.Log("Change to Skill_2");
             }
         }
 
@@ -93,11 +111,11 @@ namespace Player
             }
         }
 
-        //private void OnGUI()
-        //{
-        //    GUI.TextField(new Rect(10, 10, 100, 30), skillTimer[1].ToString());
-        //    GUI.TextField(new Rect(10, 30, 100, 50), skillTimer[2].ToString());
-        //}
+        private void OnGUI()
+        {
+            GUI.TextField(new Rect(10, 10, 100, 30), skillTimer[1].ToString());
+            GUI.TextField(new Rect(10, 30, 100, 50), skillTimer[2].ToString());
+        }
 
     }
 }

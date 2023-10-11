@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -31,6 +33,8 @@ namespace Player
         public string playerName;
         public int Hp;
         public PlayerCharactor charactor;
+        public GameObject camera;
+        public GameObject UI;
 
         [HideInInspector]
         public float moveSpeed;
@@ -48,11 +52,11 @@ namespace Player
         public Dictionary<string, Ability> Skills;
 
         private Vector3 input;
-        private bool jumping;
         private bool grounded;
 
         protected void Start()
         {
+            //gameObject.tag = "Friendly";
             Initialize();
             CharactorStart();
         }
@@ -70,12 +74,23 @@ namespace Player
 
         protected void Update()
         {
-            input = transform.TransformVector(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
-            input.Normalize();
-            jumping = Input.GetKey(KeyCode.Space);
-
             PlayerSkillInput();
             CharactorUpdate();
+        }
+
+        void OnMove(InputValue value)
+        {
+            input = transform.TransformVector(new Vector3(value.Get<Vector2>().x, 0, value.Get<Vector2>().y));
+            input.Normalize();
+        }
+
+        void OnJump()
+        {
+            if (grounded)
+            {
+                rigidbody.velocity = new Vector3(rigidbody.velocity.x, jumpHeight, rigidbody.velocity.z);
+                grounded = false;
+            }
         }
 
         // 캐릭터에 따른 Update
@@ -95,12 +110,6 @@ namespace Player
         protected void PlayerMove()
         {
             rigidbody.MovePosition(rigidbody.transform.position + input * moveSpeed * Time.deltaTime);
-
-            if (jumping && grounded)
-            {
-                rigidbody.velocity = new Vector3(rigidbody.velocity.x, jumpHeight, rigidbody.velocity.z);
-                grounded = false;
-            }
         }
 
         // 타워 거점 힐링
@@ -114,7 +123,42 @@ namespace Player
             }
         }
 
+        protected void OnCollisionEnter(Collision collision)
+        {
+            if(collision.gameObject.tag == "Enemy")
+            {
+                //투척무기
+                //PlayerDamaged(collision.gameObject.playerName,10);
+                //destory
+            }
+        }
+
         protected virtual void PlayerSkillInput(){}
+
+        public void IsLocalPlayer()
+        {
+            camera.SetActive(true);
+            UI.SetActive(true);
+        }
+
+        [PunRPC]
+        public void PlayerDamaged(string enemy ,int damage)
+        {
+            Hp-=damage;
+            if (Hp <= 0)
+            {
+                // 투척 무기에 쏜 사람 이름 저장
+                // playerData.murder = tag.gameObject.playerName;
+                // 히트 스캔일 경우 RPC에 쏜 사람 이름 매개변수로 전달
+                // 죽은 것 서버에 연락 
+                //GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, );
+            }
+        }
+
+        //public void PlayerDead(PlayerData data)
+        //{
+        //    Debug.Log("player dead");
+        //}
 
     }
 }
