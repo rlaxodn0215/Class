@@ -2,11 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.Aeterna
+namespace Player
 {
-    public class DimensionSword : Player.Aeterna.Aeterna, Player.Ability
+    public class DimensionSword : Aeterna, Ability
     {
-        public bool IsPossible { get; set; }
+        public GameObject Sword;
+
+        public DimensionSword(GameObject _gameObject)
+        {
+            Sword = _gameObject;
+        }
 
         public void Execution()
         {

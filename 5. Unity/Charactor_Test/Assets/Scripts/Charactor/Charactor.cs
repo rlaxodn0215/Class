@@ -1,57 +1,93 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Photon.Pun;
+using Photon.Realtime;
 
 namespace Player
 {
-    public enum PlayerStatus
+    public enum PlayerCharactor
     {
-        Born,
-        Damaged,
-        Dead
+        Aeterna,
+        ElementalOrder
+    }
+
+    public struct PlayerData
+    {
+        public string playerName;
+        public string murder;
+
+        public PlayerData(string name, string murder)
+        {
+            this.playerName = name;
+            this.murder = murder;
+        }
     }
 
     public class Charactor : MonoBehaviour
     {
         public int Hp;
-        public string PlayerName;
-        public PlayerStatus Status;
-
+        public string playerName;
+        public float moveSpeed;
+        public float jumpHeight;
+        public PlayerCharactor charactor;
+        public PlayerData playerData;
         public Animator animator;
         public Rigidbody rigidbody;
 
-        // <스킬 슬롯, 해당 스킬>
-        protected Dictionary<string, Ability> Skills;
+        public Dictionary<string, Ability> Skills;
 
-        // 플레이어 이동, 컨트롤
-        // 키 입력 -> 해당 스킬 슬롯 실행
-        // 마우스로 시점 이동은 따로 스크립트
+        private Vector3 input;
+        private bool jumping;
+        private bool grounded;
 
-        private void Start()
+        protected void Start()
         {
-            
+            Initialize();
+            CharactorInitialize();
         }
 
-        private void Update()
+        void Initialize()
         {
-            
+            animator = GetComponent<Animator>();
+            rigidbody = GetComponent<Rigidbody>();
+            Skills = new Dictionary<string, Ability>();
+            playerData = new PlayerData(playerName, "");
         }
 
-        private void FixedUpdate()
+        protected virtual void CharactorInitialize() { }
+
+        protected void Update()
         {
-            
+            input = transform.TransformVector(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
+            input.Normalize();
+            jumping = Input.GetKey(KeyCode.Space);
+
+            PlayerSkillInput();
         }
 
-        void PlayerMove()
+        protected void FixedUpdate()
         {
-
+            PlayerMove();
         }
 
-        void PlayerAttack()
+        protected void OnTriggerEnter(Collider other)
         {
-            // 입력된 스킬 슬롯 에 따라 해당 스킬 사용 // 디자인패턴 이용
+            grounded = true;
         }
+
+        protected void PlayerMove()
+        {
+            rigidbody.MovePosition(rigidbody.transform.position + input * moveSpeed * Time.deltaTime);
+
+            if (jumping && grounded)
+            {
+                rigidbody.velocity = new Vector3(rigidbody.velocity.x, jumpHeight, rigidbody.velocity.z);
+                grounded = false;
+            }
+        }
+
+        protected virtual void PlayerSkillInput(){}
 
     }
 }

@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.Aeterna
+namespace Player
 {
-    public class DimensionIO : Player.Aeterna.Aeterna, Player.Ability
+    public class DimensionIO : Aeterna, Ability
     {
-        public bool IsPossible { get; set; }
 
         public void Execution()
         {

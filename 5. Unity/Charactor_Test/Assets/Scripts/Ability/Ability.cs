@@ -6,7 +6,6 @@ namespace Player
 {
     public interface Ability
     {
-        bool IsPossible { get; set; }
         void Execution();
     }
 }

@@ -40,22 +40,18 @@ public class PlayerMove : MonoBehaviour
     void FixedUpdate()
     {
         PlayerControl();
-        Jump();
     }
 
     void PlayerControl()
     {
         rigidbody.MovePosition(rigidbody.transform.position + input * moveSpeed * Time.deltaTime);
-    }
 
-    void Jump()
-    {
         if (jumping && grounded)
         {
             rigidbody.velocity = new Vector3(rigidbody.velocity.x, jumpHeight, rigidbody.velocity.z);
             grounded = false;
         }
-
     }
+
 
 }
