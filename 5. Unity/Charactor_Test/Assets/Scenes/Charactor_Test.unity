@@ -394,6 +394,22 @@ PrefabInstance:
       propertyPath: jumpHeight
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 6009476800210432548, guid: 7b52aac81e200f34381de4c99031e8b3, type: 3}
+      propertyPath: Hp
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6009476800210432548, guid: 7b52aac81e200f34381de4c99031e8b3, type: 3}
+      propertyPath: playerName
+      value: rlaxodn
+      objectReference: {fileID: 0}
+    - target: {fileID: 6009476800210432548, guid: 7b52aac81e200f34381de4c99031e8b3, type: 3}
+      propertyPath: AeternaData
+      value: 
+      objectReference: {fileID: 11400000, guid: 68088471f050fa74fb68919ed9133893, type: 2}
+    - target: {fileID: 6009476800210432548, guid: 7b52aac81e200f34381de4c99031e8b3, type: 3}
+      propertyPath: DimensionSword
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8951237362021422356, guid: 7b52aac81e200f34381de4c99031e8b3, type: 3}
       propertyPath: m_Name
       value: Player

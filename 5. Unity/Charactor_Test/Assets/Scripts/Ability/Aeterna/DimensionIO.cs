@@ -4,8 +4,13 @@ using UnityEngine;
 
 namespace Player
 {
-    public class DimensionIO : Aeterna, Ability
+    public class DimensionIO : Ability
     {
+        private Aeterna Player;
+        public DimensionIO(Aeterna player)
+        {
+            Player = player;
+        }
 
         public void Execution()
         {

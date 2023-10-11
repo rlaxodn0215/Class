@@ -4,13 +4,12 @@ using UnityEngine;
 
 namespace Player
 {
-    public class DimensionSword : Aeterna, Ability
+    public class DimensionSword : Ability
     {
-        public GameObject Sword;
-
-        public DimensionSword(GameObject _gameObject)
+        private Aeterna Player;
+        public DimensionSword(Aeterna player)
         {
-            Sword = _gameObject;
+            Player = player;
         }
 
         public void Execution()
@@ -19,6 +18,7 @@ namespace Player
             //만일 타격이 없다면 원거리 공격
             //animator.SetBool("")
             Debug.Log("DimensionSword!");
+            
         }
     }
 }

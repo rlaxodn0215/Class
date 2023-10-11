@@ -26,15 +26,23 @@ namespace Player
 
     public class Charactor : MonoBehaviour
     {
-        public int Hp;
         public string playerName;
-        public float moveSpeed;
-        public float jumpHeight;
-        public PlayerCharactor charactor;
-        public PlayerData playerData;
-        public Animator animator;
-        public Rigidbody rigidbody;
 
+        //[HideInInspector]
+        public int Hp;
+        [HideInInspector]
+        public float moveSpeed;
+        [HideInInspector]
+        public float jumpHeight;
+        [HideInInspector]
+        public PlayerCharactor charactor;
+        [HideInInspector]
+        public PlayerData playerData;
+        [HideInInspector]
+        public Animator animator;
+        [HideInInspector]
+        public Rigidbody rigidbody;
+        [HideInInspector]
         public Dictionary<string, Ability> Skills;
 
         private Vector3 input;
@@ -59,12 +67,16 @@ namespace Player
 
         protected void Update()
         {
+            // 키 매니저
             input = transform.TransformVector(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
             input.Normalize();
             jumping = Input.GetKey(KeyCode.Space);
 
             PlayerSkillInput();
+            CharactorUpdate();
         }
+
+        protected virtual void CharactorUpdate() { }
 
         protected void FixedUpdate()
         {
@@ -86,6 +98,9 @@ namespace Player
                 grounded = false;
             }
         }
+
+        // 타워 거점 힐링 만들기
+        //protected void 
 
         protected virtual void PlayerSkillInput(){}
 

@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace Player
 {
-    public class DimensionOpen : Aeterna, Ability
+    public class DimensionOpen : Ability
     {
-        GameObject Door;
-        public DimensionOpen(GameObject _gameObject)
+        private Aeterna Player;
+        public DimensionOpen(Aeterna player)
         {
-            Door = _gameObject;
+            Player = player;
         }
 
         public void Execution()
