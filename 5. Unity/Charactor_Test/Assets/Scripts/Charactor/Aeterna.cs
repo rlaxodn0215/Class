@@ -16,8 +16,8 @@ namespace Player
         [HideInInspector]
         public float[] skillTimer;
 
-        protected override void CharactorInitialize()
-        {
+        protected override void CharactorStart() 
+        { 
             Initialize();
         }
 
@@ -93,11 +93,11 @@ namespace Player
             }
         }
 
-        private void OnGUI()
-        {
-            GUI.TextField(new Rect(10, 10, 100, 30), skillTimer[1].ToString());
-            GUI.TextField(new Rect(10, 30, 100, 50), skillTimer[2].ToString());
-        }
+        //private void OnGUI()
+        //{
+        //    GUI.TextField(new Rect(10, 10, 100, 30), skillTimer[1].ToString());
+        //    GUI.TextField(new Rect(10, 30, 100, 50), skillTimer[2].ToString());
+        //}
 
     }
 }

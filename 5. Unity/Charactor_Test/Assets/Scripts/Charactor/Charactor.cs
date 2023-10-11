@@ -6,12 +6,14 @@ using Photon.Realtime;
 
 namespace Player
 {
+    // 플레이어 캐릭터 종류 파악
     public enum PlayerCharactor
     {
         Aeterna,
         ElementalOrder
     }
 
+    // 서버에 사망 및 살인자를 알리기 위한 코드
     public struct PlayerData
     {
         public string playerName;
@@ -27,21 +29,21 @@ namespace Player
     public class Charactor : MonoBehaviour
     {
         public string playerName;
-
-        //[HideInInspector]
         public int Hp;
+        public PlayerCharactor charactor;
+
         [HideInInspector]
         public float moveSpeed;
         [HideInInspector]
         public float jumpHeight;
-        [HideInInspector]
-        public PlayerCharactor charactor;
         [HideInInspector]
         public PlayerData playerData;
         [HideInInspector]
         public Animator animator;
         [HideInInspector]
         public Rigidbody rigidbody;
+
+        // 능력 넣는 Dictionary   
         [HideInInspector]
         public Dictionary<string, Ability> Skills;
 
@@ -52,7 +54,7 @@ namespace Player
         protected void Start()
         {
             Initialize();
-            CharactorInitialize();
+            CharactorStart();
         }
 
         void Initialize()
@@ -63,11 +65,11 @@ namespace Player
             playerData = new PlayerData(playerName, "");
         }
 
-        protected virtual void CharactorInitialize() { }
+        // 캐릭터에 따른 초기화
+        protected virtual void CharactorStart() { }
 
         protected void Update()
         {
-            // 키 매니저
             input = transform.TransformVector(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
             input.Normalize();
             jumping = Input.GetKey(KeyCode.Space);
@@ -76,6 +78,7 @@ namespace Player
             CharactorUpdate();
         }
 
+        // 캐릭터에 따른 Update
         protected virtual void CharactorUpdate() { }
 
         protected void FixedUpdate()
@@ -83,6 +86,7 @@ namespace Player
             PlayerMove();
         }
 
+        //바닥 콜라이더 접촉 확인
         protected void OnTriggerEnter(Collider other)
         {
             grounded = true;
@@ -99,8 +103,16 @@ namespace Player
             }
         }
 
-        // 타워 거점 힐링 만들기
-        //protected void 
+        // 타워 거점 힐링
+        protected void OnCollisionStay(Collision collision)
+        {
+            //if(collision.gameObject.tag == "탑")
+
+            if(Input.GetKey(KeyCode.F))
+            {
+                Debug.Log("Healing");
+            }
+        }
 
         protected virtual void PlayerSkillInput(){}
 

@@ -5,8 +5,6 @@ namespace Player
 {
     public class MouseControl : MonoBehaviour
     {
-        public static MouseControl instance;
-
         [Header("Settings")]
         public Vector2 clampInDegrees = new Vector2(360, 180);
         public bool lockCursor = true;
@@ -31,8 +29,6 @@ namespace Player
 
         void Start()
         {
-            instance = this;
-
             // 카메라의 회전 값 저장
             targetDirection = transform.localRotation.eulerAngles;
 

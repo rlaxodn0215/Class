@@ -128,6 +128,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="10주차 1번.cpp" />
+    <ClCompile Include="11주차 1번.cpp" />
+    <ClCompile Include="11주차 4번.cpp" />
     <ClCompile Include="7주차 4번.cpp" />
     <ClCompile Include="8주차 2번.cpp" />
     <ClCompile Include="8주차 3번.cpp" />
