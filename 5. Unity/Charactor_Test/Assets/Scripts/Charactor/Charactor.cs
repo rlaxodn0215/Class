@@ -60,6 +60,23 @@ namespace Player
             Initialize();
             CharactorStart();
         }
+        protected void Update()
+        {
+            PlayerSkillInput();
+            CharactorUpdate();
+        }
+
+        protected void FixedUpdate()
+        {
+            PlayerMove();
+            CharactorFixedUpdate();
+        }
+        // 캐릭터에 따른 초기화
+        protected virtual void CharactorStart() { }
+        // 캐릭터에 따른 Update
+        protected virtual void CharactorUpdate() { }
+        protected virtual void PlayerSkillInput() { }
+        protected virtual void CharactorFixedUpdate() { }
 
         void Initialize()
         {
@@ -69,19 +86,15 @@ namespace Player
             playerData = new PlayerData(playerName, "");
         }
 
-        // 캐릭터에 따른 초기화
-        protected virtual void CharactorStart() { }
-
-        protected void Update()
-        {
-            PlayerSkillInput();
-            CharactorUpdate();
-        }
-
         void OnMove(InputValue value)
         {
             input = transform.TransformVector(new Vector3(value.Get<Vector2>().x, 0, value.Get<Vector2>().y));
             input.Normalize();
+        }
+
+        protected void PlayerMove()
+        {
+            rigidbody.MovePosition(rigidbody.transform.position + input * moveSpeed * Time.deltaTime);
         }
 
         void OnJump()
@@ -93,23 +106,20 @@ namespace Player
             }
         }
 
-        // 캐릭터에 따른 Update
-        protected virtual void CharactorUpdate() { }
-
-        protected void FixedUpdate()
-        {
-            PlayerMove();
-        }
-
         //바닥 콜라이더 접촉 확인
         protected void OnTriggerEnter(Collider other)
         {
             grounded = true;
         }
 
-        protected void PlayerMove()
+        protected void OnCollisionEnter(Collision collision)
         {
-            rigidbody.MovePosition(rigidbody.transform.position + input * moveSpeed * Time.deltaTime);
+            if (collision.gameObject.tag == "Enemy")
+            {
+                //투척무기
+                //PlayerDamaged(collision.gameObject.playerName,10);
+                //destory
+            }
         }
 
         // 타워 거점 힐링
@@ -122,21 +132,9 @@ namespace Player
                 Debug.Log("Healing");
             }
         }
-
-        protected void OnCollisionEnter(Collision collision)
-        {
-            if(collision.gameObject.tag == "Enemy")
-            {
-                //투척무기
-                //PlayerDamaged(collision.gameObject.playerName,10);
-                //destory
-            }
-        }
-
-        protected virtual void PlayerSkillInput(){}
-
         public void IsLocalPlayer()
         {
+            GetComponent<PlayerInput>().enabled = true;
             camera.SetActive(true);
             UI.SetActive(true);
         }

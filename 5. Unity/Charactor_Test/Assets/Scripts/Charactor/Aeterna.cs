@@ -26,6 +26,11 @@ namespace Player
             
         }
 
+        protected override void CharactorFixedUpdate()
+        {
+
+        }
+
         void Initialize()
         {
             Skills["Basic_Attack"] = new DimensionSword(this);
