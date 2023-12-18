@@ -13,5 +13,7 @@ UCLASS()
 class TUTORIAL_API ATutorialGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+public:
+	ATutorialGameModeBase();
 	
 };

@@ -6,7 +6,7 @@
 
 ATutorialGameModeBase::ATutorialGameModeBase()
 {
-	CHelpers::GetClass<APawn>(&DefaultPawnClass, "Blueprint'/Game/MyCPlayer.MyCPlayer_C'");
+	CHelpers::GetClass<APawn>(&DefaultPawnClass, "Blueprint'/Game/Bp_CPlayer.Bp_CPlayer_C'");
 }
 
 
