@@ -47,7 +47,7 @@ void ACSpawnActor::BeginPlay()
 
 	UKismetSystemLibrary::K2_SetTimer(this, "ChangeColor", 1.0f, true);
 
-	GLog->Log(Material->GetName());
+	//GLog->Log(Material->GetName());
 
 }
 
@@ -60,12 +60,12 @@ void ACSpawnActor::ChangeColor()
 	color.A = 1.0f;
 	Material->SetVectorParameterValue("Color", color);
 
-	FLinearColor outcolor;
-	FHashedMaterialParameterInfo info;
-	info.Name = L"Color";
-	Material->GetVectorParameterValue(info, outcolor);
+	//FLinearColor outcolor;
+	//FHashedMaterialParameterInfo info;
+	//info.Name = L"Color";
+	//Material->GetVectorParameterValue(info, outcolor);
 
-	GLog->Log("change" + color.ToString() + " mat " + outcolor.ToString());
+	//GLog->Log("change" + color.ToString() + " mat " + outcolor.ToString());
 
 }
 
