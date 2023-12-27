@@ -30,7 +30,7 @@ ACBox::ACBox()
 		CHelpers::CreateComponent<UStaticMeshComponent>(this, &Mesh[i],
 			FName(str), Scene);
 
-		Mesh[i]->SetRelativeLocation(FVector(0, i * 150, 0));
+		Mesh[i]->SetRelativeLocation(FVector(i * 150, 0, 0));
 		Mesh[i]->SetStaticMesh(mesh);
 		Mesh[i]->SetSimulatePhysics(false);
 	}
@@ -44,6 +44,7 @@ void ACBox::BeginPlay()
 	
 	TArray<ACMultiCastTrigger*> triggers;
 	CHelpers::FindActors<ACMultiCastTrigger>(GetWorld(), triggers);
+	// 이게 원인으로 언리얼 터짐
 	triggers[0]->OnMultiLightBeginOverlap.AddUFunction(this, "OnPhysics");
 
 	UMaterialInstanceConstant* material;
