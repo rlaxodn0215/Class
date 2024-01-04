@@ -1,121 +1,70 @@
 ﻿#include <iostream>
+#include <string>
 #include <vector>
-#include <algorithm>
-#include <queue>
+#include <math.h>
 
 using namespace std;
 
-enum Status
+int Sign(int num)
 {
-	MOVE_ABLE,
-	WALL,
-	START,
-	END
-};
+    if (num < 0)
+        return -1;
+    else if (num > 0)
+        return 1;
+    else
+        return 0;
+}
 
-enum List
-{
-	NONE,
-	OPEN_LIST,
-	CLOSE_LIST,
-	PATH
-};
-
-enum Way
-{
-	NORTH,
-	SOUTH,
-	EAST,
-	WEST
-};
-
-struct Node
-{
-	int G;
-	int H;
-	int F;
-
-	Way curWay;
-};
-
-void ReadData(string& way, vector<vector<char>>& map, pair<int, int>& start, pair<int, int>& end);
-string AStar(string way, vector<vector<char>>& map, pair<int, int> start, pair<int, int> end);
+int solution(int h1, int m1, int s1, int h2, int m2, int s2);
 
 int main()
 {
-	string firstWay = "";
-	pair<int, int> start;
-	pair<int, int> end;
-	vector<vector<char>> Map;
-
-	ReadData(firstWay, Map,start,end);
-
-	cout << AStar(firstWay, Map, start, end) << "\n";
-
-
-	return 0;
+    cout << solution(0, 0, 0, 23, 59, 59) << endl;
+    return 0;
 }
 
-void ReadData(string& way, vector<vector<char>>& map, pair<int, int>& start, pair<int, int>& end)
+int solution(int h1, int m1, int s1, int h2, int m2, int s2)
 {
-	int width = 0;
-	int height = 0;
+    int answer = 0;
 
-	cin >> way;
-	cin >> width;
-	cin >> height;
+    int hour = 0;
+    int minute = 0;
+    int second = 0;
 
-	for (int i = 0; i < height; i++)
-	{
-		vector<char> line;
+    int from = h1 * 60 * 60 + m1 * 60 + s1;
+    int to = h2 * 60 * 60 + m2 * 60 + s2;
 
-		for (int j = 0; j < width; j++)
-		{
-			char temp;
-			cin >> temp;
-			line.push_back(temp);
+    hour = 2 * from;
+    minute = (m1 * 60 + s1) * 24;
+    second = s1 * 1440;
 
-			if (temp == 'T')
-			{
-				start = { i, j };
-			}
+    for (int i = 0; i < to - from; i++)
+    {
+        //Before
+        int beforeS = second;
+        int beforeM = minute;
+        int beforeH = hour;
 
-			else if (temp == 'G')
-			{
-				end = { i, j };
-			}
+        //After
+        second += 1440;
+        minute += 24;
+        hour += 2;
 
-		}
+        if (Sign(beforeS - beforeH) * Sign(second - hour) <= 0)
+            answer++;
 
-		map.push_back(line);
-	}
+        if (Sign(beforeS - beforeM) * Sign(second - minute) <= 0)
+            answer++;
 
+        if (Sign(beforeS - beforeH) * Sign(second - hour) <= 0 &&
+            Sign(beforeM - beforeH) * Sign(minute - hour) <= 0)
+            answer--;
+
+        second %= 86400;
+        minute %= 86400;
+        hour %= 86400;
+    }
+
+
+    return answer;
 }
-
-string AStar(string firstway, vector<vector<char>>& map, pair<int, int> start, pair<int, int> end)
-{
-	string ans = "";
-
-	string way = firstway;
-	pair<int, int> point = start;
-
-	int dx[4] = { -1, 0, 1, 0 };
-	int dy[4] = { 0, -1, 0, 1 };
-
-	while (0)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			int x = point.first + dx[i];
-			int y = point.second + dy[i];
-
-			if (x < 0 || y < 0 || x >= map.size() || y >= map[0].size()) continue;
-			if (map[x][y] == '#') continue;
-
-		}
-	}
-
-
-	return ans;
-}
-
