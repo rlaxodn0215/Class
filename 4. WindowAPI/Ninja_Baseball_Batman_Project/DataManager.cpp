@@ -30,7 +30,6 @@ void DataManager::GetSentence(int& i, char* buff, char* sentence)
 
 void DataManager::LoadSprites(const TCHAR dataFileName[100])
 {
-
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
     if (hFile == NULL)
@@ -51,7 +50,15 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
             _LARGE_INTEGER temp;
             temp.QuadPart = 2;
             if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
-                ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+            {
+                bool readFile = ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+                if (!readFile)
+                {
+                    MessageBox(NULL, _T("Sprite 파일을 읽지 못했습니다."), _T("에러"), MB_OK);
+                    CloseHandle(hFile);
+                    return;
+                }
+            }
             else
             {
                 MessageBox(NULL, _T("Sprite 파일 커서 이동 에러"), _T("에러"), MB_OK);
@@ -113,7 +120,15 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
             _LARGE_INTEGER temp;
             temp.QuadPart = 2;
             if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
-                ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+            {
+                bool readFile = ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
+                if (!readFile)
+                {
+                    MessageBox(NULL, _T("Animation 파일을 읽지 못했습니다."), _T("에러"), MB_OK);
+                    CloseHandle(hFile);
+                    return;
+                }
+            }
             else
             {
                 MessageBox(NULL, _T("Animation 파일 커서 이동 에러"), _T("에러"), MB_OK);

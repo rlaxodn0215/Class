@@ -907,6 +907,8 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
     }
 }
 
+
+
 void GameManager::RenderingCharactor(HDC hdc, int timer)
 {
     if (m_Player == NULL) return;

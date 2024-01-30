@@ -173,9 +173,9 @@ RECT rec2;
 HBITMAP hImage;
 BITMAP bit;
 
-int Red = 97;
-int Green = 115;
-int Blue = 241;
+int Red = 255;
+int Green = 0;
+int Blue = 255;
 
 COLORREF transparentColor = RGB(Red, Green, Blue);
 COLORREF BoxColor = RGB(0, 0, 255);
@@ -188,7 +188,7 @@ bool showAni = false;
 bool recUpdate = false;
 
 TCHAR fileName[100];
-TCHAR ImageName[100] = _T("Bitmap/Baseball_rev.bmp");
+TCHAR ImageName[100] = _T("Bitmap/Ryno_rev.bmp");
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -568,85 +568,88 @@ void DrawRect(HDC hdc, vector<RECT> & rec)
 
 void SetMinArea(HDC hdc)
 {
+    if (rec.empty() || recUpdate) return;
+    
+    // 최근 그린 직사각형 영역 
+    RECT rc = rec.back();
+    // 한 변의 최소 영역 구했는지 획인
+    bool temp = false;
 
-    if (!rec.empty() && !recUpdate)
+    for (int i = rc.top; i <= rc.bottom; i++) //top
     {
-        RECT rc = rec.back();
-        bool temp = false;
-
-        for (int i = rc.top; i <= rc.bottom; i++) //top
+        temp = false;
+        for (int j = rc.left; j <= rc.right; j++)
         {
-            temp = false;
-            for (int j = rc.left; j <= rc.right; j++)
+            if (GetPixel(hdc, j, i) != transparentColor)
             {
-                if (GetPixel(hdc, j, i) != transparentColor)
-                {
-                    rc.top = i;
-                    temp = true;
-                    break;
-                }
+                rc.top = i;
+                temp = true;
+                break;
             }
-
-            if (temp) break;
         }
 
-        for (int i = rc.left; i <= rc.right; i++) //left
-        {
-            temp = false;
-            for (int j = rc.top; j <= rc.bottom; j++)
-            {
-                if (GetPixel(hdc, i, j) != transparentColor)
-                {
-                    rc.left = i;
-                    temp = true;
-                    break;
-                }
-            }
-
-            if (temp) break;
-        }
-
-        for (int i =rc.bottom; i >= rc.top; i--) //bottom
-        {
-            temp = false;
-            for (int j = rc.left; j <= rc.right; j++)
-            {
-                if (GetPixel(hdc, j, i) != transparentColor)
-                {
-                    rc.bottom = i;
-                    temp = true;
-                    break;
-                }
-            }
-
-            if (temp) break;
-        }
-
-        for (int i = rc.right; i >= rc.left; i--) //right
-        {
-            temp = false;
-            for (int j = rc.top; j <= rc.bottom; j++)
-            {
-                if (GetPixel(hdc, i, j) != transparentColor)
-                {
-                    rc.right = i;
-                    temp = true;
-                    break;
-                }
-            }
-
-            if (temp) break;
-        }
-
-        rec2.top=rc.top-ImageOffset.y;
-        rec2.bottom=rc.bottom-ImageOffset.y;
-        rec2.left=rc.left-ImageOffset.x;
-        rec2.right=rc.right-ImageOffset.x;
-
-        rec.pop_back();
-        rec.push_back(rc);
-        recUpdate = true;
+        if (temp) break;
     }
+
+    for (int i = rc.left; i <= rc.right; i++) //left
+    {
+        temp = false;
+        for (int j = rc.top; j <= rc.bottom; j++)
+        {
+            if (GetPixel(hdc, i, j) != transparentColor)
+            {
+                rc.left = i;
+                temp = true;
+                break;
+            }
+        }
+
+        if (temp) break;
+    }
+
+    for (int i =rc.bottom; i >= rc.top; i--) //bottom
+    {
+        temp = false;
+        for (int j = rc.left; j <= rc.right; j++)
+        {
+            if (GetPixel(hdc, j, i) != transparentColor)
+            {
+                rc.bottom = i;
+                temp = true;
+                break;
+            }
+        }
+
+        if (temp) break;
+    }
+
+    for (int i = rc.right; i >= rc.left; i--) //right
+    {
+        temp = false;
+        for (int j = rc.top; j <= rc.bottom; j++)
+        {
+            if (GetPixel(hdc, i, j) != transparentColor)
+            {
+                rc.right = i;
+                temp = true;
+                break;
+            }
+        }
+
+        if (temp) break;
+    }
+
+    // 보여지는 영역에 맞게 그린다.
+    rec2.top=rc.top-ImageOffset.y;
+    rec2.bottom=rc.bottom-ImageOffset.y;
+    rec2.left=rc.left-ImageOffset.x;
+    rec2.right=rc.right-ImageOffset.x;
+
+    // 수정된 영역으로 바꾼다.
+    rec.pop_back();
+    rec.push_back(rc);
+    recUpdate = true;
+    
 }
 
 void DrawRectInstant(HDC hdc, RECT& rec)
@@ -849,6 +852,11 @@ void SaveData()
 
     HANDLE hFile;
     hFile = CreateFile(fileName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, 0, 0);
+    if (hFile == NULL)
+    {
+        MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+        return;
+    }
 
     int n = rec.size();
     DWORD size;
