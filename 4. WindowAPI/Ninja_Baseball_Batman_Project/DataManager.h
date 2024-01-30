@@ -55,13 +55,13 @@ public:
 
 	void GetSentence(int& i, char* buff, char* sentence);			// 텍스트 파일 한 영역 읽기
 	void LoadSprites(const TCHAR dataFileName[100]);				// 스프라이트 로드
-	void LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp, bool isReference);			// 애니메이션 로드
+	void LoadAnimations(const TCHAR dataFileName[100],map<string, shared_ptr<Animation>>& temp, bool isReference);			// 애니메이션 로드
 	void LoadSounds(const TCHAR dataFileName[100], map<string, shared_ptr<Sound>>& temp, HWND hWnd, bool isReference);		// 사운드 로드
 
 	void LoadPlayerDatas(HWND hWnd, shared_ptr<Player>& player);
 	void LoadSceneDatas(int SceneNum, HWND hWnd);
 	void LoadWaveDatas(HWND hWnd, RECT winRect, shared_ptr<Wave>& wave);
-	void MakeRanking(const TCHAR rankFileName[100]);
+	void MakeRanking(const TCHAR rankFileName[100]); 
 
 };
 

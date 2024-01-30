@@ -27,8 +27,13 @@ void DataManager::GetSentence(int& i, char* buff, char* sentence)
     i++;
     return;
 }
+#define CHAR_BUFFER_FILE 3000
+#define CHAR_BUFFER_WORD 200
+#define FILE_FIRST_NUMBER 0xFEFF
+#define LARGE_INTEGER_QUADPART 2
 
-void DataManager::LoadSprites(const TCHAR dataFileName[100])
+
+void DataManager::LoadSprites(const TCHAR dataFileName[CHAR_BUFFER_WORD])
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -39,16 +44,16 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
     }
 
     DWORD rbytes;
-    TCHAR buff[2000] = {};
-    char chbuff[2000] = {};
+    TCHAR buff[CHAR_BUFFER_FILE] = {};
+    char chbuff[CHAR_BUFFER_FILE] = {};
     size_t convertedChars = 0;
 
     if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
     {
-        if (buff[0] == 0xFEFF)
+        if (buff[0] == FILE_FIRST_NUMBER)
         {
             _LARGE_INTEGER temp;
-            temp.QuadPart = 2;
+            temp.QuadPart = LARGE_INTEGER_QUADPART;
             if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
             {
                 bool readFile = ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
@@ -85,12 +90,12 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
     while (chbuff[index++] != '\n');
     while (1)
     {
-        char name[100], address[200];
+        char name[CHAR_BUFFER_WORD], address[CHAR_BUFFER_WORD];
         GetSentence(index, chbuff, name);
         if (buff[index] == '\0') break;
         GetSentence(index, chbuff, address);
-        TCHAR uniAddress[200] = {};
-        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
+        TCHAR uniAddress[CHAR_BUFFER_WORD] = {};
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, CHAR_BUFFER_WORD);
         m_Sprites[name] = shared_ptr<Sprite>(new Sprite(uniAddress));
         index++;
     }
@@ -98,7 +103,8 @@ void DataManager::LoadSprites(const TCHAR dataFileName[100])
     CloseHandle(hFile);
 }
 
-void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shared_ptr<Animation>>& temp, bool isReference)
+void DataManager::LoadAnimations(const TCHAR dataFileName[CHAR_BUFFER_WORD], 
+    map<string, shared_ptr<Animation>>& temp, bool isReference)
 {
     HANDLE hFile = CreateFile(dataFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -109,16 +115,16 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
     }
 
     DWORD rbytes;
-    TCHAR buff[3000] = {};
-    char chbuff[3000] = {};
+    TCHAR buff[CHAR_BUFFER_FILE] = {};
+    char chbuff[CHAR_BUFFER_FILE] = {};
     size_t convertedChars = 0;
 
     if (ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL))
     {
-        if (buff[0] == 0xFEFF)
+        if (buff[0] == FILE_FIRST_NUMBER)
         {
             _LARGE_INTEGER temp;
-            temp.QuadPart = 2;
+            temp.QuadPart = LARGE_INTEGER_QUADPART;
             if (SetFilePointerEx(hFile, temp, NULL, FILE_BEGIN))
             {
                 bool readFile = ReadFile(hFile, buff, sizeof(buff), &rbytes, NULL);
@@ -155,7 +161,7 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
     while (chbuff[index++] != '\n');
     while (1)
     {
-        char aniName[100], originSprite[100], address[200];
+        char aniName[CHAR_BUFFER_WORD], originSprite[CHAR_BUFFER_WORD], address[CHAR_BUFFER_WORD];
         GetSentence(index, chbuff, aniName);
         if (buff[index] == '\0') break;
         GetSentence(index, chbuff, originSprite);
@@ -167,8 +173,8 @@ void DataManager::LoadAnimations(const TCHAR dataFileName[100], map<string, shar
         }
         else
         {
-            TCHAR uniAddress[200] = {};
-            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, 200);
+            TCHAR uniAddress[CHAR_BUFFER_WORD] = {};
+            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, address, strlen(address), uniAddress, CHAR_BUFFER_WORD);
             temp[aniName] = shared_ptr<Animation>(new Animation(m_Sprites[originSprite], uniAddress));
         }
         index++;

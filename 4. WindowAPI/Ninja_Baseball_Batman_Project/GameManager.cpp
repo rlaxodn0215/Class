@@ -907,20 +907,13 @@ void GameManager::MonsterInstantiate(int timeInterval, int timer)
     }
 }
 
+#define TEMP_CHAR 100
+ vector<shared_ptr<Charactor>> RenderingIndex;
 
 
 void GameManager::RenderingCharactor(HDC hdc, int timer)
 {
     if (m_Player == NULL) return;
-
-    vector<shared_ptr<Charactor>> RenderingIndex;
-
-    RenderingIndex.push_back(m_Player);
-
-    for (auto iter : m_Wave->LiveMonsters)
-    {
-        RenderingIndex.push_back(iter);
-    }
 
     sort(RenderingIndex.begin(), RenderingIndex.end(), RenderingOrder);
 
@@ -931,8 +924,9 @@ void GameManager::RenderingCharactor(HDC hdc, int timer)
         if (OnCollider)
         {
             RenderingIndex[i]->ShowColliders(hdc);
-            TCHAR temp[20];
-            _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
+            TCHAR temp[TEMP_CHAR];
+            _stprintf_s(temp, L"[%d, %d, %d]", RenderingIndex[i]->GetPos().m_X,
+                RenderingIndex[i]->GetPos().m_Y, RenderingIndex[i]->GetPos().m_Z);
             TextOut(hdc, RenderingIndex[i]->GetPos().m_X, RenderingIndex[i]->GetPos().m_Y, temp, _tcslen(temp));
         }
     }
