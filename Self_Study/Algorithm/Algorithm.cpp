@@ -5,66 +5,71 @@
 
 using namespace std;
 
-int Sign(int num)
-{
-    if (num < 0)
-        return -1;
-    else if (num > 0)
-        return 1;
-    else
-        return 0;
-}
+#define M 3
+#define N 2
 
-int solution(int h1, int m1, int s1, int h2, int m2, int s2);
+int solution1();
+vector<vector<float>> solution2();
+vector<float> FindMid(int startX, int startY, int endX, int endY);
 
 int main()
 {
-    cout << solution(0, 0, 0, 23, 59, 59) << endl;
+    cout << solution1() << '\n';
+
+    vector<vector<float>> temp = solution2();
+    
+    for (int i = 0; i < temp.size(); i++)
+    {
+        cout << "(" << temp[i][0] << ", " << temp[i][1] << ")" << '\n';
+    }
+
     return 0;
 }
 
-int solution(int h1, int m1, int s1, int h2, int m2, int s2)
+int solution1()
 {
     int answer = 0;
+    int dp[M][N] = {0,};
 
-    int hour = 0;
-    int minute = 0;
-    int second = 0;
+    dp[0][0] = 1;
 
-    int from = h1 * 60 * 60 + m1 * 60 + s1;
-    int to = h2 * 60 * 60 + m2 * 60 + s2;
+    for (int i = 1; i < M; i++)
+        dp[i][0] = dp[i - 1][0] + (i + 1);
+    for (int i = 1; i < N; i++)
+        dp[0][i] = dp[0][i-1] + (i + 1);
 
-    hour = 2 * from;
-    minute = (m1 * 60 + s1) * 24;
-    second = s1 * 1440;
-
-    for (int i = 0; i < to - from; i++)
+    for (int i = 1; i < M; i++)
     {
-        //Before
-        int beforeS = second;
-        int beforeM = minute;
-        int beforeH = hour;
-
-        //After
-        second += 1440;
-        minute += 24;
-        hour += 2;
-
-        if (Sign(beforeS - beforeH) * Sign(second - hour) <= 0)
-            answer++;
-
-        if (Sign(beforeS - beforeM) * Sign(second - minute) <= 0)
-            answer++;
-
-        if (Sign(beforeS - beforeH) * Sign(second - hour) <= 0 &&
-            Sign(beforeM - beforeH) * Sign(minute - hour) <= 0)
-            answer--;
-
-        second %= 86400;
-        minute %= 86400;
-        hour %= 86400;
+        for (int j = 1; j < N; j++)
+        {
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1] - dp[i - 1][j - 1] + (i + 1) * (j + 1);
+        }
     }
 
+    return dp[M-1][N-1];
+}
 
-    return answer;
+vector<vector<float>> solution2()
+{
+    vector<vector<float>> ans;
+    
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            for (int k = i + 1; k <= M; k++)
+            {
+                for (int l = j + 1; l <= N; l++)
+                {
+                    ans.push_back(FindMid(j,i,l,k));
+                }
+            }
+        }
+    }
+    return ans;
+}
+
+vector<float> FindMid(int startX, int startY, int endX, int endY)
+{
+    return {(endY- startY)/2.0f, (endX - startX) / 2.0f };
 }
