@@ -10,7 +10,8 @@ public class Block : MonoBehaviour
         RedBlock,
         GreenBlock,
         BlueBlock,
-        BlockCount
+        BlockCount,
+        EmptyBlock
     }
 
     public struct BlockInfo

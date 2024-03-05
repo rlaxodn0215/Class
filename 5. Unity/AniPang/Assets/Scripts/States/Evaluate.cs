@@ -48,6 +48,7 @@ public class Evaluate : BaseState
 
     void MoveBlockToTop(List<Block> blocks)
     {
+        // 세로 길이 만큼 블록 추가 하기 -> 인덱스 확인해서 내리기 
         for(int i = 0; i < blocks.Count; i++)
         {
             blocks[i].SetBlockType((Block.BlockType)Random.Range(0, (int)Block.BlockType.BlockCount));
