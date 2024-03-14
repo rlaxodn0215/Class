@@ -30,7 +30,6 @@ namespace DefineData
     {
         InitalizeBlockState,
         SwitchBlockState,
-        CheckBlockState,
         BreakBlockState,
         GameStateCount
     }

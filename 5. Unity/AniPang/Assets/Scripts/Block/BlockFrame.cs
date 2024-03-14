@@ -11,10 +11,12 @@ namespace AniPang
         public delegate void GivePos(Vector2Int start, Vector3 mouse);
         public GivePos givePos;
 
-        //[HideInInspector]
+        [HideInInspector]
         public Block_Type type;
-        //[HideInInspector]
+        [HideInInspector]
         public Vector2Int pos = new Vector2Int();
+        [HideInInspector]
+        public BlockImage image;
 
         public void SetBlockType(Block_Type type)
         {

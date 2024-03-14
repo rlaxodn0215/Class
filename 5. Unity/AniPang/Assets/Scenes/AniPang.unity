@@ -182,10 +182,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2828a3083f0085f4c8f671e9f4384109, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  row: 5
+  col: 3
+  breakNumber: 4
   blockFrame: {fileID: 1333677432782743967, guid: 4ea6c850e8b5ba54d8eb63f03da527fc, type: 3}
-  size: 50
-  startSwitchPos: {x: 0, y: 0, z: 0}
-  endSwitchPos: {x: 0, y: 0, z: 0}
+  startSwitchPos: {x: 0, y: 0}
+  switchStartDirection: {x: 0, y: 0, z: 0}
+  way: 0
   blockTypes:
   - {fileID: 4455983165383601004, guid: 29e2c754ad79bdd42bbff736092fb4dc, type: 3}
   - {fileID: 897840495228147729, guid: 8ab92ca04821e70419e90edd8ae74f3c, type: 3}

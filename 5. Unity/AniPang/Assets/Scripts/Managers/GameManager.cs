@@ -10,6 +10,7 @@ namespace AniPang
         public int row = 5;
         public int col = 3;
         public int breakNumber = 4;
+        public float swithTime = 0.5f;
         public GameObject blockFrame;
 
         [HideInInspector]
@@ -45,7 +46,6 @@ namespace AniPang
                 {
                     case Game_State.InitalizeBlockState: gameState[Game_State.InitalizeBlockState] = new InitalizeBlockState(this); break;
                     case Game_State.SwitchBlockState: gameState[Game_State.SwitchBlockState] = new SwitchBlockState(this); break;
-                    case Game_State.CheckBlockState: gameState[Game_State.CheckBlockState] = new CheckBlockState(this); break;
                     case Game_State.BreakBlockState: gameState[Game_State.BreakBlockState] = new BreakBlockState(this); break;
                 }
             }          
@@ -83,9 +83,9 @@ namespace AniPang
 
         public void SwapBlock(Vector2Int from, Vector2Int to)
         {
-            BlockFrame temp = blockFrames[(int)from.y, (int)from.x];
-            blockFrames[(int)from.y, (int)from.x] = blockFrames[(int)to.y, (int)to.x];
-            blockFrames[(int)to.y, (int)to.x] = temp;
+            BlockFrame temp = blockFrames[from.x, from.y];
+            blockFrames[from.x, from.y] = blockFrames[to.x, to.y];
+            blockFrames[to.x, to.y] = temp;
         }
 
     }

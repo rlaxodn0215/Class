@@ -27,7 +27,6 @@ namespace AniPang
             if(Input.GetMouseButtonUp(0))
             {
                 gameManager.GetDirection(Input.mousePosition);
-                Debug.Log(gameManager.way);
                 ExChangeBlock();
                 gameManager.startSwitchPos = new Vector2Int(-1,-1);
             }
@@ -41,6 +40,7 @@ namespace AniPang
                     if (CheckChangeable())
                     {
                         gameManager.SwapBlock(gameManager.startSwitchPos, gameManager.startSwitchPos + new Vector2Int(0, -1));
+                        
                         CheckBlockBreakAll();
                     }
                     break;
@@ -73,9 +73,9 @@ namespace AniPang
             switch (gameManager.way)
             {
                 case Switch_Way.Up:     return gameManager.startSwitchPos.y > 0;
-                case Switch_Way.Down:   return gameManager.startSwitchPos.y < gameManager.row - 1;
+                case Switch_Way.Down:   return gameManager.startSwitchPos.y < gameManager.col - 1;
                 case Switch_Way.Left:   return gameManager.startSwitchPos.x > 0;
-                case Switch_Way.Right:  return gameManager.startSwitchPos.x < gameManager.col - 1;
+                case Switch_Way.Right:  return gameManager.startSwitchPos.x < gameManager.row - 1;
             }
             return false;
         }
