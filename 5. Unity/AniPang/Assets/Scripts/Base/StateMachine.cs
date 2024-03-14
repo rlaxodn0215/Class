@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StateMachine : MonoBehaviour
 {
-    BaseState currentState;
+    IBaseState currentState;
     void Start()
     {
         currentState = GetInitalState();
@@ -18,14 +18,14 @@ public class StateMachine : MonoBehaviour
             currentState.Update();
     }
 
-    public void ChangeState(BaseState newState)
+    public void ChangeState(IBaseState newState)
     {
         currentState.Exit();
         currentState = newState;
         currentState.Enter();
     }
 
-    protected virtual BaseState GetInitalState()
+    protected virtual IBaseState GetInitalState()
     {
         return null;
     }
