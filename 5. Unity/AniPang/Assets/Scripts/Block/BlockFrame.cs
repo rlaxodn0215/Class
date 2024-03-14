@@ -8,20 +8,20 @@ namespace AniPang
 {
     public class BlockFrame : MonoBehaviour, IPointerDownHandler
     {
-        public delegate void GivePos(Vector3 start, Vector3 mouse);
+        public delegate void GivePos(Vector2Int start, Vector3 mouse);
         public GivePos givePos;
 
         //[HideInInspector]
         public Block_Type type;
         //[HideInInspector]
-        public Vector3 pos = new Vector3();
+        public Vector2Int pos = new Vector2Int();
 
         public void SetBlockType(Block_Type type)
         {
             this.type = type;
         }
 
-        public void SetPos(Vector3 pos)
+        public void SetPos(Vector2Int pos)
         {
             this.pos = pos;
         }

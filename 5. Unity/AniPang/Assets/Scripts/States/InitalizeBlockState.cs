@@ -40,7 +40,7 @@ namespace AniPang
                     pos.x += Constant.imageSize;
 
                     gameManager.blockFrames[j, i] = frame.GetComponent<BlockFrame>();
-                    gameManager.blockFrames[j, i].SetPos(new Vector3(j, i, 0));
+                    gameManager.blockFrames[j, i].SetPos(new Vector2Int(j, i));
                     gameManager.blockFrames[j, i].SetBlockType((Block_Type)randNum);
                     gameManager.blockFrames[j, i].givePos += gameManager.GetPos;
                 }

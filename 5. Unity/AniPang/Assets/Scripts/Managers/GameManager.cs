@@ -9,12 +9,13 @@ namespace AniPang
     {
         public int row = 5;
         public int col = 3;
+        public int breakNumber = 4;
         public GameObject blockFrame;
 
         [HideInInspector]
         public BlockFrame[,] blockFrames;
         [HideInInspector]
-        public Vector3 startSwitchPos = new Vector3();
+        public Vector2Int startSwitchPos = new Vector2Int(-1, -1);
         [HideInInspector]
         public Vector3 switchStartDirection = new Vector3();
         [HideInInspector]
@@ -55,7 +56,7 @@ namespace AniPang
             return gameState[Game_State.InitalizeBlockState];
         }
 
-        public void GetPos(Vector3 start, Vector3 mouse)
+        public void GetPos(Vector2Int start, Vector3 mouse)
         {
             startSwitchPos = start;
             switchStartDirection = mouse;
@@ -65,14 +66,22 @@ namespace AniPang
         {
             Vector3 dir = (pos - switchStartDirection).normalized;
 
-            if (dir.x >= 0.95f) way = Switch_Way.Right;
-            else if (dir.x <= -0.95f) way = Switch_Way.Left;
-            else if (dir.y >= 0.95f) way = Switch_Way.Up;
-            else if (dir.y <= -0.95f) way = Switch_Way.Down;
-            else way = Switch_Way.None;
+            if (startSwitchPos != new Vector2Int(-1, -1))
+            {
+                if (dir.x >= 0.95f) way = Switch_Way.Right;
+                else if (dir.x <= -0.95f) way = Switch_Way.Left;
+                else if (dir.y >= 0.95f) way = Switch_Way.Up;
+                else if (dir.y <= -0.95f) way = Switch_Way.Down;
+                else way = Switch_Way.None;
+            }
+
+            else
+            {
+                way = Switch_Way.None;
+            }
         }
 
-        public void SwapBlock(Vector3 from, Vector3 to)
+        public void SwapBlock(Vector2Int from, Vector2Int to)
         {
             BlockFrame temp = blockFrames[(int)from.y, (int)from.x];
             blockFrames[(int)from.y, (int)from.x] = blockFrames[(int)to.y, (int)to.x];
