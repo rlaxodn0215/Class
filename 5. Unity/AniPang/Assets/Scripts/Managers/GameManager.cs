@@ -7,8 +7,8 @@ namespace AniPang
 {
     public class GameManager : StateMachine
     {
-        private int row = 5;
-        private int col = 3;
+        public int row = 5;
+        public int col = 3;
         public GameObject blockFrame;
 
         [HideInInspector]
@@ -70,6 +70,13 @@ namespace AniPang
             else if (dir.y >= 0.95f) way = Switch_Way.Up;
             else if (dir.y <= -0.95f) way = Switch_Way.Down;
             else way = Switch_Way.None;
+        }
+
+        public void SwapBlock(Vector3 from, Vector3 to)
+        {
+            BlockFrame temp = blockFrames[(int)from.y, (int)from.x];
+            blockFrames[(int)from.y, (int)from.x] = blockFrames[(int)to.y, (int)to.x];
+            blockFrames[(int)to.y, (int)to.x] = temp;
         }
 
     }
