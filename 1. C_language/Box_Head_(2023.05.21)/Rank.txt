@@ -1,0 +1,9 @@
+kind		521
+456		474
+helloworld		450
+nums		415
+rlaxodn0215		350
+name7		300
+hello		250
+yuiop		200
+you		169
